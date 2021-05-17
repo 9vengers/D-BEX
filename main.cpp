@@ -227,6 +227,8 @@ void ReadPage(unsigned char *buffer)
             std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
         }
     }
+    delete[] cellContents;
+    delete[] cellVarInt;
 
     delete[] cellOffset;
 }
