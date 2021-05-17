@@ -108,7 +108,6 @@ void ReadPage(unsigned char *buffer)
     // Initialize
     // ---------------------
     int pageHeaderSize = 0;
-<<<<<<< HEAD
     unsigned char *startOfPage = buffer;
 
     // PageFlag     1Byte
@@ -117,7 +116,6 @@ void ReadPage(unsigned char *buffer)
     // Internal   : 0x05
     // Leaf       : 0x0D
     switch(*buffer){
-=======
     int offset = 0;
     int freeblockOffset = 0;
     int numberOfCells = 0;
@@ -134,7 +132,6 @@ void ReadPage(unsigned char *buffer)
     // Internal Table   : 0x05
     // Leaf     Table   : 0x0D
     switch(buffer[offset]){
->>>>>>> ebaab64e567351352512ebd4b2bd6959183b4069
         case 0x02:
             std::cout << "Page type : Internal page of B-tree index" << std::endl;
             return;
@@ -211,14 +208,11 @@ void ReadPage(unsigned char *buffer)
         // --------------------
         std::cout << "Cell Offset[" << count << "] : " << std::hex << cellOffset[count] << std::dec << std::endl;
     }
-<<<<<<< HEAD
-    cout << noshowbase << nouppercase << dec;
+    std::cout << std::noshowbase << std::nouppercase << std::dec;
 
     delete[] cellOffset;
-=======
     std::cout << std::noshowbase << std::nouppercase << std::dec;
     
->>>>>>> ebaab64e567351352512ebd4b2bd6959183b4069
 
 
 
@@ -226,7 +220,6 @@ void ReadPage(unsigned char *buffer)
 
     // -----------------------------------------------
     // Cell Contents
-<<<<<<< HEAD
     // ------------------
     unsigned int *cellContents = new unsigned int[numberOfCells];
     unsigned long *cellVarInt = new unsigned long[numberOfCells];
@@ -234,11 +227,10 @@ void ReadPage(unsigned char *buffer)
         for (int count = 0; count < numberOfCells ; count++){
             *(cellContents + count) = ByteStream(startOfPage + cellOffset[count],4);
             *(cellVarInt + count) = ByteStream(startOfPage + cellOffset[count] + 4 ,BitPatternSize(startOfPage + cellOffset[count] + 4));
-            cout<< "Cell Contents[" << count << "] : " << hex << cellContents[count] << cellVarInt[count] << dec << endl;
+            std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;
         
         }
     }
-=======
     // -----------------------------------------------
     for(int count = 0; count < numberOfCells; count++)
     {
@@ -252,7 +244,6 @@ void ReadPage(unsigned char *buffer)
 
     delete[] cellOffset;
 
->>>>>>> ebaab64e567351352512ebd4b2bd6959183b4069
 }
 
 struct ForeignKey{
