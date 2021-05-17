@@ -2,7 +2,7 @@
 #include <string>
 #include <fstream>
 #include <cmath>
-using namespace std;
+
 #define SIZE_OF_DB_HEADER 100
 #define SIZE_OF_INTERIOR_PAGE_HEAGER 12
 #define SIZE_OF_LEAF_PAGE_HEAGER 8
@@ -104,10 +104,11 @@ int ByteStream(unsigned char *buffer, int sizeOfBytes)
 // Read Only One Page in pageSize
 void ReadPage(unsigned char *buffer)
 {
-    // ---------------
-    // HEADER
-    // ---------------
+    // ---------------------
+    // Initialize
+    // ---------------------
     int pageHeaderSize = 0;
+<<<<<<< HEAD
     unsigned char *startOfPage = buffer;
 
     // PageFlag     1Byte
@@ -116,22 +117,42 @@ void ReadPage(unsigned char *buffer)
     // Internal   : 0x05
     // Leaf       : 0x0D
     switch(*buffer){
+=======
+    int offset = 0;
+    int freeblockOffset = 0;
+    int numberOfCells = 0;
+    int firstCellOffset = 0;
+    int fragmentedFreeBytes = 0;
+    int rightMostChildPage = 0;
+
+
+    // -----------------------------------------------
+    // Page header
+    // -----------------------------------------------
+    //
+    // PageFlag                             1Byte
+    // Internal Table   : 0x05
+    // Leaf     Table   : 0x0D
+    switch(buffer[offset]){
+>>>>>>> ebaab64e567351352512ebd4b2bd6959183b4069
         case 0x02:
+            std::cout << "Page type : Internal page of B-tree index" << std::endl;
             return;
             break;
 
         case 0x05:
             pageHeaderSize = 12;
-            cout << "Page type : Internal page of B-tree table" << endl;
+            std::cout << "Page type : Internal page of B-tree table" << std::endl;
             break;
 
         case 0x0A:
+            std::cout << "Page type : Leaf page of B-tree index" << std::endl;
             return;
             break;
 
         case 0x0D:
             pageHeaderSize = 8;
-            cout << "Page type : leaf page of B-tree table" << endl;
+            std::cout << "Page type : Leaf page of B-tree table" << std::endl;
             break;
 
         // exception, error
@@ -139,45 +160,73 @@ void ReadPage(unsigned char *buffer)
             return;
             break;
     }
-    buffer += 1;
+    offset += 1;
+    // Offset of freeblock                  2Bytes
+    freeblockOffset = ByteStream(&buffer[offset], 2);
+    offset += 2;
+    // Number of cells                      2Bytes
+    numberOfCells = ByteStream(&buffer[offset], 2);
+    offset += 2;
+    // Offset of the first Cell             2Bytes
+    firstCellOffset = ByteStream(&buffer[offset], 2);
+    offset += 2;
+    // Size of fragmented Free bytes        1Byte
+    fragmentedFreeBytes = ByteStream(&buffer[offset], 1);
+    offset += 1;
+    // The number of right-most child page  4Bytes
+    // (Only Internal Page)
+    if(pageHeaderSize == 12)
+    {
+        rightMostChildPage = ByteStream(&buffer[offset], 4);
+        offset += 4;
+    }
 
-    int freeblockOffset = ByteStream(buffer, 2);
-    buffer += 2;
-    int numberOfCells = ByteStream(buffer, 2);
-    buffer += 2;
-    int firstCellOffset = ByteStream(buffer, 2);
-    buffer += 2;
-    int fragmentedFreeBytes = ByteStream(buffer, 1);
-    buffer += 1;
-    int rightMostChildPage = 0;
-    if(pageHeaderSize == 12) rightMostChildPage = ByteStream(buffer, 4);
-    buffer += 4;
+    // --------------------
+    // Console Output
+    // --------------------
+    std::cout << "Number of Cells : " << numberOfCells << std::endl;
+    std::cout << "Fragmented Free Bytes : " << fragmentedFreeBytes << std::endl;
+    if(pageHeaderSize == 12)
+        std::cout << "The right-most child page : " << rightMostChildPage << std::endl;
 
-    // test command out line
+    std::cout << std::showbase << std::uppercase << std::hex;
+    std::cout << "First of Freeblock Offset : " << std::hex << freeblockOffset << std::endl;
+    std::cout << "First of Cellblock Offset : " << firstCellOffset << std::dec << std::endl;
 
-    cout << "Number of Cells : " << numberOfCells << endl;
-    cout << "Fragmented Free Bytes : " << fragmentedFreeBytes << endl;
-    cout << "The right-most child page : " << rightMostChildPage << endl;
 
-    cout << showbase << uppercase << hex;
-    cout << "First of Freeblock Offset : " << hex << freeblockOffset << endl;
-    cout << "First of Cellblock Offset : " << firstCellOffset << dec << endl;
-    // ------------------
+
+
+
+
+    // -----------------------------------------------
     // Cell Offsets
-    // ------------------
+    // -----------------------------------------------
     unsigned short *cellOffset = new unsigned short [numberOfCells];
     for(int count = 0; count < numberOfCells; count++)
     {
-        *(cellOffset + count) = ByteStream(buffer, 2);
-        buffer += 2;
-        cout << "Cell Offset[" << count << "] : " << hex << cellOffset[count] << dec << endl;
+        *(cellOffset + count) = ByteStream(&buffer[offset], 2);
+        offset += 2;
+        // --------------------
+        // Console Output
+        // --------------------
+        std::cout << "Cell Offset[" << count << "] : " << std::hex << cellOffset[count] << std::dec << std::endl;
     }
+<<<<<<< HEAD
     cout << noshowbase << nouppercase << dec;
 
     delete[] cellOffset;
+=======
+    std::cout << std::noshowbase << std::nouppercase << std::dec;
+    
+>>>>>>> ebaab64e567351352512ebd4b2bd6959183b4069
 
-    // ------------------
+
+
+
+
+    // -----------------------------------------------
     // Cell Contents
+<<<<<<< HEAD
     // ------------------
     unsigned int *cellContents = new unsigned int[numberOfCells];
     unsigned long *cellVarInt = new unsigned long[numberOfCells];
@@ -189,11 +238,26 @@ void ReadPage(unsigned char *buffer)
         
         }
     }
+=======
+    // -----------------------------------------------
+    for(int count = 0; count < numberOfCells; count++)
+    {
+        offset = cellOffset[count];
+        //*(buffer + offset) = ;
+
+    }
+    
+
+
+
+    delete[] cellOffset;
+
+>>>>>>> ebaab64e567351352512ebd4b2bd6959183b4069
 }
 
 struct ForeignKey{
-    string field;
-    string table;
+    std::string field;
+    std::string table;
 
     // 1: RESTRICT  2: CASCADE  3:NO ACTION  4: SET NULL  5: SET DEFAULT
     int onDelete;
@@ -203,29 +267,29 @@ struct Field{
     int type;
     int typeLength;
     bool nullable;
-    string defaultData;
+    std::string defaultData;
     int collation;
     bool autoIncrement;
 
 
     bool primaryKey;
     bool unique;
-    string check;
+    std::string check;
 
     ForeignKey foriegnKey;
 };
 struct Constraint{
-    string primaryKey;
+    std::string primaryKey;
     bool autoIncrement;
 
-    string check;
-    string defaultData;
+    std::string check;
+    std::string defaultData;
 
     ForeignKey foriegnKey;
 };
 struct Table{
-    string name;
-    string createSql;
+    std::string name;
+    std::string createSql;
     int numberOfFields;
     Field *fields;
     void addField(){
@@ -236,10 +300,9 @@ struct Table{
 
 
 };
-
 class SqliteInfo{
 public:
-    string fileName;
+    std::string fileName;
     int pageSize, changeCounter, inheaderSize, pageOfFreelist, numberOfFreelist, schemaCookie,
     schemaFormat, defaultCacheSize, vacuumRootPage, textEncoding, userVersion, incrementalVacuum,
     applicationID, versionValid, sqliteVersion, numberOfTables;
@@ -249,7 +312,7 @@ public:
     // Auto Vacuum mode(auto optimize db size), FSYNC, Journal mode, Locking mode ...
     // ...
 
-    SqliteInfo(string file){
+    SqliteInfo(std::string file){
         fileName = file;
         pageSize = 0;
         writeVersion = 1;
@@ -277,7 +340,6 @@ private:
 
 
 };
-
 class DBConverter{
     public:
     int sizeOfPageHeader_;
@@ -293,31 +355,40 @@ class DBConverter{
 
 int main ()
 {
+    std::ifstream readFile;
+    std::ofstream writeFile;
 
-    ifstream readFile;
-    ofstream writeFile;
-
-    //open the target file
-    readFile.open("D-BEX/chinook.db", ios::binary);
+    // Open the target file
+    readFile.open("D-BEX/chinook.db", std::ios::binary);
 
     if(readFile.is_open())
     {
-        unsigned int sizeOfPage, numberOfPage;
+        unsigned int sizeOfPage, numberOfPages;
         char *buffer = 0;
+
+        // Database Header 100 Bytes
         buffer = new char [SIZE_OF_DB_HEADER];
         readFile.read(buffer, SIZE_OF_DB_HEADER);
-        ReadDBheader((unsigned char*)buffer, &sizeOfPage, &numberOfPage);
-        printf("Page size : %d, Number of pages : %d\n", sizeOfPage, numberOfPage);
+        ReadDBheader((unsigned char*)buffer, &sizeOfPage, &numberOfPages);
+        printf("Page size : %d, Number of pages : %d\n", sizeOfPage, numberOfPages);
         delete[] buffer;
 
-        //only first page
-        cout << "------------1Page-----------" << endl;
+        // Only first page
+        std::cout << "------------Page1-----------" << std::endl;
         buffer = new char[sizeOfPage-SIZE_OF_DB_HEADER];
         readFile.read(buffer, sizeOfPage-SIZE_OF_DB_HEADER);
-
         ReadPage((unsigned char*)buffer);
         delete[] buffer;
 
+        // The other pages ~
+        buffer = new char[sizeOfPage];
+        for(int count = 2 ; count <= 10; count++ )
+        {
+            std::cout << "------------Page" << count << "-----------" << std::endl;
+            readFile.read(buffer, sizeOfPage);
+            ReadPage((unsigned char*)buffer);
+        }
+        delete[] buffer;
     } 
 
 
