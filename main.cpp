@@ -343,13 +343,13 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
             childPage = ByteStream(buffer + offset, 4); // left child page number  : 4 Bytes
             offset += 4;
             varintSize = GetVarintSize(buffer + offset);
-            content = ByteStream(buffer + offset, varintSize);
+            content = BitPattern(buffer + offset);
             std::cout << "Cell Content[" << count << "] : "  << content << ", size : " << varintSize << ", child page : " << childPage << std::endl;
         }
     }
     else if(pageHeaderSize == 8) // leaf page
     {
-
+        
     }
 
 
