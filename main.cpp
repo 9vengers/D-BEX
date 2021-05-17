@@ -211,12 +211,12 @@ void ReadPage(unsigned char *buffer)
     // -----------------------------------------------
     // Cell Contents
     // ------------------
-    unsigned int *cellContents = new unsigned int[numberOfCells];
-    unsigned long *cellVarInt = new unsigned long[numberOfCells];
+    unsigned char *cellContents = new unsigned char[numberOfCells];
+    unsigned char *cellVarInt = new unsigned char[numberOfCells];
     if (*buffer == 0x53){
         for (int count = 0; count < numberOfCells ; count++){
-            *(cellContents + count) = ByteStream(&buffer[cellOffset[count] - SIZE_OF_DB_HEADER] ,4);
-            *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] - SIZE_OF_DB_HEADER + 4] , BitPatternSize(&buffer[cellOffset[count]]));
+            *(cellContents + count) = ByteStream(&buffer[cellOffset[count]] ,4);
+            *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count]+ 4] , BitPatternSize(&buffer[cellOffset[count]]));
             std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
         }
         
@@ -224,9 +224,33 @@ void ReadPage(unsigned char *buffer)
         for (int count = 0; count < numberOfCells ; count++){
             *(cellContents + count) = ByteStream(&buffer[cellOffset[count]] ,4);
             *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] + 4] , BitPatternSize(&buffer[cellOffset[count]]));
-            std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
+            std::cout<< "Cell Contents[" << count << "] : " << std::hex << (int)cellContents[count] << (int)cellVarInt[count] << std::dec << std::endl;        
+        }
+    }else if(pageHeaderSize == 8 ){
+        int lengthOfRecord = 0;
+        int rowID = 0;
+        int lengthOfDataHeader = 0;
+        int sizeOfField[lengthOfDataHeader];
+        int dataOfField[lengthOfDataHeader];
+
+
+        for (int count = 0; count < numberOfCells ; count++){
+            offset = cellOffset[count];
+            lengthOfRecord = BitPatternSize(buffer[offset]);
+            offset += BitPatternSize(buffer[offset]);
+            rowID = BitPattern(buffer[offset]);
+            offset += BitPatternSize(buffer[offset]);
+            lengthOfDataHeader = BitPattern(buffer[offset]);
+            offset += BitPatternSize(buffer[offset]);
+            for [int i = 1; i <= lengthOfDataHeader; i++]{
+                sizeOfField[i] BitPattern(buffer[offset]);
+                offset += BitPatternSize(buffer[offset]);
+            }
+
+            
         }
     }
+    
     delete[] cellContents;
     delete[] cellVarInt;
 
@@ -368,6 +392,8 @@ int main ()
             ReadPage((unsigned char*)buffer);
         }
         delete[] buffer;
+
+        
     } 
 
 
