@@ -4,6 +4,8 @@
 #include <cmath>
 using namespace std;
 #define SIZE_OF_DB_HEADER 100
+#define SIZE_OF_INTERIOR_PAGE_HEAGER 12
+#define SIZE_OF_LEAF_PAGE_HEAGER 8
 
 // temporary Function.
 // Only read the size of a page and the number of pages in the database.
@@ -40,6 +42,22 @@ int BitPattern(unsigned char *buffer)
     result += buffer[sizeOfBytes - 1];
 
     return result;
+}
+
+int BitPatternSize(unsigned char *buffer){
+      unsigned int result = 0;
+    int count = 0;
+    int sizeOfBytes = 1;
+
+    // get a byte_size
+    while(count < 9)
+    {
+        if(buffer[count] >= 128)
+            sizeOfBytes++;
+        else break;
+        count++;
+    }
+    return sizeOfBytes;
 }
 
 /*int DataFieldSize(int a){
@@ -90,8 +108,11 @@ void ReadPage(unsigned char *buffer)
     // HEADER
     // ---------------
     int pageHeaderSize = 0;
+    unsigned char *startOfPage = buffer;
 
     // PageFlag     1Byte
+
+
     // Internal   : 0x05
     // Leaf       : 0x0D
     switch(*buffer){
@@ -152,17 +173,24 @@ void ReadPage(unsigned char *buffer)
         cout << "Cell Offset[" << count << "] : " << hex << cellOffset[count] << dec << endl;
     }
     cout << noshowbase << nouppercase << dec;
-    
+
+    delete[] cellOffset;
 
     // ------------------
     // Cell Contents
     // ------------------
-
-
-
-    delete[] cellOffset;
-
+    unsigned int *cellContents = new unsigned int[numberOfCells];
+    unsigned long *cellVarInt = new unsigned long[numberOfCells];
+    if (pageHeaderSize == 12){
+        for (int count = 0; count < numberOfCells ; count++){
+            *(cellContents + count) = ByteStream(startOfPage + cellOffset[count],4);
+            *(cellVarInt + count) = ByteStream(startOfPage + cellOffset[count] + 4 ,BitPatternSize(startOfPage + cellOffset[count] + 4));
+            cout<< "Cell Contents[" << count << "] : " << hex << cellContents[count] << cellVarInt[count] << dec << endl;
+        
+        }
+    }
 }
+
 struct ForeignKey{
     string field;
     string table;
