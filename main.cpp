@@ -8,10 +8,10 @@ using namespace std;
 // temporary Function.
 // Only read the size of a page and the number of pages in the database.
 // It will store variety variables TBD.
-void ReadDBheader(unsigned char *buffer, unsigned int *sizeOfPage, unsigned int *numberOfPage)
+void ReadDBheader(unsigned char *buffer, unsigned int *sizeOfPage, unsigned int *numberOfPages)
 {
     *sizeOfPage = buffer[16] * pow(2,8) + buffer[17];   // 16-17 offset in DB Header
-    *numberOfPage = buffer[28] * pow(2,24) + buffer[29] * pow(2,16) + buffer[30] * pow(2,8) + buffer[31]; // 28-31 offset in DB Header
+    *numberOfPages = buffer[28] * pow(2,24) + buffer[29] * pow(2,16) + buffer[30] * pow(2,8) + buffer[31]; // 28-31 offset in DB Header
 
     return;
 }
@@ -20,29 +20,29 @@ int BitPattern(unsigned char *buffer)
 {
     unsigned int result = 0;
     int count = 0;
-    int sizeOfByte = 1;
+    int sizeOfBytes = 1;
 
     // get a byte_size
     while(count < 9)
     {
         if(buffer[count] >= 128)
-            sizeOfByte++;
+            sizeOfBytes++;
         else break;
         count++;
     }
     // get result
-    for (count = 0; count < sizeOfByte - 1; count++)
+    for (count = 0; count < sizeOfBytes - 1; count++)
     {
         result += buffer[count];
         if(buffer[count] >= 128) result -= 128;
         result <<= 7;
     }
-    result += buffer[sizeOfByte - 1];
+    result += buffer[sizeOfBytes - 1];
 
     return result;
 }
 
-int DataFieldSize(int a){
+/*int DataFieldSize(int a){
     if (a == 0){
         return 0;
     }
@@ -64,41 +64,44 @@ int DataFieldSize(int a){
     else if(a > 13){
         return (a-13)/2;
     }
-}
+}*/
 
 
 // Get the data of bytestream as much as you want
-int GetByteStream(unsigned char *buffer, int sizeOfByte)
+int ByteStream(unsigned char *buffer, int sizeOfBytes)
 {
     unsigned int result = 0;
     int count = 0;
 
-    for (count = 0; count < sizeOfByte - 1; count++)
+    for (count = 0; count < sizeOfBytes - 1; count++)
     {
         result += buffer[count];
         result <<= 8;
     }
-    result += buffer[sizeOfByte - 1];
-
-
-    // test command out line
-    cout << result << endl;
+    result += buffer[sizeOfBytes - 1];
 
     return result;
 }
 
+// Read Only One Page in pageSize
 void ReadPage(unsigned char *buffer)
 {
-    //header
-    int sizeOfPageHeader = 0;
-    //PageFlag 1Byte(Internal : 0x05, Leaf:0x0D)
+    // ---------------
+    // HEADER
+    // ---------------
+    int pageHeaderSize = 0;
+
+    // PageFlag     1Byte
+    // Internal   : 0x05
+    // Leaf       : 0x0D
     switch(*buffer){
         case 0x02:
             return;
             break;
 
         case 0x05:
-            sizeOfPageHeader = 12;
+            pageHeaderSize = 12;
+            cout << "Page type : Internal page of B-tree table" << endl;
             break;
 
         case 0x0A:
@@ -106,46 +109,145 @@ void ReadPage(unsigned char *buffer)
             break;
 
         case 0x0D:
-            sizeOfPageHeader = 8;
+            pageHeaderSize = 8;
+            cout << "Page type : leaf page of B-tree table" << endl;
             break;
 
+        // exception, error
         default:
             return;
             break;
     }
     buffer += 1;
 
-    int offsetOfFreeSpace = GetByteStream((unsigned char*)buffer, 2);
+    int freeblockOffset = ByteStream(buffer, 2);
     buffer += 2;
-    int numberOfCells = GetByteStream((unsigned char*)buffer, 2);
+    int numberOfCells = ByteStream(buffer, 2);
     buffer += 2;
-    int offsetOfFirstByte = GetByteStream((unsigned char*)buffer, 2);
+    int firstCellOffset = ByteStream(buffer, 2);
     buffer += 2;
-    int fragmentedFreeBytes = GetByteStream((unsigned char*)buffer, 1);
+    int fragmentedFreeBytes = ByteStream(buffer, 1);
     buffer += 1;
+    int rightMostChildPage = 0;
+    if(pageHeaderSize == 12) rightMostChildPage = ByteStream(buffer, 4);
+    buffer += 4;
+
+    // test command out line
+
+    cout << "Number of Cells : " << numberOfCells << endl;
+    cout << "Fragmented Free Bytes : " << fragmentedFreeBytes << endl;
+    cout << "The right-most child page : " << rightMostChildPage << endl;
+
+    cout << showbase << uppercase << hex;
+    cout << "First of Freeblock Offset : " << hex << freeblockOffset << endl;
+    cout << "First of Cellblock Offset : " << firstCellOffset << dec << endl;
+    // ------------------
+    // Cell Offsets
+    // ------------------
+    unsigned short *cellOffset = new unsigned short [numberOfCells];
+    for(int count = 0; count < numberOfCells; count++)
+    {
+        *(cellOffset + count) = ByteStream(buffer, 2);
+        buffer += 2;
+        cout << "Cell Offset[" << count << "] : " << hex << cellOffset[count] << dec << endl;
+    }
+    cout << noshowbase << nouppercase << dec;
     
-    if(sizeOfPageHeader == 12) int childPage = GetByteStream((unsigned char*)buffer, 4);
+
+    // ------------------
+    // Cell Contents
+    // ------------------
+
+
+
+    delete[] cellOffset;
 
 }
+struct ForeignKey{
+    string field;
+    string table;
 
-struct DbexData{
+    // 1: RESTRICT  2: CASCADE  3:NO ACTION  4: SET NULL  5: SET DEFAULT
+    int onDelete;
+    int onUpdate;
+};
+struct Field{
+    int type;
+    int typeLength;
+    bool nullable;
+    string defaultData;
+    int collation;
+    bool autoIncrement;
+
+
+    bool primaryKey;
+    bool unique;
+    string check;
+
+    ForeignKey foriegnKey;
+};
+struct Constraint{
+    string primaryKey;
+    bool autoIncrement;
+
+    string check;
+    string defaultData;
+
+    ForeignKey foriegnKey;
+};
+struct Table{
+    string name;
+    string createSql;
+    int numberOfFields;
+    Field *fields;
+    void addField(){
+        fields = new Field[numberOfFields];
+        return;
+    }
+
+
+
+};
+
+class SqliteInfo{
+public:
     string fileName;
-    int numberOfTable;
-    struct table{
-        
-        struct attribute{
-            string name;
-            int type;
-            int length;
-            bool nullable;
+    int pageSize, changeCounter, inheaderSize, pageOfFreelist, numberOfFreelist, schemaCookie,
+    schemaFormat, defaultCacheSize, vacuumRootPage, textEncoding, userVersion, incrementalVacuum,
+    applicationID, versionValid, sqliteVersion, numberOfTables;
+    char writeVersion, readVersion, reservedSpace, maxPayload, minPayload, leafPayload;
 
-            };
-        
-        string tableName;
-        string rowNumber;
-        int numberOfColumn;
-        
-    };
+    // PRAGMA 추후 고려
+    // Auto Vacuum mode(auto optimize db size), FSYNC, Journal mode, Locking mode ...
+    // ...
+
+    SqliteInfo(string file){
+        fileName = file;
+        pageSize = 0;
+        writeVersion = 1;
+        readVersion = 1;
+        reservedSpace = 0;
+        maxPayload = 64;
+        minPayload = 32;
+        leafPayload = 32;
+        changeCounter = 0;
+        inheaderSize = 1;
+        pageOfFreelist= 0;
+        numberOfFreelist = 0;
+        schemaCookie = 0;
+        schemaFormat = 0;
+        defaultCacheSize;
+        vacuumRootPage = 0;
+        textEncoding = 1;
+        userVersion = 0;
+        incrementalVacuum = 0;
+        applicationID = 0;
+        versionValid = 0;
+        sqliteVersion = 0;
+    }
+private:
+
+
 };
 
 class DBConverter{
@@ -157,10 +259,7 @@ class DBConverter{
     int fragmentedFreeBytes_;
     int childPage_;
     int cellOffset_[];
-
-
 };
-
 
 
 
@@ -180,14 +279,16 @@ int main ()
         buffer = new char [SIZE_OF_DB_HEADER];
         readFile.read(buffer, SIZE_OF_DB_HEADER);
         ReadDBheader((unsigned char*)buffer, &sizeOfPage, &numberOfPage);
-        printf("page size is : %d, the number of pages : %d\n", sizeOfPage, numberOfPage);
+        printf("Page size : %d, Number of pages : %d\n", sizeOfPage, numberOfPage);
         delete[] buffer;
 
+        //only first page
+        cout << "------------1Page-----------" << endl;
         buffer = new char[sizeOfPage-SIZE_OF_DB_HEADER];
         readFile.read(buffer, sizeOfPage-SIZE_OF_DB_HEADER);
 
         ReadPage((unsigned char*)buffer);
-
+        delete[] buffer;
 
     } 
 
