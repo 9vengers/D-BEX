@@ -5,6 +5,8 @@
 #include <cmath>
 
 #define SIZE_OF_DB_HEADER 100
+#define SIZE_OF_INTERIOR_PAGE_HEAGER 12
+#define SIZE_OF_LEAF_PAGE_HEAGER 8
 
 struct ForeignKey{
     std::string field;
@@ -160,6 +162,20 @@ int GetVarintSize(unsigned char *buffer)
     {
         if(buffer[count] < 128) break;
         sizeOfBytes++;
+    }
+}
+int BitPatternSize(unsigned char *buffer)
+{
+      unsigned int result = 0;
+    int count = 0;
+    int sizeOfBytes = 1;
+
+    // get a byte_size
+    while(count < 9)
+    {
+        if(buffer[count] >= 128)
+            sizeOfBytes++;
+        else break;
         count++;
     }
     return sizeOfBytes;
@@ -272,6 +288,7 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     offset += 1;
     // The number of right-most child page  4Bytes
     // (Only Internal Page)
+
     if(pageHeaderSize == 12)
     {
         rightMostChildPage = ByteStream(buffer + offset, 4);
@@ -318,24 +335,29 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     // -----------------------------------------------
     // Cell Contents
     // -----------------------------------------------
-    /*for(int count = 0; count < numberOfCells; count++)
-    {
-        offset = cellOffset[count];
-        //*(buffer + offset) = ;
 
-    }*/
-    
+    unsigned int *cellContents = new unsigned int[numberOfCells];
+    unsigned long *cellVarInt = new unsigned long[numberOfCells];
+    if (*buffer == 0x53){
+        for (int count = 0; count < numberOfCells ; count++){
+            *(cellContents + count) = ByteStream(&buffer[cellOffset[count] - SIZE_OF_DB_HEADER] ,4);
+            *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] - SIZE_OF_DB_HEADER + 4] , BitPatternSize(&buffer[cellOffset[count]]));
+            std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
+        }
+        
+    }else if(pageHeaderSize == 12){
+        for (int count = 0; count < numberOfCells ; count++){
+            *(cellContents + count) = ByteStream(&buffer[cellOffset[count]] ,4);
+            *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] + 4] , BitPatternSize(&buffer[cellOffset[count]]));
+            std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
+        }
+    }
+    delete[] cellContents;
+    delete[] cellVarInt;
 
+    delete[] cellOffset;
 
-
-    //unsigned int *cellContents = new unsigned int[numberOfCells];
-    //unsigned long *cellVarInt = new unsigned long[numberOfCells];
-
-    unsigned int childPage = 0;
-    int varintSize = 0;
-    int content;
-
-    if (pageHeaderSize == 12) // interior page
+    /*if (pageHeaderSize == 12) // interior page
     {
         for (int count = 0; count < numberOfCells ; count++)
         {
@@ -353,9 +375,9 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     }
 
 
-    delete[] cellOffset;
+    delete[] cellOffset;*/
 
-}
+};
 
 
 int main ()
@@ -365,6 +387,7 @@ int main ()
 
     // Open the target file
     readFile.open("D-BEX/chinook.db", std::ios::binary);
+
 
     if(readFile.is_open())
     {
