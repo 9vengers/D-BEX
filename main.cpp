@@ -213,14 +213,21 @@ void ReadPage(unsigned char *buffer)
     // ------------------
     unsigned int *cellContents = new unsigned int[numberOfCells];
     unsigned long *cellVarInt = new unsigned long[numberOfCells];
-    if (pageHeaderSize == 12){
+    if (*buffer == 0x53){
         for (int count = 0; count < numberOfCells ; count++){
-            *(cellContents + count) = ByteStream(&buffer[cellOffset[count] ] ,4);
-            *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] + 4] , BitPatternSize(&buffer[cellOffset[count]]));
-            std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;
+            *(cellContents + count) = ByteStream(&buffer[cellOffset[count] - SIZE_OF_DB_HEADER] ,4);
+            *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] - SIZE_OF_DB_HEADER + 4] , BitPatternSize(&buffer[cellOffset[count]]));
+            std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
+        }
         
+    }else if(pageHeaderSize == 12){
+        for (int count = 0; count < numberOfCells ; count++){
+            *(cellContents + count) = ByteStream(&buffer[cellOffset[count]] ,4);
+            *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] + 4] , BitPatternSize(&buffer[cellOffset[count]]));
+            std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
         }
     }
+
     delete[] cellOffset;
 }
 
