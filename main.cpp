@@ -5,8 +5,8 @@
 #include <cmath>
 
 #define SIZE_OF_DB_HEADER 100
-#define SIZE_OF_INTERIOR_PAGE_HEAGER 12
-#define SIZE_OF_LEAF_PAGE_HEAGER 8
+#define SIZE_OF_INTERIOR_PAGE_HEADER 12
+#define SIZE_OF_LEAF_PAGE_HEADER 8
 
 struct ForeignKey{
     std::string field;
@@ -104,7 +104,6 @@ class DBConverter{
     int cellOffset_[];
 };
 
-
 // temporary Function.
 // Only read the size of a page and the number of pages in the database.
 // It will store variety variables TBD.
@@ -153,7 +152,6 @@ int BitPattern(unsigned char *buffer)
 
     return result;
 }
-
 int GetVarintSize(unsigned char *buffer)
 {
     int count = 0;
@@ -162,11 +160,13 @@ int GetVarintSize(unsigned char *buffer)
     {
         if(buffer[count] < 128) break;
         sizeOfBytes++;
+        count++;
     }
+    return sizeOfBytes;
 }
 int BitPatternSize(unsigned char *buffer)
 {
-      unsigned int result = 0;
+    unsigned int result = 0;
     int count = 0;
     int sizeOfBytes = 1;
 
@@ -240,6 +240,7 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     // -----------------------------------------------
     if (firstPageFlag == 1) offset = SIZE_OF_DB_HEADER;
 
+
     // -----------------------------------------------
     // Page header
     // -----------------------------------------------
@@ -288,7 +289,6 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     offset += 1;
     // The number of right-most child page  4Bytes
     // (Only Internal Page)
-
     if(pageHeaderSize == 12)
     {
         rightMostChildPage = ByteStream(buffer + offset, 4);
@@ -302,10 +302,9 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     std::cout << "Fragmented Free Bytes : " << fragmentedFreeBytes << std::endl;
     if(pageHeaderSize == 12)
         std::cout << "The right-most child page : " << rightMostChildPage << std::endl;
-
     std::cout << std::showbase << std::uppercase << std::hex;
-    std::cout << "First of Freeblock Offset : " << std::hex << freeblockOffset << std::endl;
-    std::cout << "First of Cellblock Offset : " << firstCellOffset << std::dec << std::endl;
+    std::cout << "First of Freeblock Offset : " << std::hex << 1024*(firstPageFlag-1) + freeblockOffset << std::endl;
+    std::cout << "First of Cellblock Offset : " << 1024*(firstPageFlag-1) + firstCellOffset << std::dec << std::endl;
 
 
 
@@ -335,22 +334,26 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     // -----------------------------------------------
     // Cell Contents
     // ------------------
-    unsigned char *cellContents = new unsigned char[numberOfCells];
+    /*unsigned char *cellContents = new unsigned char[numberOfCells];
     unsigned char *cellVarInt = new unsigned char[numberOfCells];
-    if (*buffer == 0x53){
+    if (*buffer == 0x53)
+    {
         for (int count = 0; count < numberOfCells ; count++){
             *(cellContents + count) = ByteStream(&buffer[cellOffset[count]] ,4);
             *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count]+ 4] , BitPatternSize(&buffer[cellOffset[count]]));
             std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
         }
-        
-    }else if(pageHeaderSize == 12){
+    }
+    else if(pageHeaderSize == 12)
+    {
         for (int count = 0; count < numberOfCells ; count++){
             *(cellContents + count) = ByteStream(&buffer[cellOffset[count]] ,4);
             *(cellVarInt + count) = ByteStream(&buffer[cellOffset[count] + 4] , BitPatternSize(&buffer[cellOffset[count]]));
             std::cout<< "Cell Contents[" << count << "] : " << std::hex << (int)cellContents[count] << (int)cellVarInt[count] << std::dec << std::endl;        
         }
-    }else if(pageHeaderSize == 8 ){
+    }
+    else if(pageHeaderSize == 8 )
+    {
         int lengthOfRecord = 0;
         int rowID = 0;
         int lengthOfDataHeader = 0;
@@ -358,7 +361,8 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
         int dataOfField[lengthOfDataHeader];
 
 
-        for (int count = 0; count < numberOfCells ; count++){
+        for (int count = 0; count < numberOfCells ; count++)
+        {
             offset = cellOffset[count];
             lengthOfRecord = BitPatternSize(buffer[offset]);
             offset += BitPatternSize(buffer[offset]);
@@ -366,7 +370,9 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
             offset += BitPatternSize(buffer[offset]);
             lengthOfDataHeader = BitPattern(buffer[offset]);
             offset += BitPatternSize(buffer[offset]);
-            for [int i = 1; i <= lengthOfDataHeader; i++]{
+
+            for(int i = 1; i <= lengthOfDataHeader; i++)
+            {
                 sizeOfField[i] BitPattern(buffer[offset]);
                 offset += BitPatternSize(buffer[offset]);
             }
@@ -378,9 +384,43 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     delete[] cellContents;
     delete[] cellVarInt;
 
-    delete[] cellOffset;
+    delete[] cellOffset;*/
 
-    /*if (pageHeaderSize == 12) // interior page
+    int childPage = 0;
+    int varintSize = 0;
+    int content = 0;
+
+    struct Cell
+    {
+        int cellHeaderSize = 0;
+        int recordSize = 0;
+        int rowId = 0;
+
+        int dataHeaderSize = 0;
+        int lengthOfDataHeaderSize = 0;
+        int numberOfFields = 0;
+
+        unsigned char *fieldSizes = NULL;
+        unsigned char *fieldDatas = NULL;
+
+
+       void allocateFieldSizes(int size)
+        {
+            fieldSizes = new unsigned char [dataHeaderSize - lengthOfDataHeaderSize];
+        }
+        void allcateFieldDatas(int size)
+        {
+            fieldDatas = new unsigned char [recordSize - dataHeaderSize];
+        }
+
+        void endCell()
+        {
+            delete[] fieldSizes;
+            delete[] fieldDatas;
+        }
+    };
+
+    if (pageHeaderSize == SIZE_OF_INTERIOR_PAGE_HEADER)
     {
         for (int count = 0; count < numberOfCells ; count++)
         {
@@ -389,16 +429,54 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
             offset += 4;
             varintSize = GetVarintSize(buffer + offset);
             content = BitPattern(buffer + offset);
-            std::cout << "Cell Content[" << count << "] : "  << content << ", size : " << varintSize << ", child page : " << childPage << std::endl;
+            std::cout << "Cell Content[" << count << "] : rowid : "  << content << ", size : " << varintSize << ", child page : " << childPage << std::endl;
         }
     }
-    else if(pageHeaderSize == 8) // leaf page
+    else if(pageHeaderSize == SIZE_OF_LEAF_PAGE_HEADER)
     {
-        
+        struct Cell cell[numberOfCells];
+        int bytesCount = 0;
+        int varintSize = 0;
+        for (int count = 0; count < numberOfCells ; count++)
+        {
+            offset = cellOffset[count];
+
+            cell[count].recordSize = BitPattern(buffer + offset);
+            varintSize = GetVarintSize(buffer + offset);
+            offset += varintSize;
+            cell[count].cellHeaderSize += varintSize;
+
+            cell[count].rowId = BitPattern(buffer + offset);
+            varintSize =  GetVarintSize(buffer + offset);
+            offset += varintSize;
+            cell[count].cellHeaderSize += varintSize;
+
+            cell[count].dataHeaderSize = BitPattern(buffer + offset);
+            varintSize = GetVarintSize(buffer + offset);
+            offset += varintSize;
+            cell[count].lengthOfDataHeaderSize = varintSize;
+
+            while (cell[count].lengthOfDataHeaderSize + bytesCount < cell[count].dataHeaderSize)
+            {
+                varintSize = GetVarintSize(buffer + offset);
+                bytesCount += varintSize;
+                offset += varintSize;
+                cell[count].numberOfFields++;
+            }
+            if (cell[count].lengthOfDataHeaderSize + bytesCount == cell[count].dataHeaderSize)
+            {
+                std::cout << "incorrect size calculate!!!" << std::endl;
+                bytesCount = 0;
+            }
+        }
+
+    }
+    else
+    {
     }
 
 
-    delete[] cellOffset;*/
+    delete[] cellOffset;
 
 };
 
@@ -431,7 +509,7 @@ int main ()
             buffer = new char[sizeOfPage];
             for(int count = 1 ; count <= 10; count++ )
             {
-                std::cout << "------------Page" << count << "-----------" << std::endl;
+                std::cout << "------------------Page" << count << "-----------------" << std::endl;
                 readFile.read(buffer, sizeOfPage);
                 ReadPage((unsigned char*)buffer, count);
             }
