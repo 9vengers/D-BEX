@@ -140,9 +140,9 @@ int ReadDBheader(unsigned char *buffer, unsigned int *sizeOfPage, unsigned int *
     }
 }
 
-int BitPattern(unsigned char *buffer, int *getSize)
+__int64 BitPattern(unsigned char *buffer, unsigned char *getSize)
 {
-    unsigned int result = 0;
+    __int64 result = 0;
     int count = 0;
     int sizeOfBytes = 1;
 
@@ -198,34 +198,79 @@ int BitPatternSize(unsigned char *buffer)
     return sizeOfBytes;
 }
 */
-char GetDataType(unsigned short a){
-    if (a == 0){
-        return 0;
+unsigned short GetDataSize(__int64 value){
+
+    char type;
+    switch (value)
+    {
+        case 0:
+            type = DATA_TYPE_NULL;
+            return 0;
+            break;
+        case 1:
+            type = DATA_TYPE_SIGNED_INT8;
+            return 1;
+            break;
+        case 2:
+            type = DATA_TYPE_SIGNED_INT16;
+            return 2;
+            break;
+        case 3:
+            type = DATA_TYPE_SIGNED_INT24;
+            return 3;
+            break;
+        case 4:
+            type = DATA_TYPE_SIGNED_INT32;
+            return 4;
+            break;
+        case 5:
+            type = DATA_TYPE_SIGNED_INT48;
+            return 6;
+            break;
+        case 6:
+            type = DATA_TYPE_SIGNED_INT64;
+            return 8;
+            break;
+        case 7:
+            type = DATA_TYPE_FLOAT64;
+            return 8;
+            break;
+        case 8:
+            type = DATA_TYPE_ZERO;
+            return 0;
+            break;
+        case 9:
+            type = DATA_TYPE_ONE;
+            return 0;
+            break;
+        case 10:
+            type = DATA_TYPE_RESERVED;
+            return 0;
+            break;
+        case 11:
+            type = DATA_TYPE_RESERVED;
+            return 0;
+            break;
+        default:
+            if((value >= 12) && (value % 2) == 0)      // value is even
+            {
+                type = DATA_TYPE_BLOB;
+                return (value - 12) / 2;
+            }
+            else if((value >= 13) && (value % 2) == 1) // value is odd
+            {
+                type = DATA_TYPE_TEXT;
+                return (value - 13) / 2;
+            }
+            break;
     }
-    else if(a > 0 && a <= 4){
-        return a;
-    }
-    else if(a == 5){
-        return 6;
-    }
-    else if(a == 6){
-        return 8;
-    }
-    else if(a == 7){
-        return 8;
-    } 
-    else if(a > 12){
-        return (a-12)/2;
-    } 
-    else if(a > 13){
-        return (a-13)/2;
-    }
+    return 0;
 }
 
 // Get the data of bytestream as much as you want
-int ByteStream(unsigned char *buffer, int sizeOfBytes)
+__int64 ByteStream(unsigned char *buffer, unsigned short sizeOfBytes)
 {
-    unsigned int result = 0;
+    __int64 result = 0;
     int count = 0;
 
     for (count = 0; count < sizeOfBytes - 1; count++)
@@ -397,9 +442,9 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
 
     delete[] cellOffset;
     */
-    int childPage = 0;
-    int varintSize = 0;
-    int content = 0;
+    __int64 childPage = 0;
+    unsigned char varintSize = 0;
+    __int64 content = 0;
 
     struct LeafCell
     {
@@ -457,30 +502,29 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
                 bytesCount += varintSize;
                 cell[count].numberOfFields++;
 
-                // 여기에 GetDataType() 할거임.
+                content = GetDataSize(content);
 
-                std::cout << "    field[" << cell[count].numberOfFields << "] : ";
+                std::cout << "    field[" << cell[count].numberOfFields << "] : (" << content << "bytes) - ";
 
                 // PART B - Data of Field
                 content = ByteStream(buffer + offset + cell[count].dataHeaderSize, content);
+                std::cout << std::showbase << std::uppercase << std::hex;
+                std::cout << content << std::endl;
+                std::cout << std::noshowbase << std::nouppercase << std::dec;
 
 
             }
 
-            if (cell[count].lengthOfDataHeaderSize + bytesCount == cell[count].dataHeaderSize)
+            /*if (cell[count].lengthOfDataHeaderSize + bytesCount == cell[count].dataHeaderSize)
             {
                 std::cout << "incorrect size calculate!!!" << std::endl;
-                bytesCount = 0;
-            }
-
+            }*/
         }
 
     }
     else
     {
     }
-
-
     delete[] cellOffset;
 
 };
@@ -512,7 +556,7 @@ int main ()
 
             // Read Pages
             buffer = new char[sizeOfPage];
-            for(int count = 1 ; count <= 10; count++ )
+            for(int count = 1 ; count <= 3; count++ )
             {
                 std::cout << "------------------Page" << count << "-----------------" << std::endl;
                 readFile.read(buffer, sizeOfPage);
