@@ -8,6 +8,20 @@
 #define SIZE_OF_INTERIOR_PAGE_HEADER 12
 #define SIZE_OF_LEAF_PAGE_HEADER 8
 
+#define DATA_TYPE_NULL 101
+#define DATA_TYPE_SIGNED_INT8 102
+#define DATA_TYPE_SIGNED_INT16 103
+#define DATA_TYPE_SIGNED_INT24 104
+#define DATA_TYPE_SIGNED_INT32 105
+#define DATA_TYPE_SIGNED_INT48 106
+#define DATA_TYPE_SIGNED_INT64 107
+#define DATA_TYPE_FLOAT64 108
+#define DATA_TYPE_ZERO 109
+#define DATA_TYPE_ONE 110
+#define DATA_TYPE_RESERVED 111
+#define DATA_TYPE_BLOB 112
+#define DATA_TYPE_TEXT 113
+
 struct ForeignKey{
     std::string field;
     std::string table;
@@ -184,7 +198,7 @@ int BitPatternSize(unsigned char *buffer)
     return sizeOfBytes;
 }
 */
-int DataFieldSize(int a){
+char GetDataType(unsigned short a){
     if (a == 0){
         return 0;
     }
@@ -349,8 +363,6 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
             std::cout<< "Cell Contents[" << count << "] : " << std::hex << cellContents[count] << cellVarInt[count] << std::dec << std::endl;        
         }
     }
-    */
-    /*
     else if(pageHeaderSize == 8 )
     {
         int lengthOfRecord = 0;
@@ -389,11 +401,7 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     int varintSize = 0;
     int content = 0;
 
-    int value = 0;
-    int fieldSize = 0;
-    int dataOffset = 0;
-
-    struct Cell
+    struct LeafCell
     {
         int cellHeaderSize = 0;
         int recordSize = 0;
@@ -402,19 +410,6 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
         int dataHeaderSize = 0;
         int lengthOfDataHeaderSize = 0;
         int numberOfFields = 0;
-
-        unsigned int **fieldDatas = NULL;
-
-
-        void allcateFieldDatas(int size)
-        {
-            fieldDatas = new unsigned int* [];
-        }
-
-        void endCell()
-        {
-            delete[] fieldDatas;
-        }
     };
 
     if (pageHeaderSize == SIZE_OF_INTERIOR_PAGE_HEADER)
@@ -430,13 +425,16 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     }
     else if(pageHeaderSize == SIZE_OF_LEAF_PAGE_HEADER)
     {
-        struct Cell cell[numberOfCells];
+        struct LeafCell cell[numberOfCells];
         int bytesCount;
         for (int count = 0; count < numberOfCells ; count++)
         {
-            cell[count].allocateFieldDatas();
+            bytesCount = 0;
             offset = cellOffset[count];
-
+            
+            //
+            // Cell Header
+            //
             cell[count].recordSize = BitPattern(buffer + offset, &varintSize);
             offset += varintSize;
             cell[count].cellHeaderSize += varintSize;
@@ -447,15 +445,26 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
 
             cell[count].dataHeaderSize = BitPattern(buffer + offset, &varintSize);
             cell[count].lengthOfDataHeaderSize = varintSize;
-            //dataOffset = offset + cell[count].dataHeaderSize;
-            offset += varintSize;
 
-            bytesCount = 0;         
+            std::cout << "Cell Content[" << count << "] : rowid : " << cell[count].rowId << std::endl;
+            //
+            // Data Header
+            // Repeat 'Size of Field' datas until the end of the Data Header
             while (cell[count].lengthOfDataHeaderSize + bytesCount < cell[count].dataHeaderSize)
             {
-                BitPattern(buffer + offset , &varintSize);
+                // PART A - Size of Field
+                content = BitPattern(buffer + offset + cell[count].lengthOfDataHeaderSize + bytesCount, &varintSize);
                 bytesCount += varintSize;
                 cell[count].numberOfFields++;
+
+                // 여기에 GetDataType() 할거임.
+
+                std::cout << "    field[" << cell[count].numberOfFields << "] : ";
+
+                // PART B - Data of Field
+                content = ByteStream(buffer + offset + cell[count].dataHeaderSize, content);
+
+
             }
 
             if (cell[count].lengthOfDataHeaderSize + bytesCount == cell[count].dataHeaderSize)
@@ -463,13 +472,7 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
                 std::cout << "incorrect size calculate!!!" << std::endl;
                 bytesCount = 0;
             }
-            cell[count].allcateFieldDatas();
 
-
-            
-
-
-            cell[count].endCell();
         }
 
     }
