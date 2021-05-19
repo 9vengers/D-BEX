@@ -445,6 +445,7 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     __int64 childPage = 0;
     unsigned char varintSize = 0;
     __int64 content = 0;
+    __int64 data = 0;
 
     struct LeafCell
     {
@@ -471,10 +472,11 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
     else if(pageHeaderSize == SIZE_OF_LEAF_PAGE_HEADER)
     {
         struct LeafCell cell[numberOfCells];
-        int bytesCount;
+        int bytesCount, fieldBytesCount;
         for (int count = 0; count < numberOfCells ; count++)
         {
             bytesCount = 0;
+            fieldBytesCount = 0;
             offset = cellOffset[count];
             
             //
@@ -505,14 +507,12 @@ void ReadPage(unsigned char *buffer, int firstPageFlag)
                 content = GetDataSize(content);
 
                 std::cout << "    field[" << cell[count].numberOfFields << "] : (" << content << "bytes) - ";
-
                 // PART B - Data of Field
-                content = ByteStream(buffer + offset + cell[count].dataHeaderSize, content);
+                data = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, content);
                 std::cout << std::showbase << std::uppercase << std::hex;
-                std::cout << content << std::endl;
+                std::cout << data << std::endl;
                 std::cout << std::noshowbase << std::nouppercase << std::dec;
-
-
+                fieldBytesCount += content;
             }
 
             /*if (cell[count].lengthOfDataHeaderSize + bytesCount == cell[count].dataHeaderSize)
