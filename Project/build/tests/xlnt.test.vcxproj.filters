@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\runner.cpp">
+      <Filter>runner</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\cell\cell_test_suite.cpp">
+      <Filter>tests\cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\cell\index_types_test_suite.cpp">
+      <Filter>tests\cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\cell\rich_text_test_suite.cpp">
+      <Filter>tests\cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\drawing\drawing_test_suite.cpp">
+      <Filter>tests\drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\detail\numeric_util_test_suite.cpp">
+      <Filter>tests\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\styles\alignment_test_suite.cpp">
+      <Filter>tests\styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\styles\color_test_suite.cpp">
+      <Filter>tests\styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\styles\conditional_format_test_suite.cpp">
+      <Filter>tests\styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\styles\fill_test_suite.cpp">
+      <Filter>tests\styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\styles\number_format_test_suite.cpp">
+      <Filter>tests\styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\styles\protection_test_suite.cpp">
+      <Filter>tests\styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\styles\style_test_suite.cpp">
+      <Filter>tests\styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\utils\datetime_test_suite.cpp">
+      <Filter>tests\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\utils\helper_test_suite.cpp">
+      <Filter>tests\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\utils\optional_tests.cpp">
+      <Filter>tests\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\utils\path_test_suite.cpp">
+      <Filter>tests\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\utils\timedelta_test_suite.cpp">
+      <Filter>tests\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\utils\variant_tests.cpp">
+      <Filter>tests\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\workbook\named_range_test_suite.cpp">
+      <Filter>tests\workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\workbook\serialization_test_suite.cpp">
+      <Filter>tests\workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\workbook\workbook_test_suite.cpp">
+      <Filter>tests\workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\worksheet\page_setup_test_suite.cpp">
+      <Filter>tests\worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\worksheet\range_test_suite.cpp">
+      <Filter>tests\worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\worksheet\worksheet_test_suite.cpp">
+      <Filter>tests\worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\test_suite.cpp">
+      <Filter>helpers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\assertions.hpp">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\path_helper.hpp">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\temporary_directory.hpp">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\temporary_file.hpp">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\test_suite.hpp">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\timing.hpp">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\helpers\xml_helper.hpp">
+      <Filter>helpers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\parser.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\qname.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\serializer.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\value-traits.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\char-props.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\genx.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\xmlparse.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\xmlrole.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\xmltok.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{D30840C0-4BC3-3F21-A902-EC8A21D7DE14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helpers">
+      <UniqueIdentifier>{2E67F3AC-E1B1-30BB-A96E-636F33E2131D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="runner">
+      <UniqueIdentifier>{1835EB21-5A38-3B03-B9FF-12B1BD13035D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{16BA047F-1D05-3C74-A0FD-700DD7D77127}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\cell">
+      <UniqueIdentifier>{28BC3B09-FFC6-3EE8-8764-F63204986FE8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\detail">
+      <UniqueIdentifier>{D8D16322-DBD3-3740-A0CF-36210AEE0C64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\drawing">
+      <UniqueIdentifier>{F5C5530B-22BD-3AB0-AE26-808B0C344B8A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\styles">
+      <UniqueIdentifier>{B31350C6-AFF4-3D19-BFB5-366DB9BC5C57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\utils">
+      <UniqueIdentifier>{7C5E3302-F5F3-3C2F-9C62-AB5EBAFF1009}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\workbook">
+      <UniqueIdentifier>{C025149B-1C92-33A1-8B11-2ACFF5A99541}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests\worksheet">
+      <UniqueIdentifier>{1C086595-6FB6-321D-AFF1-BC74F1C8B312}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

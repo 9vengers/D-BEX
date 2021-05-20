@@ -1,0 +1,10 @@
+^C:\USERS\JINA0\DOWNLOADS\XLNT-1.5.0\BUILD\CMAKEFILES\B676DE6D2FB881127BF5CD14B6B8C7B8\INSTALL_FORCE.RULE
+setlocal
+cd .
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
