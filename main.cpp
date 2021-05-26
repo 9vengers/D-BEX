@@ -31,7 +31,7 @@
 #define FIELD_TYPE_INT 302
 #define FIELD_TYPE_REAL 303
 #define FIELD_TYPE_TEXT 304
-#define FIEDL_TYPE_BLOB 305
+#define FIELD_TYPE_BLOB 305
 
 #define REFERENCE_RULE_RESTRICT 401
 #define REFERENCE_RULE_CASCADE 402
@@ -75,6 +75,7 @@ struct Table{
     std::string name;       // table name
     std::string createSql;  // create sentence - Sql
     int numberOfFields;     // count a number of fields
+    int rowid;
     Field* fields;          // array of fields
 };
 
@@ -157,11 +158,15 @@ public:
         return 0;
     }
 
-    int seekg()
+    int seekg(int pageNumber, int size)
     {
-        readFile.seekg(0, std::ios::beg);
-
+        readFile.seekg(size * (pageNumber - 1));
         return 0;
+    }
+
+    std::string GetName()
+    {
+        return srcpath;
     }
 
 };
@@ -170,8 +175,10 @@ public:
 
 class DBConverter{
 private:
-    int childPage;
-    int numberOfTables;
+
+    unsigned int sizeOfPage, numberOfPages, numberOfTables;
+    FileContainer *srcFile;
+    FileContainer *targetFile;
 
     struct SqliteInfo{
         std::string fileName;
@@ -212,42 +219,44 @@ private:
     SqliteInfo* sqliteInfo;
 
 public:
-    DBConverter(std::string inputfile)
+    DBConverter(FileContainer &db)  // db->excel  or  db->db
     {
-        sqliteInfo = new SqliteInfo(inputfile);
+        sqliteInfo = new SqliteInfo(db.GetName());
+        srcFile = &db;
+    }
+    DBConverter()   // only excel->db
+    {
+
     }
     ~DBConverter()
     {
         delete sqliteInfo;
     }
-    int ReadDB(FileContainer &db)
+    int ReadDB()
     {
-        char *buffer = 0;
-        unsigned int sizeOfPage, numberOfPages;
-
+        unsigned int currentPage = 1;
+        unsigned int nextPage = 0;
         // Database Header 100 Bytes
-        buffer = new char [SIZE_OF_DB_HEADER];
-        db.Read(buffer, SIZE_OF_DB_HEADER);
-        if (ReadDBheader((unsigned char*)buffer, &sizeOfPage, &numberOfPages))
+        unsigned char *buffer = new unsigned char [SIZE_OF_DB_HEADER];
+        srcFile->Read((char *)buffer, SIZE_OF_DB_HEADER);
+        if (ReadDBheader(buffer))
         {
             printf("Page size : %d, Number of pages : %d\n", sizeOfPage, numberOfPages);
             delete[] buffer;
-            db.seekg();
+
             // Read Pages
-            buffer = new char[sizeOfPage];
-            for(int count = 1 ; count <= 3; count++ )
-            {
-                std::cout << "------------------Page" << count << "-----------------" << std::endl;
-                db.Read(buffer, sizeOfPage);
-                ReadPage((unsigned char*)buffer, count);
-            }
+            //while(1)
+            //{
+                nextPage = ReadPage(currentPage);
+
+            //    if (nextPage == 0) break;
+            //}
         }
         else
         {
             delete[] buffer;
             return 1;
         }
-        delete[] buffer;
         return 0;
     }
     int MakeJSON(FileContainer &file)
@@ -264,8 +273,8 @@ public:
     }
 
 private:
-    int ReadDBheader(unsigned char *buffer, unsigned int *sizeOfPage, unsigned int *numberOfPages);
-    int ReadPage(unsigned char *buffer, int pageNumber);
+    int ReadDBheader(unsigned char* buffer);
+    int ReadPage(unsigned int pageNumber);
     int InteriorTable(unsigned char *buffer, int pageNumber);
     int LeafTable(unsigned char *buffer, int pageNumber);
     int InteriorIndex(unsigned char *buffer, int pageNumber);
@@ -283,12 +292,12 @@ private:
         }
         return sizeOfBytes;
     }
-    unsigned short GetDataSize(long long value);
+    unsigned short GetDataSize(long long value, unsigned short *getType);
     long long ByteStream(unsigned char *buffer, unsigned short sizeOfBytes);
     long long BitPattern(unsigned char *buffer, unsigned char *getSize);
 };
 
-int DBConverter::ReadDBheader(unsigned char *buffer, unsigned int *sizeOfPage, unsigned int *numberOfPages)
+int DBConverter::ReadDBheader(unsigned char *buffer)
 {
     // temporary Function.
     // Only read the size of a page and the number of pages in the database.
@@ -297,8 +306,8 @@ int DBConverter::ReadDBheader(unsigned char *buffer, unsigned int *sizeOfPage, u
     if ( strncmp((const char *)buffer, signature, 16) == 0)
     {
         // correct file
-        *sizeOfPage = buffer[16] * pow(2,8) + buffer[17];   // 16-17 offset in DB Header
-        *numberOfPages = buffer[28] * pow(2,24) + buffer[29] * pow(2,16) + buffer[30] * pow(2,8) + buffer[31]; // 28-31 offset in DB Header
+        sizeOfPage = buffer[16] * pow(2,8) + buffer[17];   // 16-17 offset in DB Header
+        numberOfPages = buffer[28] * pow(2,24) + buffer[29] * pow(2,16) + buffer[30] * pow(2,8) + buffer[31]; // 28-31 offset in DB Header
 
         return 1;
     }
@@ -337,68 +346,67 @@ long long DBConverter::BitPattern(unsigned char *buffer, unsigned char *getSize)
 
     return result;
 };
-unsigned short DBConverter::GetDataSize(long long value)
+unsigned short DBConverter::GetDataSize(long long value, unsigned short *getType)
 {
-    char type;
     switch (value)
     {
         case 0:
-            type = DATA_TYPE_NULL;
+            *getType = DATA_TYPE_NULL;
             return 0;
             break;
         case 1:
-            type = DATA_TYPE_SIGNED_INT8;
+            *getType = DATA_TYPE_SIGNED_INT8;
             return 1;
             break;
         case 2:
-            type = DATA_TYPE_SIGNED_INT16;
+            *getType = DATA_TYPE_SIGNED_INT16;
             return 2;
             break;
         case 3:
-            type = DATA_TYPE_SIGNED_INT24;
+            *getType = DATA_TYPE_SIGNED_INT24;
             return 3;
             break;
         case 4:
-            type = DATA_TYPE_SIGNED_INT32;
+            *getType = DATA_TYPE_SIGNED_INT32;
             return 4;
             break;
         case 5:
-            type = DATA_TYPE_SIGNED_INT48;
+            *getType = DATA_TYPE_SIGNED_INT48;
             return 6;
             break;
         case 6:
-            type = DATA_TYPE_SIGNED_INT64;
+            *getType = DATA_TYPE_SIGNED_INT64;
             return 8;
             break;
         case 7:
-            type = DATA_TYPE_FLOAT64;
+            *getType = DATA_TYPE_FLOAT64;
             return 8;
             break;
         case 8:
-            type = DATA_TYPE_ZERO;
+            *getType = DATA_TYPE_ZERO;
             return 0;
             break;
         case 9:
-            type = DATA_TYPE_ONE;
+            *getType = DATA_TYPE_ONE;
             return 0;
             break;
         case 10:
-            type = DATA_TYPE_RESERVED;
+            *getType = DATA_TYPE_RESERVED;
             return 0;
             break;
         case 11:
-            type = DATA_TYPE_RESERVED;
+            *getType = DATA_TYPE_RESERVED;
             return 0;
             break;
         default:
             if((value >= 12) && (value % 2) == 0)      // value is even
             {
-                type = DATA_TYPE_BLOB;
+                *getType = DATA_TYPE_BLOB;
                 return (value - 12) / 2;
             }
             else if((value >= 13) && (value % 2) == 1) // value is odd
             {
-                type = DATA_TYPE_TEXT;
+                *getType = DATA_TYPE_TEXT;
                 return (value - 13) / 2;
             }
             break;
@@ -420,16 +428,19 @@ long long DBConverter::ByteStream(unsigned char *buffer, unsigned short sizeOfBy
 
     return result;
 };
-int DBConverter::ReadPage(unsigned char *buffer, int pageNumber)
+int DBConverter::ReadPage(unsigned int pageNumber)
 {
     int offset = 0;
+    unsigned char *buffer = 0;
+    
+    buffer = new unsigned char[sizeOfPage];
+    srcFile->seekg(pageNumber, sizeOfPage);
+    srcFile->Read((char *)buffer, sizeOfPage);
+    std::cout << "------------------Page" << pageNumber << "-----------------" << std::endl;
 
     // Only First Page
-    if (pageNumber == 1) offset = SIZE_OF_DB_HEADER;
+    if ( pageNumber == 1) offset = SIZE_OF_DB_HEADER;
 
-
-    // -----------------------------------------------
-    // Page header
     // -----------------------------------------------
     // PageFlag           1Byte
     // Internal Table   : 0x05
@@ -460,12 +471,17 @@ int DBConverter::ReadPage(unsigned char *buffer, int pageNumber)
         default:
             return 0;
     }
+    delete[] buffer;
     return 0;
 };
 int DBConverter::InteriorTable(unsigned char *buffer, int pageNumber)
 {
     int offset = 0;
     if (pageNumber == 1)  offset = SIZE_OF_DB_HEADER;
+
+    // -----------------------------------------------
+    // Page header
+    // -----------------------------------------------
     int freeblockOffset = 0;
     int numberOfCells = 0;
     int firstCellOffset = 0;
@@ -536,6 +552,7 @@ int DBConverter::InteriorTable(unsigned char *buffer, int pageNumber)
         offset += 4;
         content = BitPattern(buffer + offset, &varintSize);
         std::cout << "Cell Content[" << count << "] : rowid : "  << content << ", size : " << (int)varintSize << ", child page : " << childPage << std::endl;
+        ReadPage(childPage);
     }
 
     delete[] cellOffset;
@@ -547,12 +564,14 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
 {
     int offset = 0;
     if (pageNumber == 1)  offset = SIZE_OF_DB_HEADER;
+
+    // -----------------------------------------------
+    // Page header
+    // -----------------------------------------------
     int freeblockOffset = 0;
     int numberOfCells = 0;
     int firstCellOffset = 0;
     int fragmentedFreeBytes = 0;
-    int rightMostChildPage = 0;
-
     offset += 1;
     // Offset of freeblock                  2Bytes
     freeblockOffset = ByteStream(buffer + offset, 2);
@@ -598,11 +617,7 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
 
     // -----------------------------------------------
     // Cell Contents
-    // ------------------
-
-    unsigned char varintSize = 0;
-    long long content = 0;
-    long long data = 0;
+    // -----------------------------------------------
 
     struct LeafCell
     {
@@ -618,6 +633,15 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
 
     struct LeafCell cell[numberOfCells];
     int bytesCount, fieldBytesCount;
+
+    unsigned char varintSize = 0;
+    long long content = 0;
+    long long dataSize = 0;
+    unsigned short dataType = 0;
+    long long datai = 0;
+    unsigned char *datac = 0;
+    double dataf = 0;
+
     for (int count = 0; count < numberOfCells ; count++)
     {
         bytesCount = 0;
@@ -649,21 +673,62 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
             bytesCount += varintSize;
             cell[count].numberOfFields++;
 
-            content = GetDataSize(content);
+            dataSize = GetDataSize(content, &dataType);
 
-            std::cout << "    field[" << cell[count].numberOfFields << "] : (" << content << "bytes) - ";
+            std::cout << "    field" << cell[count].numberOfFields << "(" << dataSize << "bytes) : ";
+
+
             // PART B - Data of Field
-            data = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, content);
-            std::cout << std::showbase << std::uppercase << std::hex;
-            std::cout << data << std::endl;
-            std::cout << std::noshowbase << std::nouppercase << std::dec;
-            fieldBytesCount += content;
-        }
+            switch (dataType)
+            {
+                case DATA_TYPE_NULL:
+                    std::cout << "NULL" << std::endl;
+                break;
+                case DATA_TYPE_FLOAT64:
+                    dataf = (double)ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                    std::cout << dataf << " (";
+                    std::cout << std::showbase << std::uppercase << std::hex;
+                    std::cout << dataf << ")" << std::endl;
+                    std::cout << std::noshowbase << std::nouppercase << std::dec;
+                    fieldBytesCount += dataSize;
+                break;
+                case DATA_TYPE_ZERO:
+                    std::cout << "0" << std::endl;
+                break;
+                case DATA_TYPE_ONE:
+                    std::cout << "1" << std::endl;
+                break;
+                case DATA_TYPE_RESERVED:
+                    std::cout << "[error] Invalid data type" << std::endl;
+                break;
+                case DATA_TYPE_BLOB:
+                    datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                    std::cout << "BLOB type" << std::endl;
+                    fieldBytesCount += dataSize;
+                break;
+                case DATA_TYPE_TEXT:
+                    datac = new unsigned char[dataSize + 1];
+                    for (int i = 0; i < dataSize; i++)
+                    {
+                        datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
+                        fieldBytesCount++;
+                    }
+                    datac[dataSize] = '\0';
+                    std::cout << datac << std::endl;
+                    delete[] datac;
+                break;
+                default:
+                    datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                    std::cout << datai << " (";
+                    std::cout << std::showbase << std::uppercase << std::hex;
+                    std::cout << datai << ")" << std::endl;
+                    std::cout << std::noshowbase << std::nouppercase << std::dec;
+                    fieldBytesCount += dataSize;
+                break;
+            }
 
-        /*if (cell[count].lengthOfDataHeaderSize + bytesCount == cell[count].dataHeaderSize)
-        {
-            std::cout << "incorrect size calculate!!!" << std::endl;
-        }*/
+
+        }
     }
 
 
@@ -690,10 +755,10 @@ int DBConverter::LeafIndex(unsigned char *buffer, int pageNumber)
 int DBtoExcel(std::string srcpath)
 {
     // DB
-    DBConverter dbConverter(srcpath);
     FileContainer srcFile(FILE_TYPE_DB, srcpath);
     srcFile.Load();
-    dbConverter.ReadDB(srcFile);
+    DBConverter dbConverter(srcFile);
+    dbConverter.ReadDB();
 
     //FileContainer jsonFile(FILE_TYPE_JSON, srcpath);
     //dbConverter.MakeJSON(&jsonFile);
