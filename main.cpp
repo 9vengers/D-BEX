@@ -22,26 +22,39 @@
 #define DATA_TYPE_RESERVED 111
 #define DATA_TYPE_BLOB 112
 #define DATA_TYPE_TEXT 113
+
 #define FILE_TYPE_DB 201
 #define FILE_TYPE_EXCEL 202
 #define FILE_TYPE_JSON 203
+
+#define FIELD_TYPE_NULL 301
+#define FIELD_TYPE_INT 302
+#define FIELD_TYPE_REAL 303
+#define FIELD_TYPE_TEXT 304
+#define FIEDL_TYPE_BLOB 305
+
+#define REFERENCE_RULE_RESTRICT 401
+#define REFERENCE_RULE_CASCADE 402
+#define REFERENCE_RULE_NOACTION 403
+#define REFERENCE_RULE_SETNULL 404
+#define REFERENCE_RULE_SETDEFAULT 405
 
 struct ForeignKey{
     std::string field;
     std::string table;
 
-    // 1: RESTRICT  2: CASCADE  3:NO ACTION  4: SET NULL  5: SET DEFAULT
+    // 401: RESTRICT  402: CASCADE  403:NO ACTION  404: SET NULL  405: SET DEFAULT
     int onDelete;
     int onUpdate;
 };
 struct Field{
+    // 301: NULL   302: INT    303: REAL   304: TEXT   305: BLOB
     int type;
     int typeLength;
     bool nullable;
-    std::string defaultData;
+    std::string defaultData;    // save it as a string (regardless of integer/character)
     int collation;
     bool autoIncrement;
-
 
     bool primaryKey;
     bool unique;
@@ -59,17 +72,10 @@ struct Constraint{
     ForeignKey foriegnKey;
 };
 struct Table{
-    std::string name;
-    std::string createSql;
-    int numberOfFields;
-    Field *fields;
-    void addField(){
-        fields = new Field[numberOfFields];
-        return;
-    }
-
-
-
+    std::string name;       // table name
+    std::string createSql;  // create sentence - Sql
+    int numberOfFields;     // count a number of fields
+    Field* fields;          // array of fields
 };
 
 
