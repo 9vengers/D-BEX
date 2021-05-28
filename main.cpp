@@ -241,7 +241,7 @@ public:
 
 };
 
-class SqlParser 
+class SqlParser
 {
     int numberOfFields;
     char *sql;
@@ -249,6 +249,14 @@ class SqlParser
     char *content;
 
 public:
+    std::string Trimming(std::string input)
+    {
+	    input.erase(std::remove(input.begin(), input.end(), 0x0d), input.end());    // '\r'
+        input.erase(std::remove(input.begin(), input.end(), 0x0a), input.end());    // '\n'
+        input.erase(std::remove(input.begin(), input.end(), 0x09), input.end());    // tab
+
+        return input;
+    }
 
     void InputSql(std::string input)
     {
@@ -348,38 +356,25 @@ public:
         return;
     }
 
-    int GetNumberOfField(char *input) //해씀
+    std::string GetTableName() 
     {
-        std::string a = input;
-        int count = 0;
-        for (int i = 0; i < a.size(); i++) 
-        {   
-            if (a[i] == ',')  //find ','의 개수를 구함
-            count++;
-        }
-        return count; 
-    }
+        std::string tableName;
+        char *temp = strchr(head, '\"') + 1;
+        int size = strlen(temp) - strlen(strrchr(temp, '\"'));
+        char *buffer = new char[size + 1];
 
-    std::string Trimming(std::string input)
+        memcpy(buffer, temp, size);
+        buffer[size] = '\0';
+        tableName = buffer;
+
+        delete[] buffer;
+        return tableName;
+    };
+
+
+    int GetNumberOfSentece() 
     {
-	    input.erase(std::remove(input.begin(), input.end(), 0x0d), input.end());    // '\r'
-        input.erase(std::remove(input.begin(), input.end(), 0x0a), input.end());    // '\n'
-        input.erase(std::remove(input.begin(), input.end(), 0x09), input.end());    // tab
-
-        return input;
-    }
-
-    std::string GetSql(char *input)
-    {
-        char *sqlParagraph = NULL;
-        sqlParagraph = strchr(input, '(') + 1;
-        sqlParagraph[strlen(sqlParagraph) - strlen(strrchr(input, ')'))] = '\0';
-        return sqlParagraph;
-    }
-
-    int GetNumberOfSentece(char *sqlParagraph) 
-    {
-        std::string buffer = sqlParagraph;
+        std::string buffer = content;
         int numberOfSentence = 0;
         for (int i = 0; i < buffer.size(); i++) 
         {   
@@ -399,16 +394,20 @@ public:
             numberOfWord++;
         }
         return numberOfWord + 1; 
-    }    
+    }
 
-    std::string GetTableName(char *sqlParagraph) 
+    int GetNumberOfField()
     {
-        char *buffer = NULL;
-        char *tableName = 0;
-        buffer = strchr(sqlParagraph, '\"') + 1;
-        tableName = strtok(buffer,"\"");
-        return tableName;
-    };
+        std::string a = input;
+        int count = 0;
+        for (int i = 0; i < a.size(); i++) 
+        {   
+            if (a[i] == ',')  //find ','의 개수를 구함
+            count++;
+        }
+        return count;
+    }
+
 
     /*Field GetField(std::string input) 
     {
@@ -423,7 +422,7 @@ public:
         return fieldContents;
     };*/
 
-    void SplitSql(char *sqlParagraph) // 저장 모르게따..
+    void SplitSql(char *sqlParagraph)
     {
         char *sentence = NULL;
         int stringLength = 0;
@@ -466,7 +465,6 @@ public:
             printf("%s\n", word);
             word = strtok(NULL, " ");
         }
-
     }
 
     bool IsPrimeryKey(char *sentence)
@@ -519,8 +517,6 @@ public:
     {
         
     }
-
-
 
 };
 
@@ -1202,9 +1198,6 @@ void DBConverter::SqlParsing()
 
     // (6)
     parser.DeleteSql();
-    char *sql2 = new char[sql.size() + 1];
-    strcpy(sql2,sql.c_str());
-
 }
 
 
@@ -1222,8 +1215,6 @@ int DBtoExcel(std::string srcpath)
 
     //FileContainer jsonFile(FILE_TYPE_JSON, srcpath);
     //dbConverter.MakeJSON(&jsonFile);
-
-
 
     // Excel
 
