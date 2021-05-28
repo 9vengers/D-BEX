@@ -243,7 +243,7 @@ public:
 
 class SqlParser
 {
-    int numberOfFields;
+    int numberOfFields, numberOfConstraints;
     char *sql;
     char *head;
     char *content;
@@ -293,112 +293,21 @@ public:
         return parsed;
     }
 
-    void TableContents(std::string input) 
-    {
-        //----------------
-        // initialize
-        // string --> char
-        //----------------
-        // declare type - char *
-        char *sql = new char[input.size() + 1];
-        std::copy(input.begin(), input.end(), sql);
-        sql[input.size()] = '\0';
-        // declare type - const char *
-        // const char *sql = input.c_str();
-
-        // test SQL output
-        //std::cout << input << std::endl;
-
-        char *sentence = NULL;
-        char *word = NULL;
-        int stringLength = 0;
-        int i = 1;
-        char *head = NULL;
-        char *content = NULL;
-
-
-        head = GetHead(sql);
-        std::cout << head << std::endl;
-        content = GetContent(sql);
-        std::cout << content << std::endl;
-        std::cout << sql << std::endl;
-
-        sentence = strtok(content, ",");
-        while (sentence != NULL)
-        {
-            printf(" Sentence%d-------------------------------------\n", i);
-            while (*sentence == ' ')
-            {
-                sentence++;
-            }
-            stringLength = strlen(sentence);
-            printf("%s\n", sentence);
-
-            printf(" Word---------------------------------------\n");
-            word = strtok(sentence, " ");
-            while (word != NULL)
-            {
-                while (*word == ' ')
-                {
-                    word++;
-                }
-                printf("%s\n", word);
-                word = strtok(NULL, " ");
-            }
-
-            i++;
-            sentence += stringLength + 1;
-            sentence = strtok(sentence, ",");
-        }
-        delete[] head;
-        delete[] content;
-        delete[] sql;   // declared type - char *
-        return;
-    }
-
-    std::string GetTableName() 
-    {
-        std::string tableName;
-        char *temp = strchr(head, '\"') + 1;
-        int size = strlen(temp) - strlen(strrchr(temp, '\"'));
-        char *buffer = new char[size + 1];
-
-        memcpy(buffer, temp, size);
-        buffer[size] = '\0';
-        tableName = buffer;
-
-        delete[] buffer;
-        return tableName;
-    };
-
-
-    int GetNumberOfSentece() 
+    int GetNumberOfSentence()
     {
         std::string buffer = content;
-        int numberOfSentence = 0;
+        int numberOfSentence = 1;
         for (int i = 0; i < buffer.size(); i++) 
         {   
-            if (buffer[i] == ',')  //find ','의 개수를 구함
-            numberOfSentence++;
+            if (buffer[i] == ',')  //find ','의 개수 + 1
+                numberOfSentence++;
         }
         return numberOfSentence; 
     }
 
-    int GetNumberOfWord(char *sentence) 
-    {
-        std::string a = sentence;
-        int numberOfWord = 0;
-        for (int i = 0; i < a.size(); i++) 
-        {   
-            if (a[i] == ' ')  //find ' '의 개수를 구함
-            numberOfWord++;
-        }
-        return numberOfWord + 1; 
-    }
-
     int GetNumberOfField()
     {
-        std::string a = input;
+        std::string a = content;
         int count = 0;
         for (int i = 0; i < a.size(); i++) 
         {   
@@ -408,19 +317,11 @@ public:
         return count;
     }
 
-
-    /*Field GetField(std::string input) 
+    int GetNumberOfConstraint()
     {
-        Field fieldContents;
-        std::string fieldNamebuffer;
-        std::string fieldName2;
-        fieldNamebuffer = input;
-        int index1 = fieldNamebuffer.find("[");
-        int index2 = fieldNamebuffer.find("]",index1+1);
-        fieldContents.fieldName = fieldNamebuffer.substr(index1+1,index2-index1-1);
-
-        return fieldContents;
-    };*/
+        int numberOfSentences = GetNumberOfSentence();
+        return numberOfSentences - numberOfFields;
+    }
 
     void SplitSql(char *sqlParagraph)
     {
@@ -451,7 +352,6 @@ public:
 
     void SplitSentence(char *sentence)
     {
-
         char *word = NULL;
 
         printf("Word---------------------------------------\n");
@@ -467,7 +367,32 @@ public:
         }
     }
 
-    bool IsPrimeryKey(char *sentence)
+
+    std::string GetTableName() 
+    {
+        std::string tableName;
+        char *temp = strchr(head, '\"') + 1;
+        int size = strlen(temp) - strlen(strrchr(temp, '\"'));
+        char *buffer = new char[size + 1];
+
+        memcpy(buffer, temp, size);
+        buffer[size] = '\0';
+        tableName = buffer;
+
+        delete[] buffer;
+        return tableName;
+    };
+
+    std::string GetDataType(char *sentence)
+    {
+        char *dataType = NULL;
+        dataType = strchr(sentence, ']') + 1;
+        dataType = strtok(dataType," ");
+
+        return dataType;
+    }
+
+    bool IsPrimaryKey(char *sentence)
     {
         std::string buffer = sentence;
         if (buffer.find("PRIMARY KEY") != std::string::npos)
@@ -477,7 +402,7 @@ public:
         else return false;
     }
 
-    bool IsNallAble(char *sentence)
+    bool IsNullable(char *sentence)
     {
         std::string buffer = sentence;
         if (buffer.find("NOT NULL") != std::string::npos)
@@ -499,24 +424,32 @@ public:
 
     }
 
-    std::string GetDataType(char *sentence)
-    {
-        char *dataType = NULL;
-        dataType = strchr(sentence, ']') + 1;
-        dataType = strtok(dataType," ");
-
-        return dataType;
-    }
-
-    int GetNumberOfConstraint()
-    {
-        return;
-    }
 
     void GetConstraint()
     {
         
     }
+
+    int GetNumberOfWord(char *sentence) 
+    {
+        std::string a = sentence;
+        int numberOfWord = 0;
+        for (int i = 0; i < a.size(); i++) 
+        {   
+            if (a[i] == ' ')  //find ' '의 개수를 구함
+            numberOfWord++;
+        }
+        return numberOfWord + 1; 
+    }
+
+    void Parse()
+    {
+        numberOfFields = GetNumberOfField();
+        numberOfConstraints = GetNumberOfConstraint();
+
+        
+    }
+
 
 };
 
@@ -1177,18 +1110,21 @@ void DBConverter::SqlParsing()
     // (0) Input Sql ---> Trimming ---> Split head
     parser.InputSql(table->createSql);
 
+    parser.Parse();
+
     // (1) Table name
-    parser.GetTableName();
+    std::cout << "Table name: " << parser.GetTableName() << std::endl;
+    std::cout << "num of sentence: " << parser.GetNumberOfSentence() << std::endl;
 
     // (2) The number of fields
-    parser.GetNumberOfField();
+    //parser.GetNumberOfField();
 
     // (3) Field datas (repeat x (2))
-    parser.GetFieldName();
+    /*parser.GetFieldName();
     parser.GetDataType();
     parser.IsPrimaryKey();
     parser.IsAutoincrement();
-    parser.IsNullable();
+    parser.IsNullable();*/
     
     // (4) The number of Constraint
     parser.GetNumberOfConstraint();
