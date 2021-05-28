@@ -369,7 +369,7 @@ public:
         return input;
     }
 
-    std::string getSql(char *input)
+    std::string GetSql(char *input)
     {
         char *sqlParagraph = NULL;
         sqlParagraph = strchr(input, '(') + 1;
@@ -441,7 +441,7 @@ public:
             
             stringLength = strlen(sentence);
             printf("%s\n", sentence);
-            splitSentence(sentence);
+            SplitSentence(sentence);
             sentence += stringLength + 1;
             sentence = strtok(sentence, ",");
 
@@ -509,6 +509,19 @@ public:
 
         return dataType;
     }
+
+    int GetNumberOfConstraint()
+    {
+        return;
+    }
+
+    void GetConstraint()
+    {
+        
+    }
+
+
+
 };
 
 class DBConverter{
@@ -1189,6 +1202,8 @@ void DBConverter::SqlParsing()
 
     // (6)
     parser.DeleteSql();
+    char *sql2 = new char[sql.size() + 1];
+    strcpy(sql2,sql.c_str());
 
 }
 
