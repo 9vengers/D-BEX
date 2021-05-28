@@ -73,13 +73,77 @@ struct Constraint{
 };
 struct Table{
     std::string name;       // table name
+    long long rowid;
+    int rootPage;
     std::string createSql;  // create sentence - Sql
+
     int numberOfFields;     // count a number of fields
-    int rowid;
     Field* fields;          // array of fields
 };
+class LinkedList{
+    struct Node{
+        void *data;
+        Node *next;
+    };
+    Node head;
+    Node *tail;
+    Node *node;
+    Node *current;
 
+public:
+    LinkedList()
+    {
+        head = {NULL, NULL};
+        tail = &head;
+        node = NULL;
+        current = NULL;
+    }
+    ~LinkedList()
+    {
+        deleteNode();
+    }
 
+    int addNode(void* data)
+    {
+        node = new Node;
+        node->data = data;
+        node->next = NULL;
+        tail->next = node;
+        tail = node;
+        node = NULL;
+
+        return 0;
+    }
+
+    int deleteNode()
+    {
+        while(head.next != NULL)
+        {
+            node = head.next;
+            head.next = node->next;
+            delete node;
+        }
+        tail = &head;
+        current = NULL;
+
+        return 0;
+    }
+
+    void *getNodeData()
+    {
+        Node *result;
+        if (current == NULL)
+            current = head.next;
+        result = current;
+        if (current != NULL)
+        {
+            current = current->next;
+            return result->data;
+        }
+        else
+            return result;
+    }
+};
 
 class FileContainer{
 private:
@@ -171,12 +235,10 @@ public:
 
 };
 
-
-
 class DBConverter{
 private:
 
-    unsigned int sizeOfPage, numberOfPages, numberOfTables;
+    unsigned int sizeOfPage, numberOfPages, currentRootPage;
     FileContainer *srcFile;
     FileContainer *targetFile;
 
@@ -218,11 +280,22 @@ private:
     };
     SqliteInfo* sqliteInfo;
 
+    unsigned int numberOfTables;
+    Table *table;
+    LinkedList tableList;
+
 public:
     DBConverter(FileContainer &db)  // db->excel  or  db->db
     {
         sqliteInfo = new SqliteInfo(db.GetName());
         srcFile = &db;
+        targetFile = NULL;
+
+        sizeOfPage = 0;
+        numberOfPages = 0;
+        currentRootPage = 1;
+        numberOfTables = 0;
+        table = NULL;
     }
     DBConverter()   // only excel->db
     {
@@ -230,11 +303,35 @@ public:
     }
     ~DBConverter()
     {
+        unsigned int i = 0;
+        // table output
+        // Console output
+        // test
+        /*for (i; i < numberOfTables; i++)
+        {
+            std::cout << "[Table " << i + 1 << "]" << std::endl;
+            table = (Table *)tableList.getNodeData();
+            std::cout << "name: " << table->name << std::endl;
+            std::cout << "rowid: " << table->rowid << std::endl;
+            std::cout << "root page: " << table->rootPage << std::endl;
+            std::cout << "sql: " << table->createSql << std::endl << std::endl;
+        }*/
+
         delete sqliteInfo;
+        i = 0;
+        // delete tables
+        table = (Table *)tableList.getNodeData();
+        while (i < numberOfTables)
+        {
+            delete table;
+            table = (Table *)tableList.getNodeData();
+            i++;
+        }
+        // delete table List
+        tableList.~LinkedList();
     }
     int ReadDB()
     {
-        unsigned int currentPage = 1;
         unsigned int nextPage = 0;
         // Database Header 100 Bytes
         unsigned char *buffer = new unsigned char [SIZE_OF_DB_HEADER];
@@ -245,12 +342,13 @@ public:
             delete[] buffer;
 
             // Read Pages
-            //while(1)
-            //{
-                nextPage = ReadPage(currentPage);
+            ReadPage(currentRootPage);
+            printf("Total number of Tables: %d\n", numberOfTables);
 
-            //    if (nextPage == 0) break;
-            //}
+            table = (Table *)tableList.getNodeData();
+            currentRootPage = table->rootPage;
+            ReadPage(currentRootPage);
+            
         }
         else
         {
@@ -556,6 +654,7 @@ int DBConverter::InteriorTable(unsigned char *buffer, int pageNumber)
     }
 
     delete[] cellOffset;
+    ReadPage(rightMostChildPage);
 
     return 0;
 
@@ -569,8 +668,8 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
     // Page header
     // -----------------------------------------------
     int freeblockOffset = 0;
-    int numberOfCells = 0;
     int firstCellOffset = 0;
+    int numberOfCells = 0;
     int fragmentedFreeBytes = 0;
     offset += 1;
     // Offset of freeblock                  2Bytes
@@ -611,7 +710,7 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
         std::cout << "Cell Offset[" << count << "] : " << std::hex << 1024*(pageNumber-1) + cellOffset[count] << std::dec << std::endl;
     }
     std::cout << std::noshowbase << std::nouppercase << std::dec;
-    
+
 
 
 
@@ -631,7 +730,7 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
     };
 
 
-    struct LeafCell cell[numberOfCells];
+    LeafCell *cell = new LeafCell[numberOfCells];
     int bytesCount, fieldBytesCount;
 
     unsigned char varintSize = 0;
@@ -639,18 +738,22 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
     long long dataSize = 0;
     unsigned short dataType = 0;
     long long datai = 0;
-    unsigned char *datac = 0;
+    char *datac = 0;
     double dataf = 0;
+
+    int sqliteObjType = 0;  //temp var.  (1: table, 2: index)
 
     for (int count = 0; count < numberOfCells ; count++)
     {
         bytesCount = 0;
         fieldBytesCount = 0;
         offset = cellOffset[count];
+
+        sqliteObjType = 0;
         
-        //
+        //---------------------
         // Cell Header
-        //
+        //---------------------
         cell[count].recordSize = BitPattern(buffer + offset, &varintSize);
         offset += varintSize;
         cell[count].cellHeaderSize += varintSize;
@@ -674,64 +777,162 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
             cell[count].numberOfFields++;
 
             dataSize = GetDataSize(content, &dataType);
-
             std::cout << "    field" << cell[count].numberOfFields << "(" << dataSize << "bytes) : ";
 
-
             // PART B - Data of Field
-            switch (dataType)
+            // current root page가 1일 경우 : ( sqlite_schema  B-tree Page )
+            // 우선 Table인 데이터만 저장.
+            // Index 등의 경우,   Table 객체보다 큰 상위 객체를 만들어야 함.
+            // 그리고, 객체 타입을  table, index, ..로 지정해야함.
+            if(currentRootPage == 1)
             {
-                case DATA_TYPE_NULL:
-                    std::cout << "NULL" << std::endl;
-                break;
-                case DATA_TYPE_FLOAT64:
-                    dataf = (double)ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                    std::cout << dataf << " (";
-                    std::cout << std::showbase << std::uppercase << std::hex;
-                    std::cout << dataf << ")" << std::endl;
-                    std::cout << std::noshowbase << std::nouppercase << std::dec;
-                    fieldBytesCount += dataSize;
-                break;
-                case DATA_TYPE_ZERO:
-                    std::cout << "0" << std::endl;
-                break;
-                case DATA_TYPE_ONE:
-                    std::cout << "1" << std::endl;
-                break;
-                case DATA_TYPE_RESERVED:
-                    std::cout << "[error] Invalid data type" << std::endl;
-                break;
-                case DATA_TYPE_BLOB:
-                    datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                    std::cout << "BLOB type" << std::endl;
-                    fieldBytesCount += dataSize;
-                break;
-                case DATA_TYPE_TEXT:
-                    datac = new unsigned char[dataSize + 1];
-                    for (int i = 0; i < dataSize; i++)
-                    {
-                        datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
-                        fieldBytesCount++;
-                    }
-                    datac[dataSize] = '\0';
-                    std::cout << datac << std::endl;
-                    delete[] datac;
-                break;
-                default:
-                    datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                    std::cout << datai << " (";
-                    std::cout << std::showbase << std::uppercase << std::hex;
-                    std::cout << datai << ")" << std::endl;
-                    std::cout << std::noshowbase << std::nouppercase << std::dec;
-                    fieldBytesCount += dataSize;
-                break;
+                switch (cell[count].numberOfFields)
+                {
+                    case 1:
+                        datac = new char[dataSize + 1];
+                        for (int i = 0; i < dataSize; i++)
+                        {
+                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
+                            fieldBytesCount++;
+                        }
+                        datac[dataSize] = '\0';
+
+                        if (strcmp("table", datac) == 0)
+                        {
+                            sqliteObjType = 1;
+                            numberOfTables++;
+                            table = new Table;
+                            table->rowid = cell[count].rowId;
+                            tableList.addNode(table);
+                        }
+                        else if (strcmp("index", datac) == 0)
+                        {
+                            sqliteObjType = 2;
+                        }
+                        std::cout << datac << std::endl;
+                        delete[] datac;
+                    break;
+
+                    case 2:
+                        datac = new char[dataSize + 1];
+                        for (int i = 0; i < dataSize; i++)
+                        {
+                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
+                            fieldBytesCount++;
+                        }
+                        datac[dataSize] = '\0';
+
+                        if (sqliteObjType == 1)
+                        {
+                            table->name = datac;
+                        }
+                        std::cout << datac << std::endl;
+                        delete[] datac;
+                    break;
+
+                    case 3:
+                        datac = new char[dataSize + 1];
+                        for (int i = 0; i < dataSize; i++)
+                        {
+                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
+                            fieldBytesCount++;
+                        }
+                        datac[dataSize] = '\0';
+
+                        std::cout << datac << std::endl;
+                        delete[] datac;
+                    break;
+
+                    case 4:
+                        datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                        if (sqliteObjType == 1)
+                        {
+                            table->rootPage = datai;
+                        }
+                        
+                        std::cout << datai << " (";
+                        std::cout << std::showbase << std::uppercase << std::hex;
+                        std::cout << datai << ")" << std::endl;
+                        std::cout << std::noshowbase << std::nouppercase << std::dec;
+                        fieldBytesCount += dataSize;
+                    break;
+
+                    case 5:
+                        datac = new char[dataSize + 1];
+                        for (int i = 0; i < dataSize; i++)
+                        {
+                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
+                            fieldBytesCount++;
+                        }
+                        datac[dataSize] = '\0';
+
+                        if (sqliteObjType == 1)
+                        {
+                            table->createSql = datac;
+                        }
+                        std::cout << datac << std::endl;
+                        delete[] datac;
+                    break;
+                    default:
+                        std::cout << "[error] Invalid sqlite schema" << std::endl;
+                    break;
+                }
             }
-
-
+            else
+            {
+                switch (dataType)
+                {
+                    case DATA_TYPE_NULL:
+                        std::cout << "NULL" << std::endl;
+                    break;
+                    case DATA_TYPE_FLOAT64:
+                        dataf = (double)ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                        std::cout << dataf << " (";
+                        std::cout << std::showbase << std::uppercase << std::hex;
+                        std::cout << dataf << ")" << std::endl;
+                        std::cout << std::noshowbase << std::nouppercase << std::dec;
+                        fieldBytesCount += dataSize;
+                    break;
+                    case DATA_TYPE_ZERO:
+                        std::cout << "0" << std::endl;
+                    break;
+                    case DATA_TYPE_ONE:
+                        std::cout << "1" << std::endl;
+                    break;
+                    case DATA_TYPE_RESERVED:
+                        std::cout << "[error] Invalid data type" << std::endl;
+                    break;
+                    case DATA_TYPE_BLOB:
+                        datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                        std::cout << "BLOB type" << std::endl;
+                        fieldBytesCount += dataSize;
+                    break;
+                    case DATA_TYPE_TEXT:
+                        datac = new char[dataSize + 1];
+                        for (int i = 0; i < dataSize; i++)
+                        {
+                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
+                            fieldBytesCount++;
+                        }
+                        datac[dataSize] = '\0';
+                        
+                        std::cout << datac << std::endl;
+                        delete[] datac;
+                    break;
+                    default:
+                        datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                        std::cout << datai << " (";
+                        std::cout << std::showbase << std::uppercase << std::hex;
+                        std::cout << datai << ")" << std::endl;
+                        std::cout << std::noshowbase << std::nouppercase << std::dec;
+                        fieldBytesCount += dataSize;
+                    break;
+                }
+            }
         }
+        table = NULL;
     }
-
-
+    delete[] cell;
     delete[] cellOffset;
     return 0;
 
@@ -747,10 +948,9 @@ int DBConverter::LeafIndex(unsigned char *buffer, int pageNumber)
 
 
 
-/*class ExcelConverter{
+class ExcelConverter{
 
-};*/
-
+};
 
 int DBtoExcel(std::string srcpath)
 {
