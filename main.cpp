@@ -3,7 +3,7 @@
 #include <cstring>
 #include <fstream>
 #include <cmath>
-
+#include <algorithm>
 
 #define SIZE_OF_DB_HEADER 100
 #define SIZE_OF_INTERIOR_PAGE_HEADER 12
@@ -143,6 +143,12 @@ public:
         else
             return result;
     }
+
+    void resetCurrent()
+    {
+        current = NULL;
+        return;
+    }
 };
 
 class FileContainer{
@@ -235,6 +241,270 @@ public:
 
 };
 
+class SqlParser 
+{
+    int numberOfFields;
+    char *sql;
+
+public:
+
+    void inputSql(std::string input)
+    {
+        char *sql = new char[input.size() + 1];
+        std::copy(input.begin(), input.end(), sql);
+        sql[input.size()] = '\0';
+    }
+
+    void deleteSql()
+    {
+        delete[] sql;
+    }
+    
+    void tableContents(std::string input) 
+    {
+        //----------------
+        // initialize
+        // string --> char
+        //----------------
+        // declare type - char *
+        char *sql = new char[input.size() + 1];
+        std::copy(input.begin(), input.end(), sql);
+        sql[input.size()] = '\0';
+        // declare type - const char *
+        // const char *sql = input.c_str();
+
+        // test SQL output
+        //std::cout << input << std::endl;
+
+        char *sentence = NULL;
+        char *word = NULL;
+        int stringLength = 0;
+        int i = 1;
+        char *head = NULL;
+        char *content = NULL;
+
+
+        head = GetHead(sql);
+        std::cout << head << std::endl;
+        content = GetContent(sql);
+        std::cout << content << std::endl;
+        std::cout << sql << std::endl;
+
+        sentence = strtok(content, ",");
+        while (sentence != NULL)
+        {
+            printf(" Sentence%d-------------------------------------\n", i);
+            while (*sentence == ' ')
+            {
+                sentence++;
+            }
+            stringLength = strlen(sentence);
+            printf("%s\n", sentence);
+
+            printf(" Word---------------------------------------\n");
+            word = strtok(sentence, " ");
+            while (word != NULL)
+            {
+                while (*word == ' ')
+                {
+                    word++;
+                }
+                printf("%s\n", word);
+                word = strtok(NULL, " ");
+            }
+
+            i++;
+            sentence += stringLength + 1;
+            sentence = strtok(sentence, ",");
+        }
+        delete[] head;
+        delete[] content;
+        delete[] sql;   // declared type - char *
+        return;
+    }
+
+    char *GetHead(char *input)
+    {
+        int size = strlen(input) - strlen(strchr(input, '('));
+        char *parsed = new char[size + 1];
+        memcpy(parsed, input, size);
+        parsed[size] = '\0';
+        return parsed;
+    }
+
+    char *GetContent(char *input)
+    {
+        input = strpbrk(input, "(") + 1;
+        int size = strlen(input) - strlen(strrchr(input, ')'));
+        char *parsed = new char[size + 1];
+        memcpy(parsed, input, size);
+        parsed[size] = '\0';
+        return parsed;
+    }
+
+    int GetNumberOfField(char *input) //해씀
+    {
+        std::string a = input;
+        int count = 0;
+        for (int i = 0; i < a.size(); i++) 
+        {   
+            if (a[i] == ',')  //find ','의 개수를 구함
+            count++;
+        }
+        return count; 
+    }
+
+    std::string Trimming(std::string input)
+    {
+	    input.erase(std::remove(input.begin(), input.end(), 0x0d), input.end());    // '\r'
+        input.erase(std::remove(input.begin(), input.end(), 0x0a), input.end());    // '\n'
+        input.erase(std::remove(input.begin(), input.end(), 0x09), input.end());    // tab
+
+        return input;
+    }
+
+    std::string getSql(char *input)
+    {
+        char *sqlParagraph = NULL;
+        sqlParagraph = strchr(input, '(') + 1;
+        sqlParagraph[strlen(sqlParagraph) - strlen(strrchr(input, ')'))] = '\0';
+        return sqlParagraph;
+    }
+
+    int getNumberOfSentece(char *sqlParagraph) 
+    {
+        std::string buffer = sqlParagraph;
+        int numberOfSentence = 0;
+        for (int i = 0; i < buffer.size(); i++) 
+        {   
+            if (buffer[i] == ',')  //find ','의 개수를 구함
+            numberOfSentence++;
+        }
+        return numberOfSentence; 
+    }
+
+    int getNumberOfWord(char *sentence) 
+    {
+        std::string a = sentence;
+        int numberOfWord = 0;
+        for (int i = 0; i < a.size(); i++) 
+        {   
+            if (a[i] == ' ')  //find ' '의 개수를 구함
+            numberOfWord++;
+        }
+        return numberOfWord + 1; 
+    }    
+
+    std::string getTableName(char *sqlParagraph) 
+    {
+        char *buffer = NULL;
+        char *tableName = 0;
+        buffer = strchr(sqlParagraph, '\"') + 1;
+        tableName = strtok(buffer,"\"");
+        return tableName;
+    };
+
+    /*Field getField(std::string input) 
+    {
+        Field fieldContents;
+        std::string fieldNamebuffer;
+        std::string fieldName2;
+        fieldNamebuffer = input;
+        int index1 = fieldNamebuffer.find("[");
+        int index2 = fieldNamebuffer.find("]",index1+1);
+        fieldContents.fieldName = fieldNamebuffer.substr(index1+1,index2-index1-1);
+
+        return fieldContents;
+    };*/
+
+    void splitSql(char *sqlParagraph) // 저장 모르게따..
+    {
+        char *sentence = NULL;
+        int stringLength = 0;
+        int i = 1;
+
+        sentence = strtok(sqlParagraph, ",");
+        while (sentence != NULL)
+        {
+            printf("Sentence%d----------------------------------------------------------------\n",i);
+            while (*sentence == ' ')
+            {
+
+                sentence++;
+            }
+            
+            stringLength = strlen(sentence);
+            printf("%s\n", sentence);
+            splitSentence(sentence);
+            sentence += stringLength + 1;
+            sentence = strtok(sentence, ",");
+
+            i++;
+        }
+        return;
+    };
+
+    void splitSentence(char *sentence)
+    {
+
+        char *word = NULL;
+
+        printf("Word---------------------------------------\n");
+        word = strtok(sentence, " ");
+        while (word != NULL)
+        {
+            while (*word == ' ')
+            {
+                word++;
+            }
+            printf("%s\n", word);
+            word = strtok(NULL, " ");
+        }
+
+    }
+
+    bool isPrimeryKey(char *sentence)
+    {
+        std::string buffer = sentence;
+        if (buffer.find("PRIMARY KEY") != std::string::npos)
+        {
+            return true;
+        }
+        else return false;
+    }
+
+    bool isNallAble(char *sentence)
+    {
+        std::string buffer = sentence;
+        if (buffer.find("NOT NULL") != std::string::npos)
+        {
+            return false;
+        }
+        else return true;    
+    }
+
+    bool isAutoincrement(char *sentence)
+    {
+        std::string buffer = sentence;
+        if (buffer.find("AUTOINCREMENT") != std::string::npos)
+        {
+            return true;
+        }
+        else return false;    
+        
+
+    }
+
+    std::string getDataType(char *sentence)
+    {
+        char *dataType = NULL;
+        dataType = strchr(sentence, ']') + 1;
+        dataType = strtok(dataType," ");
+
+        return dataType;
+    }
+};
+
 class DBConverter{
 private:
 
@@ -320,6 +590,7 @@ public:
         delete sqliteInfo;
         i = 0;
         // delete tables
+        tableList.resetCurrent();
         table = (Table *)tableList.getNodeData();
         while (i < numberOfTables)
         {
@@ -338,17 +609,27 @@ public:
         srcFile->Read((char *)buffer, SIZE_OF_DB_HEADER);
         if (ReadDBheader(buffer))
         {
-            printf("Page size : %d, Number of pages : %d\n", sizeOfPage, numberOfPages);
+            std::cout << "----------------[schema]-----------------" << std::endl;
+            printf(" One Page size : %d, Total number of pages : %d\n", sizeOfPage, numberOfPages);
             delete[] buffer;
 
-            // Read Pages
+            // Read and create a schema
             ReadPage(currentRootPage);
-            printf("Total number of Tables: %d\n", numberOfTables);
+            printf(" Total number of Tables: %d\n", numberOfTables);
 
-            table = (Table *)tableList.getNodeData();
-            currentRootPage = table->rootPage;
-            ReadPage(currentRootPage);
-            
+            // Build the table schema (SQL Parser)
+            SqlParsing();
+
+            // Read Pages and input data
+            tableList.resetCurrent();
+
+            for (int i = 0; i < numberOfTables; i++)
+            {
+                //std::cout << "-----------------[table" << i + 1 << "]-----------------" << std::endl;
+                table = (Table *)tableList.getNodeData();
+                currentRootPage = table->rootPage;
+                ReadPage(currentRootPage);
+            }
         }
         else
         {
@@ -377,6 +658,8 @@ private:
     int LeafTable(unsigned char *buffer, int pageNumber);
     int InteriorIndex(unsigned char *buffer, int pageNumber);
     int LeafIndex(unsigned char *buffer, int pageNumber);
+
+    void SqlParsing();
 
     int GetVarintSize(unsigned char *buffer)
     {
@@ -534,7 +817,7 @@ int DBConverter::ReadPage(unsigned int pageNumber)
     buffer = new unsigned char[sizeOfPage];
     srcFile->seekg(pageNumber, sizeOfPage);
     srcFile->Read((char *)buffer, sizeOfPage);
-    std::cout << "------------------Page" << pageNumber << "-----------------" << std::endl;
+    //std::cout << "Page" << pageNumber << ": ";
 
     // Only First Page
     if ( pageNumber == 1) offset = SIZE_OF_DB_HEADER;
@@ -546,22 +829,22 @@ int DBConverter::ReadPage(unsigned int pageNumber)
     // -----------------------------------------------
     switch(buffer[offset]){
         case 0x02:
-            std::cout << "Page type : Internal page of B-tree index" << std::endl;
+            //std::cout << "Internal index" << std::endl;
             InteriorIndex(buffer, pageNumber);
             break;
 
         case 0x05:
-            std::cout << "Page type : Internal page of B-tree table" << std::endl;
+            //std::cout << "Internal table" << std::endl;
             InteriorTable(buffer, pageNumber);
             break;
 
         case 0x0A:
-            std::cout << "Page type : Leaf page of B-tree index" << std::endl;
+            //std::cout << "Leaf index" << std::endl;
             LeafIndex(buffer, pageNumber);
             break;
 
         case 0x0D:
-            std::cout << "Page type : Leaf page of B-tree table" << std::endl;
+            //std::cout << "Leaf table" << std::endl;
             LeafTable(buffer, pageNumber);
             break;
 
@@ -604,19 +887,6 @@ int DBConverter::InteriorTable(unsigned char *buffer, int pageNumber)
     rightMostChildPage = ByteStream(buffer + offset, 4);
     offset += 4;
 
-    // --------------------
-    // Console Output
-    // --------------------
-    std::cout << "Number of Cells : " << numberOfCells << std::endl;
-    std::cout << "Fragmented Free Bytes : " << fragmentedFreeBytes << std::endl;
-    std::cout << "The right-most child page : " << rightMostChildPage << std::endl;
-    std::cout << std::showbase << std::uppercase << std::hex;
-    std::cout << "First of Freeblock Offset : ";
-    if (!freeblockOffset) std::cout << "None" << std::endl;
-    else std::cout << 1024 * (pageNumber - 1) + freeblockOffset << std::endl;
-    std::cout << "First of Cellblock Offset : " << 1024*(pageNumber-1) + firstCellOffset << std::dec << std::endl;
-
-
 
     // -----------------------------------------------
     // Cell Offsets
@@ -626,16 +896,8 @@ int DBConverter::InteriorTable(unsigned char *buffer, int pageNumber)
     {
         *(cellOffset + count) = ByteStream(buffer + offset, 2);
         offset += 2;
-        // --------------------
-        // Console Output
-        // --------------------
-        std::cout << "Cell Offset[" << count << "] : " << std::hex << 1024*(pageNumber-1) + cellOffset[count] << std::dec << std::endl;
     }
-    std::cout << std::noshowbase << std::nouppercase << std::dec;
     
-
-
-
     // -----------------------------------------------
     // Cell Contents
     // -----------------------------------------------
@@ -649,7 +911,6 @@ int DBConverter::InteriorTable(unsigned char *buffer, int pageNumber)
         childPage = ByteStream(buffer + offset, 4); // left child page number  : 4 Bytes
         offset += 4;
         content = BitPattern(buffer + offset, &varintSize);
-        std::cout << "Cell Content[" << count << "] : rowid : "  << content << ", size : " << (int)varintSize << ", child page : " << childPage << std::endl;
         ReadPage(childPage);
     }
 
@@ -685,16 +946,6 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
     fragmentedFreeBytes = ByteStream(buffer + offset, 1);
     offset += 1;
 
-    // --------------------
-    // Console Output
-    // --------------------
-    std::cout << "Number of Cells : " << numberOfCells << std::endl;
-    std::cout << "Fragmented Free Bytes : " << fragmentedFreeBytes << std::endl;
-    std::cout << std::showbase << std::uppercase << std::hex;
-    std::cout << "First of Freeblock Offset : " << std::hex << 1024*(pageNumber-1) + freeblockOffset << std::endl;
-    std::cout << "First of Cellblock Offset : " << 1024*(pageNumber-1) + firstCellOffset << std::dec << std::endl;
-
-
 
     // -----------------------------------------------
     // Cell Offsets
@@ -704,15 +955,7 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
     {
         *(cellOffset + count) = ByteStream(buffer + offset, 2);
         offset += 2;
-        // --------------------
-        // Console Output
-        // --------------------
-        std::cout << "Cell Offset[" << count << "] : " << std::hex << 1024*(pageNumber-1) + cellOffset[count] << std::dec << std::endl;
     }
-    std::cout << std::noshowbase << std::nouppercase << std::dec;
-
-
-
 
     // -----------------------------------------------
     // Cell Contents
@@ -728,8 +971,6 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
         int lengthOfDataHeaderSize = 0;
         int numberOfFields = 0;
     };
-
-
     LeafCell *cell = new LeafCell[numberOfCells];
     int bytesCount, fieldBytesCount;
 
@@ -741,7 +982,7 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
     char *datac = 0;
     double dataf = 0;
 
-    int sqliteObjType = 0;  //temp var.  (1: table, 2: index)
+    int sqliteObjType = 0;  // temporary variable.  (1: table, 2: index)
 
     for (int count = 0; count < numberOfCells ; count++)
     {
@@ -749,7 +990,7 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
         fieldBytesCount = 0;
         offset = cellOffset[count];
 
-        sqliteObjType = 0;
+        sqliteObjType = 0;  // temporary vaiable.
         
         //---------------------
         // Cell Header
@@ -765,7 +1006,6 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
         cell[count].dataHeaderSize = BitPattern(buffer + offset, &varintSize);
         cell[count].lengthOfDataHeaderSize = varintSize;
 
-        std::cout << "Cell Content[" << count << "] : rowid : " << cell[count].rowId << std::endl;
         //
         // Data Header
         // Repeat 'Size of Field' datas until the end of the Data Header
@@ -777,26 +1017,29 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
             cell[count].numberOfFields++;
 
             dataSize = GetDataSize(content, &dataType);
-            std::cout << "    field" << cell[count].numberOfFields << "(" << dataSize << "bytes) : ";
 
             // PART B - Data of Field
+            //
             // current root page가 1일 경우 : ( sqlite_schema  B-tree Page )
             // 우선 Table인 데이터만 저장.
             // Index 등의 경우,   Table 객체보다 큰 상위 객체를 만들어야 함.
             // 그리고, 객체 타입을  table, index, ..로 지정해야함.
-            if(currentRootPage == 1)
+            if(currentRootPage == 1)    // Sqlite Schema
             {
+                if (dataType == DATA_TYPE_TEXT)
+                {
+                    datac = new char[dataSize + 1];
+                    for (int i = 0; i < dataSize; i++)
+                    {
+                        datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
+                        fieldBytesCount++;
+                    }
+                    datac[dataSize] = '\0';
+                }
+
                 switch (cell[count].numberOfFields)
                 {
                     case 1:
-                        datac = new char[dataSize + 1];
-                        for (int i = 0; i < dataSize; i++)
-                        {
-                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
-                            fieldBytesCount++;
-                        }
-                        datac[dataSize] = '\0';
-
                         if (strcmp("table", datac) == 0)
                         {
                             sqliteObjType = 1;
@@ -809,38 +1052,17 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
                         {
                             sqliteObjType = 2;
                         }
-                        std::cout << datac << std::endl;
-                        delete[] datac;
                     break;
 
                     case 2:
-                        datac = new char[dataSize + 1];
-                        for (int i = 0; i < dataSize; i++)
-                        {
-                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
-                            fieldBytesCount++;
-                        }
-                        datac[dataSize] = '\0';
-
                         if (sqliteObjType == 1)
                         {
                             table->name = datac;
                         }
-                        std::cout << datac << std::endl;
-                        delete[] datac;
                     break;
 
                     case 3:
-                        datac = new char[dataSize + 1];
-                        for (int i = 0; i < dataSize; i++)
-                        {
-                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
-                            fieldBytesCount++;
-                        }
-                        datac[dataSize] = '\0';
 
-                        std::cout << datac << std::endl;
-                        delete[] datac;
                     break;
 
                     case 4:
@@ -850,61 +1072,45 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
                             table->rootPage = datai;
                         }
                         
-                        std::cout << datai << " (";
-                        std::cout << std::showbase << std::uppercase << std::hex;
-                        std::cout << datai << ")" << std::endl;
-                        std::cout << std::noshowbase << std::nouppercase << std::dec;
                         fieldBytesCount += dataSize;
                     break;
 
                     case 5:
-                        datac = new char[dataSize + 1];
-                        for (int i = 0; i < dataSize; i++)
-                        {
-                            datac[i] = *(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount);
-                            fieldBytesCount++;
-                        }
-                        datac[dataSize] = '\0';
-
                         if (sqliteObjType == 1)
                         {
                             table->createSql = datac;
                         }
-                        std::cout << datac << std::endl;
-                        delete[] datac;
                     break;
                     default:
                         std::cout << "[error] Invalid sqlite schema" << std::endl;
                     break;
                 }
+                if (dataType == DATA_TYPE_TEXT)
+                    delete[] datac;
             }
             else
             {
                 switch (dataType)
                 {
                     case DATA_TYPE_NULL:
-                        std::cout << "NULL" << std::endl;
+                        //std::cout << "NULL" << std::endl;
                     break;
                     case DATA_TYPE_FLOAT64:
                         dataf = (double)ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                        std::cout << dataf << " (";
-                        std::cout << std::showbase << std::uppercase << std::hex;
-                        std::cout << dataf << ")" << std::endl;
-                        std::cout << std::noshowbase << std::nouppercase << std::dec;
                         fieldBytesCount += dataSize;
                     break;
                     case DATA_TYPE_ZERO:
-                        std::cout << "0" << std::endl;
+                        //std::cout << "0" << std::endl;
                     break;
                     case DATA_TYPE_ONE:
-                        std::cout << "1" << std::endl;
+                        //std::cout << "1" << std::endl;
                     break;
                     case DATA_TYPE_RESERVED:
-                        std::cout << "[error] Invalid data type" << std::endl;
+                        //std::cout << "[error] Invalid data type" << std::endl;
                     break;
                     case DATA_TYPE_BLOB:
                         datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                        std::cout << "BLOB type" << std::endl;
+                        //std::cout << "BLOB type" << std::endl;
                         fieldBytesCount += dataSize;
                     break;
                     case DATA_TYPE_TEXT:
@@ -916,15 +1122,15 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
                         }
                         datac[dataSize] = '\0';
                         
-                        std::cout << datac << std::endl;
+                        //std::cout << datac << std::endl;
                         delete[] datac;
                     break;
                     default:
                         datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                        std::cout << datai << " (";
+                        /*std::cout << datai << " (";
                         std::cout << std::showbase << std::uppercase << std::hex;
                         std::cout << datai << ")" << std::endl;
-                        std::cout << std::noshowbase << std::nouppercase << std::dec;
+                        std::cout << std::noshowbase << std::nouppercase << std::dec;*/
                         fieldBytesCount += dataSize;
                     break;
                 }
@@ -945,7 +1151,21 @@ int DBConverter::LeafIndex(unsigned char *buffer, int pageNumber)
 {
     return 0;
 };
+void DBConverter::SqlParsing()
+{
+    SqlParser parser;
+    tableList.resetCurrent();
+    table = (Table *)tableList.getNodeData();
 
+    std::string sql;
+
+    // 1) Remove new line ("\r\n") and tab;
+    sql = parser.Trimming(table->createSql);
+
+    // 2) 
+    parser.tableContents(sql);
+
+}
 
 
 class ExcelConverter{
