@@ -245,22 +245,47 @@ class SqlParser
 {
     int numberOfFields;
     char *sql;
+    char *head;
+    char *content;
 
 public:
 
-    void inputSql(std::string input)
+    void InputSql(std::string input)
     {
+        input = Trimming(input);
         char *sql = new char[input.size() + 1];
         std::copy(input.begin(), input.end(), sql);
         sql[input.size()] = '\0';
-    }
 
-    void deleteSql()
-    {
-        delete[] sql;
+        head = GetHead(sql);
+        content = GetContent(sql);
     }
     
-    void tableContents(std::string input) 
+    void DeleteSql()
+    {
+        delete[] head, content, sql;
+    }
+
+    char *GetHead(char *input)
+    {
+        int size = strlen(input) - strlen(strchr(input, '('));
+        char *parsed = new char[size + 1];
+        memcpy(parsed, input, size);
+        parsed[size] = '\0';
+        return parsed;
+    }
+
+    char *GetContent(char *input)
+    {
+        input = strpbrk(input, "(") + 1;
+        int size = strlen(input) - strlen(strrchr(input, ')'));
+        char *parsed = new char[size + 1];
+        memcpy(parsed, input, size);
+        parsed[size] = '\0';
+        return parsed;
+    }
+
+    void TableContents(std::string input) 
     {
         //----------------
         // initialize
@@ -323,25 +348,6 @@ public:
         return;
     }
 
-    char *GetHead(char *input)
-    {
-        int size = strlen(input) - strlen(strchr(input, '('));
-        char *parsed = new char[size + 1];
-        memcpy(parsed, input, size);
-        parsed[size] = '\0';
-        return parsed;
-    }
-
-    char *GetContent(char *input)
-    {
-        input = strpbrk(input, "(") + 1;
-        int size = strlen(input) - strlen(strrchr(input, ')'));
-        char *parsed = new char[size + 1];
-        memcpy(parsed, input, size);
-        parsed[size] = '\0';
-        return parsed;
-    }
-
     int GetNumberOfField(char *input) //해씀
     {
         std::string a = input;
@@ -371,7 +377,7 @@ public:
         return sqlParagraph;
     }
 
-    int getNumberOfSentece(char *sqlParagraph) 
+    int GetNumberOfSentece(char *sqlParagraph) 
     {
         std::string buffer = sqlParagraph;
         int numberOfSentence = 0;
@@ -383,7 +389,7 @@ public:
         return numberOfSentence; 
     }
 
-    int getNumberOfWord(char *sentence) 
+    int GetNumberOfWord(char *sentence) 
     {
         std::string a = sentence;
         int numberOfWord = 0;
@@ -395,7 +401,7 @@ public:
         return numberOfWord + 1; 
     }    
 
-    std::string getTableName(char *sqlParagraph) 
+    std::string GetTableName(char *sqlParagraph) 
     {
         char *buffer = NULL;
         char *tableName = 0;
@@ -404,7 +410,7 @@ public:
         return tableName;
     };
 
-    /*Field getField(std::string input) 
+    /*Field GetField(std::string input) 
     {
         Field fieldContents;
         std::string fieldNamebuffer;
@@ -417,7 +423,7 @@ public:
         return fieldContents;
     };*/
 
-    void splitSql(char *sqlParagraph) // 저장 모르게따..
+    void SplitSql(char *sqlParagraph) // 저장 모르게따..
     {
         char *sentence = NULL;
         int stringLength = 0;
@@ -444,7 +450,7 @@ public:
         return;
     };
 
-    void splitSentence(char *sentence)
+    void SplitSentence(char *sentence)
     {
 
         char *word = NULL;
@@ -463,7 +469,7 @@ public:
 
     }
 
-    bool isPrimeryKey(char *sentence)
+    bool IsPrimeryKey(char *sentence)
     {
         std::string buffer = sentence;
         if (buffer.find("PRIMARY KEY") != std::string::npos)
@@ -473,7 +479,7 @@ public:
         else return false;
     }
 
-    bool isNallAble(char *sentence)
+    bool IsNallAble(char *sentence)
     {
         std::string buffer = sentence;
         if (buffer.find("NOT NULL") != std::string::npos)
@@ -483,7 +489,7 @@ public:
         else return true;    
     }
 
-    bool isAutoincrement(char *sentence)
+    bool IsAutoincrement(char *sentence)
     {
         std::string buffer = sentence;
         if (buffer.find("AUTOINCREMENT") != std::string::npos)
@@ -495,7 +501,7 @@ public:
 
     }
 
-    std::string getDataType(char *sentence)
+    std::string GetDataType(char *sentence)
     {
         char *dataType = NULL;
         dataType = strchr(sentence, ']') + 1;
@@ -1159,11 +1165,30 @@ void DBConverter::SqlParsing()
 
     std::string sql;
 
-    // 1) Remove new line ("\r\n") and tab;
-    sql = parser.Trimming(table->createSql);
+    // (0) Input Sql ---> Trimming ---> Split head
+    parser.InputSql(table->createSql);
 
-    // 2) 
-    parser.tableContents(sql);
+    // (1) Table name
+    parser.GetTableName();
+
+    // (2) The number of fields
+    parser.GetNumberOfField();
+
+    // (3) Field datas (repeat x (2))
+    parser.GetFieldName();
+    parser.GetDataType();
+    parser.IsPrimaryKey();
+    parser.IsAutoincrement();
+    parser.IsNullable();
+    
+    // (4) The number of Constraint
+    parser.GetNumberOfConstraint();
+
+    // (5) Constraint (repeat x (4))
+    parser.GetConstraint();
+
+    // (6)
+    parser.DeleteSql();
 
 }
 
