@@ -242,13 +242,28 @@ public:
 };
 
 class SqlParser
-{
-    int numberOfFields, numberOfConstraints;
+{;
     char *sql;
     char *head;
     char *content;
 
+    char *field;
+    char *constraint;
+    char **fields;
+    char **constraints;
+
+    LinkedList fieldSentence;
+    LinkedList constraintSentence;
+
+    int numberOfSentence, numberOfField, numberOfConstraint;
+
 public:
+
+    ~SqlParser()
+    {
+        fieldSentence.resetCurrent();
+        fieldSentence.deleteNode();
+    }
     std::string Trimming(std::string input)
     {
 	    input.erase(std::remove(input.begin(), input.end(), 0x0d), input.end());    // '\r'
@@ -271,6 +286,21 @@ public:
     
     void DeleteSql()
     {
+        /*int i;
+        int numberOfFields = GetNumberOfField();
+        for (i = 0; i <numberOfFields; i++)
+        {
+            std::cout << fields[i] << std::endl;
+            delete[] fields[i];
+        }
+        delete[] fields;
+        int numberOfConstraints = GetNumberOfConstraint();
+        for (i = 0; i <numberOfConstraints; i++)
+        {
+            std::cout << constraints[i] << std::endl;
+            delete[] constraints[i];
+        }
+        delete[] constraints;*/
         delete[] head, content, sql;
     }
 
@@ -293,13 +323,39 @@ public:
         return parsed;
     }
 
+    std::string GetTableName() 
+    {
+        std::string tableName;
+        char *pointer = strchr(head, '\"');
+        if (pointer == NULL)
+        {
+            pointer = strstr(head, "sqlite_");
+            if (pointer == NULL)
+                std::cout << "Sqlite system table" << std::endl;
+            else
+                tableName = pointer;
+        }
+        else
+        {
+            pointer = pointer + 1;
+            int size = strlen(pointer) - strlen(strrchr(pointer, '\"'));
+            char *buffer = new char[size + 1];
+            memcpy(buffer, pointer, size);
+            buffer[size] = '\0';
+            tableName = buffer;
+            delete[] buffer;
+        }
+        return tableName;
+    };
+
+
     int GetNumberOfSentence()
     {
         std::string buffer = content;
-        int numberOfSentence = 1;
+        numberOfSentence = 1;
         for (int i = 0; i < buffer.size(); i++) 
         {   
-            if (buffer[i] == ',')  //find ','의 개수 + 1
+            if (buffer[i] == ',')
                 numberOfSentence++;
         }
         return numberOfSentence; 
@@ -307,48 +363,28 @@ public:
 
     int GetNumberOfField()
     {
-        std::string a = content;
         int count = 0;
-        for (int i = 0; i < a.size(); i++) 
-        {   
-            if (a[i] == ',')  //find ','의 개수를 구함
-            count++;
+        int size = 0;
+        char *buffer = content;
+        char *pointer = NULL;
+        int numberOfSentence = GetNumberOfSentence();
+        for (int i = 0; i < numberOfSentence; i++)
+        {
+            while (*buffer == ' ')
+                buffer++;
+            if (*buffer == '[')
+                count++;
+            pointer = strchr(buffer, ',');
+            if (pointer == NULL)
+                break;
+            else
+            {
+                size = strlen(buffer) - strlen(pointer) + 1;
+                buffer += size;
+            }
         }
         return count;
     }
-
-    int GetNumberOfConstraint()
-    {
-        int numberOfSentences = GetNumberOfSentence();
-        return numberOfSentences - numberOfFields;
-    }
-
-    void SplitSql(char *sqlParagraph)
-    {
-        char *sentence = NULL;
-        int stringLength = 0;
-        int i = 1;
-
-        sentence = strtok(sqlParagraph, ",");
-        while (sentence != NULL)
-        {
-            printf("Sentence%d----------------------------------------------------------------\n",i);
-            while (*sentence == ' ')
-            {
-
-                sentence++;
-            }
-            
-            stringLength = strlen(sentence);
-            printf("%s\n", sentence);
-            SplitSentence(sentence);
-            sentence += stringLength + 1;
-            sentence = strtok(sentence, ",");
-
-            i++;
-        }
-        return;
-    };
 
     void SplitSentence(char *sentence)
     {
@@ -368,20 +404,7 @@ public:
     }
 
 
-    std::string GetTableName() 
-    {
-        std::string tableName;
-        char *temp = strchr(head, '\"') + 1;
-        int size = strlen(temp) - strlen(strrchr(temp, '\"'));
-        char *buffer = new char[size + 1];
 
-        memcpy(buffer, temp, size);
-        buffer[size] = '\0';
-        tableName = buffer;
-
-        delete[] buffer;
-        return tableName;
-    };
 
     std::string GetDataType(char *sentence)
     {
@@ -444,10 +467,121 @@ public:
 
     void Parse()
     {
-        numberOfFields = GetNumberOfField();
-        numberOfConstraints = GetNumberOfConstraint();
+        int numberOfFields = 0;
+        int numberOfConstraints = 0;
 
-        
+        char *start = content;
+        char *end = NULL;
+        int size = 0;
+        int count = 0;
+
+        char *pointer = NULL;
+
+        int temp = 0;
+
+        while(1)
+        {
+            while (*start == ' ')
+                start++;
+
+            if (*start == '[')  // field
+            {
+                pointer = strstr(start, "NUMERIC");
+                end = strchr(start, ',');
+
+                if (pointer != NULL && end != NULL)
+                {
+                    if(pointer < end) end = strchr(end + 1, ',');
+                }
+
+                if (end == NULL)
+                {
+                    size = strlen(start);
+                    field = new char[size + 1];
+                    memcpy(field, start, size);
+                    field[size] = '\0';
+                    numberOfFields++;
+                    fieldSentence.addNode(field);
+                    std::cout << field << std::endl;
+                    break;
+                }
+                else
+                {
+                    size = strlen(start) - strlen(end);
+                    field = new char[size + 1];
+                    memcpy(field, start, size);
+                    field[size] = '\0';
+                    start += size + 1;
+                    numberOfFields++;
+                    fieldSentence.addNode(field);
+                    std::cout << field << std::endl;
+                    continue;
+                }
+            }
+            else
+            {
+                if (strncmp(start, "CONSTRAINT", strlen("CONSTRAINT")) == 0)
+                {
+                    //std::cout << "CONSTRAINT" << std::endl;
+                    numberOfConstraints++;
+                    temp = 1;
+                }
+                else if (strncmp(start, "PRIMARY", strlen("PRIMARY")) == 0)
+                {
+                    //std::cout << "PRIMARY" << std::endl;
+                    numberOfConstraints++;
+                    temp = 1;
+                }
+                else if (strncmp(start, "FOREIGN", strlen("FOREIGN")) == 0)
+                {
+                    //std::cout << "FOREIGN" << std::endl;
+                    numberOfConstraints++;
+                    temp = 1;
+                }
+                else if (strncmp(start, "UNIQUE", strlen("UNIQUE")) == 0)
+                {
+                    //std::cout << "UNIQUE" << std::endl;
+                    numberOfConstraints++;
+                    temp = 1;
+                }
+                else if (strncmp(start, "CHECK", strlen("CHECK")) == 0)
+                {
+                    //std::cout << "CHECK" << std::endl;
+                    numberOfConstraints++;
+                    temp = 1;
+                }
+                else
+                {
+                    //std::cout << "[error] sentence parsing" << std::endl;
+                }
+                
+                end = strchr(start, ',');
+                if (end == NULL)
+                {
+                    size = strlen(start);
+                    constraint = new char[size + 1];
+                    memcpy(constraint, start, size);
+                    constraint[size] = '\0';
+                    constraintSentence.addNode(constraint);
+                    std::cout << constraint << std::endl;
+                    break;
+                }
+                else
+                {
+                    size = strlen(start) - strlen(end);
+                    constraint = new char[size + 1];
+                    memcpy(constraint, start, size);
+                    constraint[size] = '\0';
+                    start += size + 1;
+                    constraintSentence.addNode(constraint);
+                    std::cout << constraint << std::endl;
+                    continue;
+                }
+            }
+
+        }
+        std::cout << "Number of fields: " << numberOfFields << std::endl;
+        std::cout << "Number of constraints: " << numberOfConstraints << std::endl;
     }
 
 
@@ -1101,39 +1235,38 @@ int DBConverter::LeafIndex(unsigned char *buffer, int pageNumber)
 };
 void DBConverter::SqlParsing()
 {
-    SqlParser parser;
     tableList.resetCurrent();
-    table = (Table *)tableList.getNodeData();
 
-    std::string sql;
+    for (int i = 0; i < numberOfTables; i++)
+    {
+        SqlParser parser;
+        table = (Table *)tableList.getNodeData();
+        
+        // (0) Input Sql ---> Trimming ---> Split head
+        parser.InputSql(table->createSql);
 
-    // (0) Input Sql ---> Trimming ---> Split head
-    parser.InputSql(table->createSql);
+        // (1) Table name
+        std::cout << "----Table[" << i + 1 << "]----" << std::endl;
+        std::cout << "Table name: " << parser.GetTableName() << std::endl;
 
-    parser.Parse();
+        // (2) Parse Senetences - Fields & Constraints
+        parser.Parse();
 
-    // (1) Table name
-    std::cout << "Table name: " << parser.GetTableName() << std::endl;
-    std::cout << "num of sentence: " << parser.GetNumberOfSentence() << std::endl;
 
-    // (2) The number of fields
-    //parser.GetNumberOfField();
+        // (3) Field datas
+        /*parser.GetFieldName();
+        parser.GetDataType();
+        parser.IsPrimaryKey();
+        parser.IsAutoincrement();
+        parser.IsNullable();*/
 
-    // (3) Field datas (repeat x (2))
-    /*parser.GetFieldName();
-    parser.GetDataType();
-    parser.IsPrimaryKey();
-    parser.IsAutoincrement();
-    parser.IsNullable();*/
-    
-    // (4) The number of Constraint
-    parser.GetNumberOfConstraint();
+        // (4) Constraints
+        parser.GetConstraint();
 
-    // (5) Constraint (repeat x (4))
-    parser.GetConstraint();
+        // (5) Exit parsing
+        parser.DeleteSql();
+    }
 
-    // (6)
-    parser.DeleteSql();
 }
 
 
