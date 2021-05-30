@@ -249,60 +249,11 @@ class SqlParser
 
     char *field;
     char *constraint;
-    char **fields;
-    char **constraints;
 
     LinkedList fieldSentence;
     LinkedList constraintSentence;
 
-    int numberOfSentence, numberOfField, numberOfConstraint;
-
-public:
-
-    ~SqlParser()
-    {
-        fieldSentence.resetCurrent();
-        fieldSentence.deleteNode();
-    }
-    std::string Trimming(std::string input)
-    {
-	    input.erase(std::remove(input.begin(), input.end(), 0x0d), input.end());    // '\r'
-        input.erase(std::remove(input.begin(), input.end(), 0x0a), input.end());    // '\n'
-        input.erase(std::remove(input.begin(), input.end(), 0x09), input.end());    // tab
-
-        return input;
-    }
-
-    void InputSql(std::string input)
-    {
-        input = Trimming(input);
-        char *sql = new char[input.size() + 1];
-        std::copy(input.begin(), input.end(), sql);
-        sql[input.size()] = '\0';
-
-        head = GetHead(sql);
-        content = GetContent(sql);
-    }
-    
-    void DeleteSql()
-    {
-        /*int i;
-        int numberOfFields = GetNumberOfField();
-        for (i = 0; i <numberOfFields; i++)
-        {
-            std::cout << fields[i] << std::endl;
-            delete[] fields[i];
-        }
-        delete[] fields;
-        int numberOfConstraints = GetNumberOfConstraint();
-        for (i = 0; i <numberOfConstraints; i++)
-        {
-            std::cout << constraints[i] << std::endl;
-            delete[] constraints[i];
-        }
-        delete[] constraints;*/
-        delete[] head, content, sql;
-    }
+    int numberOfFields, numberOfConstraints;
 
     char *GetHead(char *input)
     {
@@ -322,6 +273,41 @@ public:
         parsed[size] = '\0';
         return parsed;
     }
+    
+    std::string Trimming(std::string input)
+    {
+	    input.erase(std::remove(input.begin(), input.end(), 0x0d), input.end());    // '\r'
+        input.erase(std::remove(input.begin(), input.end(), 0x0a), input.end());    // '\n'
+        input.erase(std::remove(input.begin(), input.end(), 0x09), input.end());    // tab
+
+        return input;
+    }
+
+
+public:
+
+    ~SqlParser()
+    {
+        fieldSentence.resetCurrent();
+        fieldSentence.deleteNode();
+    }
+
+    void InputSql(std::string input)
+    {
+        input = Trimming(input);
+        char *sql = new char[input.size() + 1];
+        std::copy(input.begin(), input.end(), sql);
+        sql[input.size()] = '\0';
+
+        head = GetHead(sql);
+        content = GetContent(sql);
+    }
+    
+    void DeleteSql()
+    {
+        delete[] head, content, sql;
+    }
+
 
     std::string GetTableName() 
     {
@@ -348,76 +334,20 @@ public:
         return tableName;
     };
 
-
-    int GetNumberOfSentence()
-    {
-        std::string buffer = content;
-        numberOfSentence = 1;
-        for (int i = 0; i < buffer.size(); i++) 
-        {   
-            if (buffer[i] == ',')
-                numberOfSentence++;
-        }
-        return numberOfSentence; 
-    }
-
     int GetNumberOfField()
     {
-        int count = 0;
-        int size = 0;
-        char *buffer = content;
-        char *pointer = NULL;
-        int numberOfSentence = GetNumberOfSentence();
-        for (int i = 0; i < numberOfSentence; i++)
-        {
-            while (*buffer == ' ')
-                buffer++;
-            if (*buffer == '[')
-                count++;
-            pointer = strchr(buffer, ',');
-            if (pointer == NULL)
-                break;
-            else
-            {
-                size = strlen(buffer) - strlen(pointer) + 1;
-                buffer += size;
-            }
-        }
-        return count;
+        return numberOfFields;
     }
 
-    void SplitSentence(char *sentence)
+    int GetNumberOfConstraint()
     {
-        char *word = NULL;
-
-        printf("Word---------------------------------------\n");
-        word = strtok(sentence, " ");
-        while (word != NULL)
-        {
-            while (*word == ' ')
-            {
-                word++;
-            }
-            printf("%s\n", word);
-            word = strtok(NULL, " ");
-        }
+        return numberOfConstraints;
     }
 
 
-
-
-    std::string GetDataType(char *sentence)
+    bool IsPrimaryKey()
     {
-        char *dataType = NULL;
-        dataType = strchr(sentence, ']') + 1;
-        dataType = strtok(dataType," ");
-
-        return dataType;
-    }
-
-    bool IsPrimaryKey(char *sentence)
-    {
-        std::string buffer = sentence;
+        std::string buffer = field;
         if (buffer.find("PRIMARY KEY") != std::string::npos)
         {
             return true;
@@ -425,98 +355,97 @@ public:
         else return false;
     }
 
-    bool IsNullable(char *sentence)
+    bool IsNullable()
     {
-        std::string buffer = sentence;
+        std::string buffer = field;
         if (buffer.find("NOT NULL") != std::string::npos)
         {
             return false;
         }
-        else return true;    
+        else return true;
     }
 
-    bool IsAutoincrement(char *sentence)
+    bool IsAutoincrement()
     {
-        std::string buffer = sentence;
+        std::string buffer = field;
         if (buffer.find("AUTOINCREMENT") != std::string::npos)
         {
             return true;
         }
-        else return false;    
-        
-
+        else return false;
     }
 
-
-    void GetConstraint()
+    bool IsUnique()
     {
-        
-    }
-
-    int GetNumberOfWord(char *sentence) 
-    {
-        std::string a = sentence;
-        int numberOfWord = 0;
-        for (int i = 0; i < a.size(); i++) 
-        {   
-            if (a[i] == ' ')  //find ' '의 개수를 구함
-            numberOfWord++;
+        std::string buffer = field;
+        if (buffer.find("UNIQUE") != std::string::npos)
+        {
+            return true;
         }
-        return numberOfWord + 1; 
+        else return false;
     }
+
 
     void Parse()
     {
-        int numberOfFields = 0;
-        int numberOfConstraints = 0;
+        numberOfFields = 0;
+        numberOfConstraints = 0;
 
-        char *start = content;
-        char *end = NULL;
-        int size = 0;
-        int count = 0;
+        char *start = content;  // 검사할 문장 처음 위치
+        char *end = NULL;       // 마지막 위치 ',' 기준
+        int size = 0;           // 문장의 길이(크기)
+        int searchComma = 0;    // 찾은 ',' 까지의 길이
+        int searchChar1 = 0;    // 찾은 문자의 길이1
+        int searchChar2 = 0;    // 찾은 문자의 길이2
 
-        char *pointer = NULL;
-
-        int temp = 0;
-
-        while(1)
+        do
         {
+            // 문장 앞부분은 항상 공백 검사
             while (*start == ' ')
                 start++;
 
             if (*start == '[')  // field
             {
-                pointer = strstr(start, "NUMERIC");
+                numberOfFields++;
+
                 end = strchr(start, ',');
 
-                if (pointer != NULL && end != NULL)
+                // () 소괄호를 찾으면 건너 뛰는 방법
+                searchComma = strcspn(start, ",");
+                searchChar1 = strcspn(start, "(");
+                searchChar2 = strcspn(start, ")");
+
+                if (searchChar2 > searchComma)
                 {
-                    if(pointer < end) end = strchr(end + 1, ',');
+                    while (searchChar1 < searchComma && searchChar2 > searchComma)
+                    {
+                        end = strchr(end + 1, ',');
+                        searchComma += strcspn(start + searchComma + 1, ",") + 1;
+                    }
+                    searchChar1 += strcspn(start + searchChar1 + 1, "(") + 1;
+                    searchChar2 += strcspn(start + searchChar2 + 1, ")") + 1;
                 }
 
-                if (end == NULL)
+
+                // 문장에 NUMERIC이 있으면 ',' 하나 건너 뛰는 방법
+                /*search = strstr(start, "NUMERIC");
+                end = strchr(start, ',');
+                if (search != NULL && end != NULL)
                 {
-                    size = strlen(start);
-                    field = new char[size + 1];
-                    memcpy(field, start, size);
-                    field[size] = '\0';
-                    numberOfFields++;
-                    fieldSentence.addNode(field);
-                    std::cout << field << std::endl;
-                    break;
-                }
-                else
-                {
-                    size = strlen(start) - strlen(end);
-                    field = new char[size + 1];
-                    memcpy(field, start, size);
-                    field[size] = '\0';
-                    start += size + 1;
-                    numberOfFields++;
-                    fieldSentence.addNode(field);
-                    std::cout << field << std::endl;
-                    continue;
-                }
+                    if(search < end) end = strchr(end + 1, ',');
+                }*/
+
+
+                size = strlen(start);
+                if (end != NULL) size -= strlen(end);
+                field = new char[size + 1];
+                memcpy(field, start, size);
+                field[size] = '\0';
+
+                if (end != NULL) start += size +1;
+                fieldSentence.addNode(field);
+                //std::cout << field << std::endl;
+
             }
             else
             {
@@ -524,31 +453,26 @@ public:
                 {
                     //std::cout << "CONSTRAINT" << std::endl;
                     numberOfConstraints++;
-                    temp = 1;
                 }
                 else if (strncmp(start, "PRIMARY", strlen("PRIMARY")) == 0)
                 {
                     //std::cout << "PRIMARY" << std::endl;
                     numberOfConstraints++;
-                    temp = 1;
                 }
                 else if (strncmp(start, "FOREIGN", strlen("FOREIGN")) == 0)
                 {
                     //std::cout << "FOREIGN" << std::endl;
                     numberOfConstraints++;
-                    temp = 1;
                 }
                 else if (strncmp(start, "UNIQUE", strlen("UNIQUE")) == 0)
                 {
                     //std::cout << "UNIQUE" << std::endl;
                     numberOfConstraints++;
-                    temp = 1;
                 }
                 else if (strncmp(start, "CHECK", strlen("CHECK")) == 0)
                 {
                     //std::cout << "CHECK" << std::endl;
                     numberOfConstraints++;
-                    temp = 1;
                 }
                 else
                 {
@@ -556,35 +480,274 @@ public:
                 }
                 
                 end = strchr(start, ',');
-                if (end == NULL)
+                // () 소괄호를 찾으면 건너 뛰는 방법
+                searchComma = strcspn(start, ",");
+                searchChar1 = strcspn(start, "(");
+                searchChar2 = strcspn(start, ")");
+
+                if (searchChar2 > searchComma)
                 {
-                    size = strlen(start);
-                    constraint = new char[size + 1];
-                    memcpy(constraint, start, size);
-                    constraint[size] = '\0';
-                    constraintSentence.addNode(constraint);
-                    std::cout << constraint << std::endl;
-                    break;
+                    while (searchChar1 < searchComma && searchChar2 > searchComma)
+                    {
+                        end = strchr(end + 1, ',');
+                        searchComma += strcspn(start + searchComma + 1, ",") + 1;
+                    }
+                    searchChar1 += strcspn(start + searchChar1 + 1, "(") + 1;
+                    searchChar2 += strcspn(start + searchChar2 + 1, ")") + 1;
                 }
-                else
-                {
-                    size = strlen(start) - strlen(end);
-                    constraint = new char[size + 1];
-                    memcpy(constraint, start, size);
-                    constraint[size] = '\0';
-                    start += size + 1;
-                    constraintSentence.addNode(constraint);
-                    std::cout << constraint << std::endl;
-                    continue;
-                }
+
+                size = strlen(start);
+                if (end != NULL) size -= strlen(end);
+                constraint = new char[size + 1];
+                memcpy(constraint, start, size);
+                constraint[size] = '\0';
+
+                if (end != NULL) start += size +1;
+                constraintSentence.addNode(constraint);
+                //std::cout << constraint << std::endl;
             }
 
-        }
+        } while (end != NULL);
         std::cout << "Number of fields: " << numberOfFields << std::endl;
         std::cout << "Number of constraints: " << numberOfConstraints << std::endl;
     }
 
+    void GetField()
+    {
+        field = (char *)fieldSentence.getNodeData();
+    }
+    
+    std::string GetFieldName()
+    {
+        char *fieldName;
+        fieldName = strtok(field, " ");
+        field += strlen(fieldName) + 1;
+        return fieldName;
+    }
 
+    std::string GetDataType()
+    {
+        char *dataType;
+        dataType = strtok(field, " ");
+        field += strlen(dataType) + 1;
+        return dataType;
+    }
+
+    std::string GetCollate()
+    {
+        char *data = strstr(field, "COLLATE");
+        if (data != NULL)
+        {
+            //strtok(data, " ");
+            //data = strtok(NULL, " ");
+
+            return "Field - Collation";
+        }
+        return "none";
+    }
+
+    std::string GetCheck()
+    {
+        char *data = strstr(field, "CHECK");
+        if (data != NULL)
+        {
+            //strtok(data, " ");
+            //data = strtok(NULL, " ");
+
+            return "Field - Check";
+        }
+        return "none";
+    }
+
+    std::string GetDefault()
+    {
+        char *data = strstr(field, "DEFAULT");
+        if (data != NULL)
+        {
+            //strtok(data, " ");
+            //data = strtok(NULL, " ");
+
+            return "Field - Default";
+        }
+        return "none";
+    }
+
+    std::string GetForeignKey()
+    {
+        int size = strlen(field) + 1;
+        char *copy = new char[size];
+        memcpy(copy, field, size);
+
+        char *data = strstr(copy, "FOREIGN KEY");
+        if (data != NULL)
+        {
+            //strtok(data, " ");
+            //strtok(NULL, " ");
+            //data = strtok(NULL, " ");
+            delete[] copy;
+            return "Field - Foreign key";
+        }
+        delete[] copy;
+        return data;
+    }
+
+
+    void GetConstraint()
+    {
+        constraint = (char *)constraintSentence.getNodeData();
+    }
+
+    std::string GetConstraintName()
+    {
+        if ( strstr(constraint, "CONSTRAINT") != NULL)
+        {
+            //strtok(data, " ");
+            //data = strtok(NULL, " ");
+
+            strtok(constraint, " ");
+            constraint += strlen(constraint) + 1;
+            char *constraintName = strtok(NULL, " ");
+            constraint += strlen(constraint) + 1;
+            return constraintName;
+        }
+        return "none";
+    }
+
+    std::string GetPrimaryKey()
+    {
+        if (strstr(constraint, "PRIMARY KEY") != NULL)
+        {
+            return "    ";
+
+        }
+        return "none";
+    }
+
+    std::string GetUnique()
+    {
+        if (strstr(constraint, "UNIQUE") != NULL)
+        {
+            return "    ";
+
+        }
+        return "none";
+    }
+
+    std::string GetCheck2()
+    {
+        if (strstr(constraint, "CHECK") != NULL)
+        {
+            return "    ";
+
+        }
+        return "none";
+    }
+
+    std::string GetForeignKey2()
+    {
+        char *src = strstr(constraint, "FOREIGN KEY");
+        char *dest;
+        std::string fk;
+        if (src != NULL)
+        {
+            src = strchr(src, '(') + 1;
+            char *end = strchr(src, ')');
+            int size = strlen(src) - strlen(end);
+            dest = new char[size + 1];
+            memcpy(dest, src, size);
+            dest[size] = '\0';
+            fk = dest;
+            delete[] dest;
+            return fk;
+        }
+        return "none";
+    }
+
+    std::string GetReferenceTable2()
+    {
+        char *src = strstr(constraint, "REFERENCES");
+        char *dest;
+        std::string refer;
+        if (src != NULL)
+        {
+            src = strchr(src, '\"') + 1;
+            char *end = strchr(src, '\"');
+            int size = strlen(src) - strlen(end);
+            dest = new char[size + 1];
+            memcpy(dest, src, size);
+            dest[size] = '\0';
+            refer = dest;
+            delete[] dest;
+            return refer;
+        }
+        return "none";
+    }
+
+    std::string GetReferenceField2()
+    {
+        char *src = strstr(constraint, "REFERENCES");
+        char *dest;
+        std::string refer;
+        if (src != NULL)
+        {
+            src = strchr(src, '(') + 1;
+            char *end = strchr(src, ')');
+            int size = strlen(src) - strlen(end);
+            dest = new char[size + 1];
+            memcpy(dest, src, size);
+            dest[size] = '\0';
+            refer = dest;
+            delete[] dest;
+            return refer;
+        }
+        return "none";
+    }
+
+    int DeleteRule()
+    {
+        char dest[23];
+        int rule = 0;
+        char *src = strstr(constraint, "ON DELETE");
+        if (src != NULL)
+        {
+            memcpy(dest, src, 23);
+            dest[22] = '\0';
+            if (strstr(dest, "ON RESTRICT") != NULL)
+                rule = REFERENCE_RULE_RESTRICT;
+            if (strstr(dest, "ON CASCADE") != NULL)
+                rule = REFERENCE_RULE_CASCADE;
+            if (strstr(dest, "NO ACTION") != NULL)
+                rule = REFERENCE_RULE_NOACTION;
+            if (strstr(dest, "SET NULL") != NULL)
+                rule = REFERENCE_RULE_SETNULL;
+            if (strstr(dest, "SET DEFAULT") != NULL)
+                rule = REFERENCE_RULE_SETDEFAULT;
+        }
+        return rule;
+    }
+
+    int UpdateRule()
+    {
+        char dest[23];
+        int rule = 0;
+        char *src = strstr(constraint, "ON UPDATE");
+        if (src != NULL)
+        {
+            memcpy(dest, src, 23);
+            dest[22] = '\0';
+            if (strstr(dest, "ON RESTRICT") != NULL)
+                rule = REFERENCE_RULE_RESTRICT;
+            if (strstr(dest, "ON CASCADE") != NULL)
+                rule = REFERENCE_RULE_CASCADE;
+            if (strstr(dest, "NO ACTION") != NULL)
+                rule = REFERENCE_RULE_NOACTION;
+            if (strstr(dest, "SET NULL") != NULL)
+                rule = REFERENCE_RULE_SETNULL;
+            if (strstr(dest, "SET DEFAULT") != NULL)
+                rule = REFERENCE_RULE_SETDEFAULT;
+        }
+        return rule;
+    }
 };
 
 class DBConverter{
@@ -1240,6 +1403,7 @@ void DBConverter::SqlParsing()
     for (int i = 0; i < numberOfTables; i++)
     {
         SqlParser parser;
+        int fieldNum, constraintNum;
         table = (Table *)tableList.getNodeData();
         
         // (0) Input Sql ---> Trimming ---> Split head
@@ -1252,16 +1416,42 @@ void DBConverter::SqlParsing()
         // (2) Parse Senetences - Fields & Constraints
         parser.Parse();
 
-
         // (3) Field datas
-        /*parser.GetFieldName();
-        parser.GetDataType();
-        parser.IsPrimaryKey();
-        parser.IsAutoincrement();
-        parser.IsNullable();*/
+        fieldNum = parser.GetNumberOfField();
+        for (int j = 0; j < fieldNum; j++)
+        {
+            parser.GetField();
+            std::cout << "field[" << j + 1 << "] " << parser.GetFieldName();
+            std::cout << " / " << parser.GetDataType();
+            
+            std::cout << " / PK(" << parser.IsPrimaryKey() << ")";
+            std::cout << " / AI(" << parser.IsAutoincrement() << ")";
+            std::cout << " / NULLABLE(" << parser.IsNullable() << ")";
+            std::cout << " / UNIQUE(" << parser.IsUnique() << ")";
+
+            std::cout << " / DEFAULT(" << parser.GetDefault() << ")";
+            std::cout << " / CHECK(" << parser.GetCheck() << ")";
+            std::cout << " / COLLATE(" << parser.GetCollate() << ")";
+            //std::cout << " / FK(" << parser.GetForeignKey() << ")";
+            std::cout << std::endl;
+        }
 
         // (4) Constraints
-        parser.GetConstraint();
+        constraintNum = parser.GetNumberOfConstraint();
+        for (int j = 0; j < constraintNum; j++)
+        {
+            parser.GetConstraint();
+            std::cout << "constraint[" << j + 1 << "] " << parser.GetConstraintName();
+            std::cout << " / PK(" << parser.GetPrimaryKey() << ")";
+            std::cout << " / UNIQUE(" << parser.GetUnique() << ")";
+            std::cout << " / CHECK(" << parser.GetCheck2() << ")";
+            std::cout << " / FK(" << parser.GetForeignKey2() << ")";
+            std::cout << " / REFERENCE(" << parser.GetReferenceTable2();
+            std::cout << " - " << parser.GetReferenceField2();
+            std::cout << " - " << parser.DeleteRule() << " ";
+            std::cout << " - " << parser.UpdateRule() << ")";
+            std::cout << std::endl;
+        }
 
         // (5) Exit parsing
         parser.DeleteSql();
