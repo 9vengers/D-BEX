@@ -39,47 +39,6 @@
 #define REFERENCE_RULE_SETNULL 404
 #define REFERENCE_RULE_SETDEFAULT 405
 
-struct ForeignKey{
-    std::string field;
-    std::string table;
-
-    // 401: RESTRICT  402: CASCADE  403:NO ACTION  404: SET NULL  405: SET DEFAULT
-    int onDelete;
-    int onUpdate;
-};
-struct Field{
-    // 301: NULL   302: INT    303: REAL   304: TEXT   305: BLOB
-    int type;
-    int typeLength;
-    bool nullable;
-    std::string defaultData;    // save it as a string (regardless of integer/character)
-    int collation;
-    bool autoIncrement;
-
-    bool primaryKey;
-    bool unique;
-    std::string check;
-
-    ForeignKey foriegnKey;
-};
-struct Constraint{
-    std::string primaryKey;
-    bool autoIncrement;
-
-    std::string check;
-    std::string defaultData;
-
-    ForeignKey foriegnKey;
-};
-struct Table{
-    std::string name;       // table name
-    long long rowid;
-    int rootPage;
-    std::string createSql;  // create sentence - Sql
-
-    int numberOfFields;     // count a number of fields
-    Field* fields;          // array of fields
-};
 class LinkedList{
     struct Node{
         void *data;
@@ -87,7 +46,6 @@ class LinkedList{
     };
     Node head;
     Node *tail;
-    Node *node;
     Node *current;
 
 public:
@@ -95,7 +53,6 @@ public:
     {
         head = {NULL, NULL};
         tail = &head;
-        node = NULL;
         current = NULL;
     }
     ~LinkedList()
@@ -105,12 +62,11 @@ public:
 
     int addNode(void* data)
     {
-        node = new Node;
+        Node *node = new Node;
         node->data = data;
         node->next = NULL;
         tail->next = node;
         tail = node;
-        node = NULL;
 
         return 0;
     }
@@ -119,9 +75,9 @@ public:
     {
         while(head.next != NULL)
         {
-            node = head.next;
-            head.next = node->next;
-            delete node;
+            current = head.next;
+            head.next = current->next;
+            delete current;
         }
         tail = &head;
         current = NULL;
@@ -149,6 +105,57 @@ public:
         current = NULL;
         return;
     }
+};
+
+struct ForeignKey{
+    std::string field;
+    std::string referenceField;
+    std::string referenceTable;
+
+    // 401: RESTRICT  402: CASCADE  403:NO ACTION  404: SET NULL  405: SET DEFAULT
+    int onDelete;
+    int onUpdate;
+};
+struct Field{
+    std::string name;
+    // 301: NULL   302: INT    303: REAL   304: TEXT   305: BLOB
+    int type;
+    int typeLength;
+    std::string typeString;
+
+    bool nullable;
+    std::string defaultData;    // save it as a string (regardless of integer/character)
+    int collation;
+    std::string collationString;
+    bool autoIncrement;
+
+    bool primaryKey;
+    bool unique;
+    std::string check;
+
+    ForeignKey foreignKey;
+};
+struct Constraint{
+    std::string name;
+    std::string primaryKey;
+    bool autoIncrement;
+
+    std::string unique;
+    std::string check;
+    std::string defaultData;
+
+    ForeignKey foreignKey;
+};
+struct Table{
+    std::string name;
+    long long rowid;
+    int rootPage;
+    std::string createSql;
+
+    int numberOfFields;
+    LinkedList fieldList;
+    int numberOfConstraints;
+    LinkedList constraintList;
 };
 
 class FileContainer{
@@ -273,7 +280,7 @@ class SqlParser
         parsed[size] = '\0';
         return parsed;
     }
-    
+
     std::string Trimming(std::string input)
     {
 	    input.erase(std::remove(input.begin(), input.end(), 0x0d), input.end());    // '\r'
@@ -285,12 +292,6 @@ class SqlParser
 
 
 public:
-
-    ~SqlParser()
-    {
-        fieldSentence.resetCurrent();
-        fieldSentence.deleteNode();
-    }
 
     void InputSql(std::string input)
     {
@@ -305,6 +306,12 @@ public:
     
     void DeleteSql()
     {
+        numberOfFields = 0;
+        numberOfConstraints = 0;
+        fieldSentence.resetCurrent();
+        fieldSentence.deleteNode();
+        constraintSentence.resetCurrent();
+        constraintSentence.deleteNode();
         delete[] head, content, sql;
     }
 
@@ -426,16 +433,6 @@ public:
                     searchChar2 += strcspn(start + searchChar2 + 1, ")") + 1;
                 }
 
-
-                // 문장에 NUMERIC이 있으면 ',' 하나 건너 뛰는 방법
-                /*search = strstr(start, "NUMERIC");
-                end = strchr(start, ',');
-                if (search != NULL && end != NULL)
-                {
-                    if(search < end) end = strchr(end + 1, ',');
-                }*/
-
-
                 size = strlen(start);
                 if (end != NULL) size -= strlen(end);
                 field = new char[size + 1];
@@ -444,7 +441,6 @@ public:
 
                 if (end != NULL) start += size +1;
                 fieldSentence.addNode(field);
-                //std::cout << field << std::endl;
 
             }
             else
@@ -504,12 +500,9 @@ public:
 
                 if (end != NULL) start += size +1;
                 constraintSentence.addNode(constraint);
-                //std::cout << constraint << std::endl;
             }
 
         } while (end != NULL);
-        std::cout << "Number of fields: " << numberOfFields << std::endl;
-        std::cout << "Number of constraints: " << numberOfConstraints << std::endl;
     }
 
     void GetField()
@@ -818,11 +811,10 @@ public:
     }
     ~DBConverter()
     {
-        unsigned int i = 0;
         // table output
         // Console output
         // test
-        /*for (i; i < numberOfTables; i++)
+        /*for (int i = 0; i < numberOfTables; i++)
         {
             std::cout << "[Table " << i + 1 << "]" << std::endl;
             table = (Table *)tableList.getNodeData();
@@ -833,15 +825,28 @@ public:
         }*/
 
         delete sqliteInfo;
-        i = 0;
-        // delete tables
+
+        // Delete tables, fields, constraints
+        Field *field;
+        Constraint *constraint;
         tableList.resetCurrent();
         table = (Table *)tableList.getNodeData();
-        while (i < numberOfTables)
+        for (int i = 0; i < numberOfTables; i++)
         {
+            table->fieldList.resetCurrent();
+            for (int j = 0; j < table->numberOfFields; j++)
+            {
+                field = (Field *)table->fieldList.getNodeData();
+                delete field;
+            }
+            table->constraintList.resetCurrent();
+            for (int j = 0; j < table->numberOfConstraints; j++)
+            {
+                constraint = (Constraint *)table->constraintList.getNodeData();
+                delete constraint;
+            }
             delete table;
             table = (Table *)tableList.getNodeData();
-            i++;
         }
         // delete table List
         tableList.~LinkedList();
@@ -867,14 +872,13 @@ public:
 
             // Read Pages and input data
             tableList.resetCurrent();
-
-            for (int i = 0; i < numberOfTables; i++)
+            /*for (int i = 0; i < numberOfTables; i++)
             {
                 //std::cout << "-----------------[table" << i + 1 << "]-----------------" << std::endl;
                 table = (Table *)tableList.getNodeData();
                 currentRootPage = table->rootPage;
                 ReadPage(currentRootPage);
-            }
+            }*/
         }
         else
         {
@@ -922,7 +926,6 @@ private:
     long long ByteStream(unsigned char *buffer, unsigned short sizeOfBytes);
     long long BitPattern(unsigned char *buffer, unsigned char *getSize);
 };
-
 int DBConverter::ReadDBheader(unsigned char *buffer)
 {
     // temporary Function.
@@ -1398,59 +1401,63 @@ int DBConverter::LeafIndex(unsigned char *buffer, int pageNumber)
 };
 void DBConverter::SqlParsing()
 {
+    Field *field;
+    Constraint *constraint;
     tableList.resetCurrent();
-
+    SqlParser parser;
     for (int i = 0; i < numberOfTables; i++)
     {
-        SqlParser parser;
-        int fieldNum, constraintNum;
         table = (Table *)tableList.getNodeData();
         
         // (0) Input Sql ---> Trimming ---> Split head
         parser.InputSql(table->createSql);
 
         // (1) Table name
-        std::cout << "----Table[" << i + 1 << "]----" << std::endl;
-        std::cout << "Table name: " << parser.GetTableName() << std::endl;
+        //std::cout << "----Table[" << i + 1 << "]----" << std::endl;
+        //std::cout << "Table name: " << parser.GetTableName() << std::endl;
 
         // (2) Parse Senetences - Fields & Constraints
         parser.Parse();
 
         // (3) Field datas
-        fieldNum = parser.GetNumberOfField();
-        for (int j = 0; j < fieldNum; j++)
+        table->numberOfFields = parser.GetNumberOfField();
+        for (int j = 0; j < table->numberOfFields; j++)
         {
+            field = new Field;
             parser.GetField();
-            std::cout << "field[" << j + 1 << "] " << parser.GetFieldName();
-            std::cout << " / " << parser.GetDataType();
-            
-            std::cout << " / PK(" << parser.IsPrimaryKey() << ")";
-            std::cout << " / AI(" << parser.IsAutoincrement() << ")";
-            std::cout << " / NULLABLE(" << parser.IsNullable() << ")";
-            std::cout << " / UNIQUE(" << parser.IsUnique() << ")";
 
-            std::cout << " / DEFAULT(" << parser.GetDefault() << ")";
-            std::cout << " / CHECK(" << parser.GetCheck() << ")";
-            std::cout << " / COLLATE(" << parser.GetCollate() << ")";
-            //std::cout << " / FK(" << parser.GetForeignKey() << ")";
-            std::cout << std::endl;
+            field->name = parser.GetFieldName();
+            field->typeString = parser.GetDataType();
+            
+            field->primaryKey = parser.IsPrimaryKey();
+            field->autoIncrement = parser.IsAutoincrement();
+            field->nullable = parser.IsNullable();
+            field->unique = parser.IsUnique();
+
+            field->defaultData = parser.GetDefault();
+            field->check = parser.GetCheck();
+            field->collationString = parser.GetCollate();
+            table->fieldList.addNode(field);
         }
 
+
         // (4) Constraints
-        constraintNum = parser.GetNumberOfConstraint();
-        for (int j = 0; j < constraintNum; j++)
+        table->numberOfConstraints = parser.GetNumberOfConstraint();
+        for (int j = 0; j < table->numberOfConstraints; j++)
         {
+            constraint = new Constraint;
             parser.GetConstraint();
-            std::cout << "constraint[" << j + 1 << "] " << parser.GetConstraintName();
-            std::cout << " / PK(" << parser.GetPrimaryKey() << ")";
-            std::cout << " / UNIQUE(" << parser.GetUnique() << ")";
-            std::cout << " / CHECK(" << parser.GetCheck2() << ")";
-            std::cout << " / FK(" << parser.GetForeignKey2() << ")";
-            std::cout << " / REFERENCE(" << parser.GetReferenceTable2();
-            std::cout << " - " << parser.GetReferenceField2();
-            std::cout << " - " << parser.DeleteRule() << " ";
-            std::cout << " - " << parser.UpdateRule() << ")";
-            std::cout << std::endl;
+
+            constraint->name = parser.GetConstraintName();
+            constraint->primaryKey = parser.GetPrimaryKey();
+            constraint->unique = parser.GetUnique();
+            constraint->check = parser.GetCheck2();
+            constraint->foreignKey.field = parser.GetForeignKey2();
+            constraint->foreignKey.referenceTable = parser.GetReferenceTable2();
+            constraint->foreignKey.referenceField = parser.GetReferenceField2();
+            constraint->foreignKey.onDelete = parser.DeleteRule();
+            constraint->foreignKey.onUpdate = parser.UpdateRule();
+            table->constraintList.addNode(constraint);
         }
 
         // (5) Exit parsing
@@ -1458,7 +1465,6 @@ void DBConverter::SqlParsing()
     }
 
 }
-
 
 class ExcelConverter{
 
