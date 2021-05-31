@@ -411,7 +411,7 @@ public:
             while (*start == ' ')
                 start++;
 
-            if (*start == '[')  // field
+            if (*start == '[')  // Field
             {
                 numberOfFields++;
 
@@ -443,7 +443,7 @@ public:
                 fieldSentence.addNode(field);
 
             }
-            else
+            else    // Constraint
             {
                 if (strncmp(start, "CONSTRAINT", strlen("CONSTRAINT")) == 0)
                 {
@@ -531,12 +531,9 @@ public:
         char *data = strstr(field, "COLLATE");
         if (data != NULL)
         {
-            //strtok(data, " ");
-            //data = strtok(NULL, " ");
-
-            return "Field - Collation";
+            return "miguhyun";
         }
-        return "none";
+        return "";
     }
 
     std::string GetCheck()
@@ -544,12 +541,9 @@ public:
         char *data = strstr(field, "CHECK");
         if (data != NULL)
         {
-            //strtok(data, " ");
-            //data = strtok(NULL, " ");
-
-            return "Field - Check";
+            return "miguhyun";
         }
-        return "none";
+        return "";
     }
 
     std::string GetDefault()
@@ -560,28 +554,29 @@ public:
             //strtok(data, " ");
             //data = strtok(NULL, " ");
 
-            return "Field - Default";
+            return "miguhyun";
         }
-        return "none";
+        return "";
     }
 
     std::string GetForeignKey()
     {
-        int size = strlen(field) + 1;
-        char *copy = new char[size];
-        memcpy(copy, field, size);
-
-        char *data = strstr(copy, "FOREIGN KEY");
-        if (data != NULL)
+        char *src = strstr(field, "FOREIGN KEY");
+        char *dest;
+        std::string fk;
+        if (src != NULL)
         {
-            //strtok(data, " ");
-            //strtok(NULL, " ");
-            //data = strtok(NULL, " ");
-            delete[] copy;
-            return "Field - Foreign key";
+            src = strchr(src, '(') + 1;
+            char *end = strchr(src, ')');
+            int size = strlen(src) - strlen(end);
+            dest = new char[size + 1];
+            memcpy(dest, src, size);
+            dest[size] = '\0';
+            fk = dest;
+            delete[] dest;
+            return fk;
         }
-        delete[] copy;
-        return data;
+        return "";
     }
 
 
@@ -594,46 +589,43 @@ public:
     {
         if ( strstr(constraint, "CONSTRAINT") != NULL)
         {
-            //strtok(data, " ");
-            //data = strtok(NULL, " ");
-
             strtok(constraint, " ");
             constraint += strlen(constraint) + 1;
             char *constraintName = strtok(NULL, " ");
             constraint += strlen(constraint) + 1;
             return constraintName;
         }
-        return "none";
+        return "";
     }
 
     std::string GetPrimaryKey()
     {
         if (strstr(constraint, "PRIMARY KEY") != NULL)
         {
-            return "    ";
+            return "miguhyun";
 
         }
-        return "none";
+        return "";
     }
 
     std::string GetUnique()
     {
         if (strstr(constraint, "UNIQUE") != NULL)
         {
-            return "    ";
+            return "miguhyun";
 
         }
-        return "none";
+        return "";
     }
 
     std::string GetCheck2()
     {
         if (strstr(constraint, "CHECK") != NULL)
         {
-            return "    ";
+            return "miguhyun";
 
         }
-        return "none";
+        return "";
     }
 
     std::string GetForeignKey2()
@@ -653,7 +645,7 @@ public:
             delete[] dest;
             return fk;
         }
-        return "none";
+        return "";
     }
 
     std::string GetReferenceTable2()
@@ -673,7 +665,7 @@ public:
             delete[] dest;
             return refer;
         }
-        return "none";
+        return "";
     }
 
     std::string GetReferenceField2()
@@ -693,7 +685,7 @@ public:
             delete[] dest;
             return refer;
         }
-        return "none";
+        return "";
     }
 
     int DeleteRule()
@@ -869,16 +861,16 @@ public:
 
             // Build the table schema (SQL Parser)
             SqlParsing();
+            TestSchema();
 
             // Read Pages and input data
             tableList.resetCurrent();
-            /*for (int i = 0; i < numberOfTables; i++)
+            for (int i = 0; i < numberOfTables; i++)
             {
-                //std::cout << "-----------------[table" << i + 1 << "]-----------------" << std::endl;
                 table = (Table *)tableList.getNodeData();
                 currentRootPage = table->rootPage;
                 ReadPage(currentRootPage);
-            }*/
+            }
         }
         else
         {
@@ -909,6 +901,7 @@ private:
     int LeafIndex(unsigned char *buffer, int pageNumber);
 
     void SqlParsing();
+    void TestSchema();
 
     int GetVarintSize(unsigned char *buffer)
     {
@@ -1437,6 +1430,7 @@ void DBConverter::SqlParsing()
             field->defaultData = parser.GetDefault();
             field->check = parser.GetCheck();
             field->collationString = parser.GetCollate();
+            field->foreignKey.field = parser.GetForeignKey();
             table->fieldList.addNode(field);
         }
 
@@ -1465,7 +1459,150 @@ void DBConverter::SqlParsing()
     }
 
 }
+void DBConverter::TestSchema()
+{
+    // console output test
 
+    Table *table;
+    Field *field;
+    Constraint *constraint;
+    tableList.resetCurrent();
+    for (int i = 0; i < numberOfTables; i++)
+    {
+        table = (Table *)tableList.getNodeData();
+        std::cout << "-------------------------[table" << i + 1 << "] " << table->name << "---------------------------" << std::endl;
+        std::cout << "Id(" << table->rowid << ") RootPage(" << table->rootPage << ")" << std::endl;
+        std::cout << "SQL: " << table->createSql << std::endl;
+        std::cout << "Number of fields: " << table->numberOfFields << " / Number of constraints: " << table->numberOfConstraints << std::endl;
+
+        table->fieldList.resetCurrent();
+        for (int j = 0; j < table->numberOfFields; j++)
+        {
+            field = (Field *)table->fieldList.getNodeData();
+            std::cout << " Field[" << j + 1 << "] " << field->name << std::endl;
+            std::cout << " Type: " << field->typeString << std::endl;
+            //std::cout << " Constraint(field level): ";
+            std::cout << " ";
+            if (field->primaryKey == true) std::cout << " PK";
+            if (field->autoIncrement == true) std::cout << " AI";
+            if (field->nullable == true) ;
+            else std::cout << " NOT NULL";
+            if (field->foreignKey.field != "")
+            {
+                std::cout << "\n  FK " << field->foreignKey.field << ": " << field->foreignKey.referenceTable << "."<< field->foreignKey.referenceField;
+                switch (field->foreignKey.onDelete)
+                {
+                    case REFERENCE_RULE_RESTRICT:
+                        std::cout << " ON DELETE RESTRICT";
+                    break;
+
+                    case REFERENCE_RULE_CASCADE:
+                        std::cout << " ON DELETE CASCADE";
+                    break;
+
+                    case REFERENCE_RULE_NOACTION:
+                        std::cout << " ON DELETE NO ACTION";
+                    break;
+
+                    case REFERENCE_RULE_SETNULL:
+                        std::cout << " ON DELETE SET NULL";
+                    break;
+
+                    case REFERENCE_RULE_SETDEFAULT:
+                        std::cout << " ON DELETE SET DEFAULT";
+                    break;
+                }
+                switch (field->foreignKey.onUpdate)
+                {
+                    case REFERENCE_RULE_RESTRICT:
+                        std::cout << " ON UPDATE RESTRICT";
+                    break;
+
+                    case REFERENCE_RULE_CASCADE:
+                        std::cout << " ON UPDATE CASCADE";
+                    break;
+
+                    case REFERENCE_RULE_NOACTION:
+                        std::cout << " ON UPDATE NO ACTION";
+                    break;
+
+                    case REFERENCE_RULE_SETNULL:
+                        std::cout << " ON UPDATE SET NULL";
+                    break;
+
+                    case REFERENCE_RULE_SETDEFAULT:
+                        std::cout << " ON UPDATE SET DEFAULT";
+                    break;
+                }
+            }
+            std::cout << std::endl;
+        }
+
+        table->constraintList.resetCurrent();
+        for (int j = 0; j < table->numberOfConstraints; j++)
+        {
+            constraint = (Constraint *)table->constraintList.getNodeData();
+            std::cout << " Constraint[" << j + 1 << "] ";
+            if (constraint->name == "none") std::cout << std::endl;
+            else std::cout << constraint->name << std::endl;
+            if (constraint->primaryKey != "")
+            {
+                std::cout << " PK";
+                if (constraint->autoIncrement == true) std::cout << "(AI)";
+                std::cout << ": " << constraint->primaryKey << std::endl;
+            }
+            if (constraint->foreignKey.field != "")
+            {
+                std::cout << "  FK " << constraint->foreignKey.field << ": " << constraint->foreignKey.referenceTable << "."<< constraint->foreignKey.referenceField;
+                switch (constraint->foreignKey.onDelete)
+                {
+                    case REFERENCE_RULE_RESTRICT:
+                        std::cout << " ON DELETE RESTRICT";
+                    break;
+
+                    case REFERENCE_RULE_CASCADE:
+                        std::cout << " ON DELETE CASCADE";
+                    break;
+
+                    case REFERENCE_RULE_NOACTION:
+                        std::cout << " ON DELETE NO ACTION";
+                    break;
+
+                    case REFERENCE_RULE_SETNULL:
+                        std::cout << " ON DELETE SET NULL";
+                    break;
+
+                    case REFERENCE_RULE_SETDEFAULT:
+                        std::cout << " ON DELETE SET DEFAULT";
+                    break;
+                }
+                switch (constraint->foreignKey.onUpdate)
+                {
+                    case REFERENCE_RULE_RESTRICT:
+                        std::cout << " ON UPDATE RESTRICT";
+                    break;
+
+                    case REFERENCE_RULE_CASCADE:
+                        std::cout << " ON UPDATE CASCADE";
+                    break;
+
+                    case REFERENCE_RULE_NOACTION:
+                        std::cout << " ON UPDATE NO ACTION";
+                    break;
+
+                    case REFERENCE_RULE_SETNULL:
+                        std::cout << " ON UPDATE SET NULL";
+                    break;
+
+                    case REFERENCE_RULE_SETDEFAULT:
+                        std::cout << " ON UPDATE SET DEFAULT";
+                    break;
+                }
+            }
+            std::cout << std::endl;
+        }
+    }
+}
 class ExcelConverter{
 
 };
