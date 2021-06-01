@@ -1111,13 +1111,185 @@ public:
             getData = std::to_string(table->numberOfFields);
             targetFile->Write(getData, getData.size());
 
+            table->fieldList.resetCurrent();
+            Field *field;
+            long long *datai;
+            char *datac;
+            double *dataf;
+            bool *datab;
+            Constraint *constraint;
 
+            for (int j = 0; j < table->numberOfFields; j++)
+            {
+                field = (Field *)table->fieldList.getNodeData();
+                targetFile->Write(",\n\t\t\"", 5);
+                getData = std::to_string(j + 1);
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\" : [\"", 6);
+                getData = field->name;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\"", 1);
 
+                field->dataList.resetCurrent();
+                if (strstr(field->typeString.c_str(), "INTEGER") != NULL || strstr(field->typeString.c_str(), "DATETIME") != NULL)
+                {                
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        targetFile->Write(", \"", 3);
+                        datai = (long long *)field->dataList.getNodeData();
+                        if (datai == NULL) getData = "";
+                        else getData = std::to_string(*datai);
+                        targetFile->Write(getData, getData.size());
+                        targetFile->Write("\"", 1);
+                    }
+                }
+                else if (strstr(field->typeString.c_str(), "NVARCHAR") != NULL)
+                {                
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        targetFile->Write(", \"", 3);
+                        datac = (char *)field->dataList.getNodeData();  
+                        if (datac == NULL) getData = "";  
+                        else getData = datac;
+                        targetFile->Write(getData, getData.size());
+                        targetFile->Write("\"", 1);
+                    }
+                }
+                else if (strstr(field->typeString.c_str(), "NUMERIC") != NULL)
+                {                
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        targetFile->Write(", \"", 3);
+                        dataf = (double *)field->dataList.getNodeData();
+                        if (dataf == NULL) getData = "";
+                        else getData = std::to_string(*dataf);
+                        targetFile->Write(getData, getData.size());
+                        targetFile->Write("\"", 1);
+                    }
+                }
+
+                targetFile->Write("]", 1);
+            }
             
+            // Schema
+            table->fieldList.resetCurrent();
+            for (int j = 0; j < table->numberOfFields; j++)
+            {
+                field = (Field *)table->fieldList.getNodeData();
+                targetFile->Write(",\n\t\t\"", 5);
+                getData = std::to_string(j + 1);
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("Schema\" : [\"", 12);
+                getData = field->name;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = field->typeString;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                if (field->nullable) getData = "YES";
+                else getData = "NO";
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = field->defaultData;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = field->collationString;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                if (field->autoIncrement) getData = "YES";
+                else getData = "NO";
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\"]", 2);
+
+            }
+
+
+            getData = ",\n\t\t\"ConstraintsNum\" : ";
+            targetFile->Write(getData, getData.size());
+            getData = std::to_string(table->numberOfConstraints);
+            targetFile->Write(getData, getData.size());
+            table->constraintList.resetCurrent();
+            for (int j = 0; j < table->numberOfConstraints; j++)
+            {
+                constraint = (Constraint *)table->constraintList.getNodeData();
+                getData = ",\n\t\t\"Constraint";
+                targetFile->Write(getData, getData.size());
+                getData = std::to_string(j + 1);
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\" : [\"", 6);
+                getData = constraint->name;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = constraint->primaryKey;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = constraint->unique;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = constraint->check;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = constraint->check;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = constraint->foreignKey.field;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = constraint->foreignKey.referenceTable;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                getData = constraint->foreignKey.referenceField;
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                switch (constraint->foreignKey.onDelete)
+                {
+                    case REFERENCE_RULE_CASCADE:
+                        getData = "CASCADE";
+                        break;
+                    case REFERENCE_RULE_NOACTION:
+                        getData = "NO ACTION";
+                        break;
+                    case REFERENCE_RULE_RESTRICT:
+                        getData = "RESTRICT";
+                        break;
+                    case REFERENCE_RULE_SETDEFAULT:
+                        getData = "SET DEFAULT";
+                        break;
+                    case REFERENCE_RULE_SETNULL:
+                        getData = "SET NULL";
+                        break;
+                    default:
+                        getData = "";
+                }
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\", \"", 4);
+                switch (constraint->foreignKey.onUpdate)
+                {
+                    case REFERENCE_RULE_CASCADE:
+                        getData = "CASCADE";
+                        break;
+                    case REFERENCE_RULE_NOACTION:
+                        getData = "NO ACTION";
+                        break;
+                    case REFERENCE_RULE_RESTRICT:
+                        getData = "RESTRICT";
+                        break;
+                    case REFERENCE_RULE_SETDEFAULT:
+                        getData = "SET DEFAULT";
+                        break;
+                    case REFERENCE_RULE_SETNULL:
+                        getData = "SET NULL";
+                        break;
+                    default:
+                        getData = "";
+                }
+                targetFile->Write(getData, getData.size());
+                targetFile->Write("\"]", 2);
+            }
+
             getData = "\n\t},\n";
             targetFile->Write(getData, getData.size());
         }
-
 
         targetFile->Write("\n}", 2);
         return 0;
