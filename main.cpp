@@ -134,6 +134,9 @@ struct Field{
     std::string check;
 
     ForeignKey foreignKey;
+
+    int numberOfDatas;
+    LinkedList dataList;
 };
 struct Constraint{
     std::string name;
@@ -293,6 +296,22 @@ class SqlParser
 
 public:
 
+    SqlParser()
+    {
+        sql = NULL;
+        head = NULL;
+        content = NULL;
+        field = NULL;
+        constraint = NULL;
+
+        numberOfFields = 0;
+        numberOfConstraints = 0;
+    }
+    ~SqlParser()
+    {
+        DeleteSql();
+    }
+
     void InputSql(std::string input)
     {
         input = Trimming(input);
@@ -306,13 +325,28 @@ public:
     
     void DeleteSql()
     {
+        fieldSentence.resetCurrent();
+        for (int i = 0; i < numberOfFields; i++)
+        {
+            field = (char *)fieldSentence.getNodeData();
+            delete[] field;
+        }
+        fieldSentence.deleteNode();
+
+        constraintSentence.resetCurrent();
+        for (int i = 0; i < numberOfConstraints; i++)
+        {
+            constraint = (char *)constraintSentence.getNodeData(); 
+            delete[] constraint;
+        }
+        constraintSentence.deleteNode();
+
         numberOfFields = 0;
         numberOfConstraints = 0;
-        fieldSentence.resetCurrent();
-        fieldSentence.deleteNode();
-        constraintSentence.resetCurrent();
-        constraintSentence.deleteNode();
         delete[] head, content, sql;
+        head = NULL;
+        content = NULL;
+        sql = NULL;
     }
 
 
@@ -733,6 +767,24 @@ public:
         }
         return rule;
     }
+
+
+    int GetNumberOfSystemField()
+    {
+        // ',' 개수 + 1
+        char *a = content;
+        while (*a != '\0')
+        {
+            if (*a == ',')
+            {
+                numberOfFields++;
+            }
+            a++;
+        }
+        numberOfFields++;
+
+        return numberOfFields;
+    }
 };
 
 class DBConverter{
@@ -803,19 +855,6 @@ public:
     }
     ~DBConverter()
     {
-        // table output
-        // Console output
-        // test
-        /*for (int i = 0; i < numberOfTables; i++)
-        {
-            std::cout << "[Table " << i + 1 << "]" << std::endl;
-            table = (Table *)tableList.getNodeData();
-            std::cout << "name: " << table->name << std::endl;
-            std::cout << "rowid: " << table->rowid << std::endl;
-            std::cout << "root page: " << table->rootPage << std::endl;
-            std::cout << "sql: " << table->createSql << std::endl << std::endl;
-        }*/
-
         delete sqliteInfo;
 
         // Delete tables, fields, constraints
@@ -823,20 +862,55 @@ public:
         Constraint *constraint;
         tableList.resetCurrent();
         table = (Table *)tableList.getNodeData();
+        long long *datai = NULL;
+        char *datac = NULL;
+        double *dataf = NULL;
+        bool *datab = NULL;
+
         for (int i = 0; i < numberOfTables; i++)
         {
             table->fieldList.resetCurrent();
             for (int j = 0; j < table->numberOfFields; j++)
             {
                 field = (Field *)table->fieldList.getNodeData();
+                const char *datatype = field->typeString.c_str();
+                if (strstr(datatype, "NVARCHAR") != NULL)
+                {
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        datac = (char *)field->dataList.getNodeData();
+                        delete[] datac;
+                    }
+                }
+                else if (strstr(datatype, "INTEGER") != NULL)
+                {
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        datai = (long long *)field->dataList.getNodeData();
+                        delete datai;
+                    }
+                }
+                else if (strstr(datatype, "NUMERIC") != NULL)
+                {
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        dataf = (double *)field->dataList.getNodeData();
+                        delete dataf;
+                    }
+                }
+                // DATETIME type?
+
+                field->dataList.~LinkedList();
                 delete field;
             }
+            table->fieldList.~LinkedList();
             table->constraintList.resetCurrent();
             for (int j = 0; j < table->numberOfConstraints; j++)
             {
                 constraint = (Constraint *)table->constraintList.getNodeData();
                 delete constraint;
             }
+            table->constraintList.~LinkedList();
             delete table;
             table = (Table *)tableList.getNodeData();
         }
@@ -871,6 +945,9 @@ public:
                 currentRootPage = table->rootPage;
                 ReadPage(currentRootPage);
             }
+
+            //std::cout << "----------------[record]-----------------" << std::endl;
+            //TestRecord();
         }
         else
         {
@@ -902,6 +979,7 @@ private:
 
     void SqlParsing();
     void TestSchema();
+    void TestRecord();
 
     int GetVarintSize(unsigned char *buffer)
     {
@@ -1219,11 +1297,15 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
     long long content = 0;
     long long dataSize = 0;
     unsigned short dataType = 0;
-    long long datai = 0;
-    char *datac = 0;
-    double dataf = 0;
+
+    long long *datai = NULL;
+    char *datac = NULL;
+    double *dataf = NULL;
+    bool *datab = NULL;
 
     int sqliteObjType = 0;  // temporary variable.  (1: table, 2: index)
+
+    Field *field;
 
     for (int count = 0; count < numberOfCells ; count++)
     {
@@ -1307,12 +1389,10 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
                     break;
 
                     case 4:
-                        datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
                         if (sqliteObjType == 1)
                         {
-                            table->rootPage = datai;
+                            table->rootPage = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
                         }
-                        
                         fieldBytesCount += dataSize;
                     break;
 
@@ -1331,28 +1411,49 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
             }
             else
             {
+                field = (Field *)table->fieldList.getNodeData();
+                field->numberOfDatas++;
                 switch (dataType)
                 {
                     case DATA_TYPE_NULL:
                         //std::cout << "NULL" << std::endl;
+                        if (strstr(field->typeString.c_str(), "INTEGER") != NULL)
+                        {
+                            datai = new long long;
+                            *datai = field->numberOfDatas;
+                            field->dataList.addNode(datai);
+                        }
+                        else
+                            field->dataList.addNode(NULL);
                     break;
                     case DATA_TYPE_FLOAT64:
-                        dataf = (double)ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                        dataf = new double;
+                        *dataf = (double)ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
                         fieldBytesCount += dataSize;
+                        //std::cout << dataf << std::endl;
+                        field->dataList.addNode(dataf);
                     break;
                     case DATA_TYPE_ZERO:
+                        datab = new bool;
+                        *datab = 0;
                         //std::cout << "0" << std::endl;
+                        field->dataList.addNode(datab);
                     break;
                     case DATA_TYPE_ONE:
+                        datab = new bool;
+                        *datab = 1;
                         //std::cout << "1" << std::endl;
+                        field->dataList.addNode(datab);
                     break;
                     case DATA_TYPE_RESERVED:
-                        //std::cout << "[error] Invalid data type" << std::endl;
+                        std::cout << "[error] Invalid data type" << std::endl;
                     break;
                     case DATA_TYPE_BLOB:
-                        datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                        //std::cout << "BLOB type" << std::endl;
+                        datai = new long long;
+                        *datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                        std::cout << "BLOB type" << std::endl;
                         fieldBytesCount += dataSize;
+                        field->dataList.addNode(datai);
                     break;
                     case DATA_TYPE_TEXT:
                         datac = new char[dataSize + 1];
@@ -1362,27 +1463,27 @@ int DBConverter::LeafTable(unsigned char *buffer, int pageNumber)
                             fieldBytesCount++;
                         }
                         datac[dataSize] = '\0';
-                        
                         //std::cout << datac << std::endl;
-                        delete[] datac;
+                        field->dataList.addNode(datac);
                     break;
                     default:
-                        datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
-                        /*std::cout << datai << " (";
+                        datai = new long long;
+                        *datai = ByteStream(buffer + offset + cell[count].dataHeaderSize + fieldBytesCount, dataSize);
+                        /*std::cout << *datai << " (";
                         std::cout << std::showbase << std::uppercase << std::hex;
-                        std::cout << datai << ")" << std::endl;
+                        std::cout << *datai << ")" << std::endl;
                         std::cout << std::noshowbase << std::nouppercase << std::dec;*/
                         fieldBytesCount += dataSize;
+                        //std::cout << *datai << std::endl;
+                        field->dataList.addNode(datai);
                     break;
                 }
             }
         }
-        table = NULL;
     }
     delete[] cell;
     delete[] cellOffset;
     return 0;
-
 };
 int DBConverter::InteriorIndex(unsigned char *buffer, int pageNumber)
 {
@@ -1414,25 +1515,75 @@ void DBConverter::SqlParsing()
 
         // (3) Field datas
         table->numberOfFields = parser.GetNumberOfField();
-        for (int j = 0; j < table->numberOfFields; j++)
+        if (table->numberOfFields == 0) // consider this table system table
         {
-            field = new Field;
-            parser.GetField();
+            table->numberOfFields = parser.GetNumberOfSystemField();
 
-            field->name = parser.GetFieldName();
-            field->typeString = parser.GetDataType();
-            
-            field->primaryKey = parser.IsPrimaryKey();
-            field->autoIncrement = parser.IsAutoincrement();
-            field->nullable = parser.IsNullable();
-            field->unique = parser.IsUnique();
+            if (strstr(table->name.c_str(), "sqlite_sequence") != NULL) // consider this table "sqlite_sequence"
+            {
+                field = new Field;
+                field->name = "name";
+                field->typeString = "NVARCHAR";
+                field->nullable = true;
+                field->numberOfDatas = 0;
+                table->fieldList.addNode(field);
 
-            field->defaultData = parser.GetDefault();
-            field->check = parser.GetCheck();
-            field->collationString = parser.GetCollate();
-            field->foreignKey.field = parser.GetForeignKey();
-            table->fieldList.addNode(field);
+                field = new Field;
+                field->name = "seq";
+                field->typeString = "INTEGER";
+                field->nullable = true;
+                field->numberOfDatas = 0;
+                table->fieldList.addNode(field);
+            }
+            else    // consider this table "sqlite_statN"
+            {
+                field = new Field;
+                field->name = "tbl";
+                field->typeString = "NVARCHAR";
+                field->nullable = true;
+                field->numberOfDatas = 0;
+                table->fieldList.addNode(field);
+
+                field = new Field;
+                field->name = "idx";
+                field->typeString = "NVARCHAR";
+                field->nullable = true;
+                field->numberOfDatas = 0;
+                table->fieldList.addNode(field);
+
+                field = new Field;
+                field->name = "stat";
+                field->typeString = "NVARCHAR";
+                field->nullable = true;
+                field->numberOfDatas = 0;
+                table->fieldList.addNode(field);
+            }
         }
+        else
+        {
+            for (int j = 0; j < table->numberOfFields; j++)
+            {
+                field = new Field;
+                parser.GetField();
+
+                field->name = parser.GetFieldName();
+                field->typeString = parser.GetDataType();
+                
+                field->primaryKey = parser.IsPrimaryKey();
+                field->autoIncrement = parser.IsAutoincrement();
+                field->nullable = parser.IsNullable();
+                field->unique = parser.IsUnique();
+
+                field->defaultData = parser.GetDefault();
+                field->check = parser.GetCheck();
+                field->collationString = parser.GetCollate();
+                field->foreignKey.field = parser.GetForeignKey();
+
+                field->numberOfDatas = 0;
+                table->fieldList.addNode(field);
+            }
+        }
+
 
 
         // (4) Constraints
@@ -1603,6 +1754,75 @@ void DBConverter::TestSchema()
         }
     }
 }
+void DBConverter::TestRecord()
+{
+    // console output test
+
+    Table *table;
+    Field *field;
+    long long *datai = NULL;
+    char *datac = NULL;
+    double *dataf = NULL;
+    bool *datab = NULL;
+    tableList.resetCurrent();
+    for (int i = 0; i < 1; i++)
+    {
+        table = (Table *)tableList.getNodeData();
+        std::cout << "-------------------------[table" << i + 1 << "] " << table->name << "---------------------------" << std::endl;
+        std::cout << "Id(" << table->rowid << ") RootPage(" << table->rootPage << ")" << std::endl;
+        std::cout << "Number of fields: " << table->numberOfFields << " / Number of constraints: " << table->numberOfConstraints << std::endl;
+        
+        table->fieldList.resetCurrent();
+        for (int j = 0; j < table->numberOfFields; j++)
+        {
+            field = (Field *)table->fieldList.getNodeData();
+            std::cout << " " << field->name << "(" << field->typeString << "), ";
+            field->dataList.resetCurrent();
+        }
+        std::cout << field->numberOfDatas << std::endl;
+
+
+        table->fieldList.resetCurrent();
+        for (int j = 0; j < table->numberOfFields; j++)
+        {
+            field = (Field *)table->fieldList.getNodeData();
+
+            const char *datatype = field->typeString.c_str();
+            if (strstr(datatype, "NVARCHAR") != NULL)
+            {
+                for (int k = 0; k < field->numberOfDatas; k++)
+                {
+                    datac = (char *)field->dataList.getNodeData();
+                    std::cout << datac << std::endl;
+                }
+            }
+            else if (strstr(datatype, "INTEGER") != NULL)
+            {
+                for (int k = 0; k < field->numberOfDatas; k++)
+                {
+                    datai = (long long *)field->dataList.getNodeData();
+                    if ( datai == NULL ) std::cout << "NULL" << std::endl;
+                    else printf(" %d\n", *datai);
+                }
+            }
+            else if (strstr(datatype, "NUMERIC") != NULL)
+            {
+                for (int k = 0; k < field->numberOfDatas; k++)
+                {
+                    dataf = (double *)field->dataList.getNodeData();
+                    printf(" %f\n", *dataf);
+                }
+            }
+            else
+            {
+                for (int k = 0; k < field->numberOfDatas; k++)
+                {
+                    std::cout << "datatime?" << std::endl;
+                }
+            }
+        }
+    }
+}
 class ExcelConverter{
 
 };
@@ -1615,7 +1835,7 @@ int DBtoExcel(std::string srcpath)
     DBConverter dbConverter(srcFile);
     dbConverter.ReadDB();
 
-    //FileContainer jsonFile(FILE_TYPE_JSON, srcpath);
+    FileContainer jsonFile(FILE_TYPE_JSON, srcpath);
     //dbConverter.MakeJSON(&jsonFile);
 
     // Excel
