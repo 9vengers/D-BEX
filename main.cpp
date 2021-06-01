@@ -23,9 +23,12 @@
 #define DATA_TYPE_BLOB 112
 #define DATA_TYPE_TEXT 113
 
-#define FILE_TYPE_DB 201
-#define FILE_TYPE_EXCEL 202
-#define FILE_TYPE_JSON 203
+#define FILE_TYPE_DB_READ 201
+#define FILE_TYPE_EXCEL_READ 202
+#define FILE_TYPE_JSON_READ 203
+#define FILE_TYPE_DB_WRITE  204
+#define FILE_TYPE_EXCEL_WRITE 205
+#define FILE_TYPE_JSON_WRITE 206
 
 #define FIELD_TYPE_NULL 301
 #define FIELD_TYPE_INT 302
@@ -171,27 +174,121 @@ private:
     int FileOpen()
     {
         // Open the target file
-        readFile.open(srcpath, std::ios::binary);
+        /*readFile.open(srcpath, std::ios::binary);
         if(readFile.is_open())
         {
             std::cout << "Created ";
             switch (filetype)
             {
-                case FILE_TYPE_DB:
+                case FILE_TYPE_DB_READ:
                 std::cout << "DB";
                 break;
-                case FILE_TYPE_EXCEL:
+                case FILE_TYPE_EXCEL_READ:
                 std::cout << "Excel";
                 break;
-                case FILE_TYPE_JSON:
+                case FILE_TYPE_JSON_READ:
                 std::cout << "JSON";
                 break;
             }
-            std::cout << " container : " << srcpath << std::endl;
+
         }
         else
         {
             std::cout << "[error] file is not opened" << std::endl;
+            return 1;
+        }
+        return 0;*/
+
+        switch (filetype)
+        {
+            case FILE_TYPE_DB_READ:
+            readFile.open(srcpath, std::ios::binary);
+            if (readFile.is_open())
+            {
+                std::cout << "Created DB container : " << srcpath << std::endl;
+                return 0;
+            }
+            else
+            {
+                std::cout << "[error] file is not opened" << std::endl;
+                return 1;
+            }
+            break;
+
+            case FILE_TYPE_EXCEL_READ:
+            readFile.open(srcpath);
+            if (readFile.is_open())
+            {
+                std::cout << "Created Excel container : " << srcpath << std::endl;
+                return 0;
+            }
+            else
+            {
+                std::cout << "[error] file is not opened" << std::endl;
+                return 1;
+            }
+            break;
+
+            case FILE_TYPE_JSON_READ:
+            readFile.open(srcpath);
+            if (readFile.is_open())
+            {
+                std::cout << "Created JSON container : " << srcpath << std::endl;
+                return 0;
+            }
+            else
+            {
+                std::cout << "[error] file is not opened" << std::endl;
+                return 1;
+            }
+            break;
+
+            case FILE_TYPE_DB_WRITE:
+            writeFile.open(srcpath, std::ios::binary);
+            if (writeFile.is_open())
+            {
+                std::cout << "Created DB container : " << srcpath << std::endl;
+                return 0;
+            }
+            else
+            {
+                std::cout << "[error] file is not opened" << std::endl;
+                return 1;
+            }
+
+            break;
+
+            case FILE_TYPE_EXCEL_WRITE:
+            writeFile.open(srcpath);
+            if (writeFile.is_open())
+            {
+                std::cout << "Created Excel container : " << srcpath << std::endl;
+                return 0;
+            }
+            else
+            {
+                std::cout << "[error] file is not opened" << std::endl;
+                return 1;
+            }
+
+            break;
+
+            case FILE_TYPE_JSON_WRITE:
+            writeFile.open(srcpath);
+            if (writeFile.is_open())
+            {
+                std::cout << "Created JSON container : " << srcpath << std::endl;
+                return 0;
+            }
+            else
+            {
+                std::cout << "[error] file is not opened" << std::endl;
+                return 1;
+            }
+
+            break;
+            default:
+            std::cout << "[error] incorrect file type" << std::endl;
         }
         return 0;
     }
@@ -204,27 +301,34 @@ public:
     ~FileContainer()
     {
         if(readFile.is_open()) readFile.close();
+        if(writeFile.is_open()) writeFile.close();
     }
 
     int Load()
     {
         switch(filetype)
         {
-            case FILE_TYPE_DB:
+            case FILE_TYPE_DB_READ:
+            case FILE_TYPE_DB_WRITE:
                 if(srcpath.substr(srcpath.find_last_of(".") + 1) == "db")
                     FileOpen();
                 else
                     std::cout << "[error] Invalid file type" << std::endl;
             break;
-            case FILE_TYPE_EXCEL:
+
+            case FILE_TYPE_EXCEL_READ:
+            case FILE_TYPE_EXCEL_WRITE:
                 std::cout << "excel" << std::endl;
             break;
-            case FILE_TYPE_JSON:
+
+            case FILE_TYPE_JSON_READ:
+            case FILE_TYPE_JSON_WRITE:
                 if(srcpath.substr(srcpath.find_last_of(".") + 1) == "json")
                     FileOpen();
                 else
                     std::cout << "[error] Invalid file type" << std::endl;
             break;
+
             default:
                 std::cout << "[error] Invalid file type" << std::endl;
         }
@@ -235,6 +339,13 @@ public:
     {
         if(readFile.is_open())
             readFile.read(buffer, size);
+        return 0;
+    }
+
+    int Write(std::string sentence, std::streamsize size)
+    {
+        if(writeFile.is_open())
+            writeFile.write(sentence.c_str(), size);
         return 0;
     }
 
@@ -956,8 +1067,59 @@ public:
         }
         return 0;
     }
-    int MakeJSON(FileContainer &file)
+    int MakeJSON(FileContainer &json)
     {
+        std::string getData;
+        targetFile = &json;
+
+        // Initialize
+        tableList.resetCurrent();
+
+        // JSON File Start
+        targetFile->Write("{\n", 2);
+
+        // Name
+        getData = "\t\"name\" : \"";
+        targetFile->Write(getData, getData.size());
+        getData = srcFile->GetName();
+        targetFile->Write(getData, getData.size());
+        targetFile->Write("\",\n", 3);
+
+        // Number of tables
+        getData = "\t\"tableNum\" : ";
+        targetFile->Write(getData, getData.size());
+        getData = std::to_string(numberOfTables);
+        targetFile->Write(getData, getData.size());
+        targetFile->Write(",\n", 2);
+
+        // Table Datas
+        for (int i = 0; i < numberOfTables; i++)
+        {
+            table = (Table *)tableList.getNodeData();
+            getData = "\t\"table";
+            targetFile->Write(getData, getData.size());
+            getData = std::to_string(i + 1);
+            targetFile->Write(getData, getData.size());
+            getData = "\" : {\n";
+            targetFile->Write(getData, getData.size());
+            getData = "\t\t\"tableName\" : \"";
+            targetFile->Write(getData, getData.size());
+            getData = table->name;
+            targetFile->Write(getData, getData.size());
+            getData ="\",\n\t\t\"columnNum\" : ";
+            targetFile->Write(getData, getData.size());
+            getData = std::to_string(table->numberOfFields);
+            targetFile->Write(getData, getData.size());
+
+
+
+            
+            getData = "\n\t},\n";
+            targetFile->Write(getData, getData.size());
+        }
+
+
+        targetFile->Write("\n}", 2);
         return 0;
     }
     int ReadJSON(FileContainer &file)
@@ -1830,15 +1992,16 @@ class ExcelConverter{
 int DBtoExcel(std::string srcpath)
 {
     // DB
-    FileContainer srcFile(FILE_TYPE_DB, srcpath);
+    FileContainer srcFile(FILE_TYPE_DB_READ, srcpath);
     srcFile.Load();
     DBConverter dbConverter(srcFile);
     dbConverter.ReadDB();
 
-    FileContainer jsonFile(FILE_TYPE_JSON, srcpath);
-    //dbConverter.MakeJSON(&jsonFile);
+    FileContainer jsonFile(FILE_TYPE_JSON_WRITE, "D-BEX/test.json");
+    jsonFile.Load();
+    dbConverter.MakeJSON(jsonFile);
 
-    // Excel
+    // EXCEL
 
     return 0;
 }
