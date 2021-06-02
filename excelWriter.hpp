@@ -1,4 +1,3 @@
-
 #pragma warning(disable: 4996)
 #pragma once
 
@@ -134,5 +133,5 @@ void setDataSchemaSheetForm(xlnt::worksheet ws, std::string cellName, std::strin
 void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::string string);
 bool ReadFromFile(char* buffer, int len);
 void readJson(excelInfo* info, std::string filename);
-void writeExcel(excelInfo* info);
-void writeXLSX(std::string filename);
+void writeExcel(excelInfo* info, std::string absPath);
+void writeXLSX(std::string filename, std::string absPath);

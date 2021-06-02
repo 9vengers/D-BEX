@@ -93,14 +93,14 @@ void readJson(excelInfo* info, std::string filename) {
     std::cout << " Read JSON complete!.." << std::endl;
 }
 
-void writeExcel(excelInfo* info)
+void writeExcel(excelInfo* info, std::string absPath)
 {
     std::cout << "...Make Excel..." << std::endl;
     std::string cellName;
     int size = info->getSheets().size();
     xlnt::workbook wb;
     xlnt::worksheet ws;
-    for (int i = 0; i < info->getSheets().size(); i++) { //ê° sheet
+    for (int i = 0; i < info->getSheets().size(); i++) { //°¢ sheet
         if (i == 0) {
             ws = wb.active_sheet();
         }
@@ -118,7 +118,7 @@ void writeExcel(excelInfo* info)
         }
         */
 
-        for (int j = 0; j < tmp->cells.size(); j++) { //ê° sheetì˜ cellë“¤
+        for (int j = 0; j < tmp->cells.size(); j++) { //°¢ sheetÀÇ cellµé
             for (int k = 0; k < tmp->cells.at(j)->size(); k++) {
                 cellName = alpha[j] + std::to_string(((k + 1)));
                 ws.cell(cellName).value(tmp->cells.at(j)->at(k)->data); //tmp->cells.at(j)->at(k)->data
@@ -150,17 +150,17 @@ void writeExcel(excelInfo* info)
     border.side(xlnt::border_side::top, border_pro);
     border.side(xlnt::border_side::bottom, border_pro);
 
-    std::string utf_string = u8"ìŠ¤í‚¤ë§ˆ";
+    std::string utf_string = u8"½ºÅ°¸¶";
     ws.cell("A1").value(utf_string);
     ws.cell("A1").alignment(alignment);
 
-    setDataSchemaSheetForm(ws, "A2", u8"í…Œì´ë¸”");
-    setDataSchemaSheetForm(ws, "B2", u8"í•„ë“œ");
-    setDataSchemaSheetForm(ws, "C2", u8"íƒ€ì…");
+    setDataSchemaSheetForm(ws, "A2", u8"Å×ÀÌºí");
+    setDataSchemaSheetForm(ws, "B2", u8"ÇÊµå");
+    setDataSchemaSheetForm(ws, "C2", u8"Å¸ÀÔ");
     setDataSchemaSheetForm(ws, "D2", u8"null");
-    setDataSchemaSheetForm(ws, "E2", u8"ê¸°ë³¸ê°’");
-    setDataSchemaSheetForm(ws, "F2", u8"ì½œë ˆì´ì…˜");
-    setDataSchemaSheetForm(ws, "G2", u8"ìë™ì¦ê°€");
+    setDataSchemaSheetForm(ws, "E2", u8"±âº»°ª");
+    setDataSchemaSheetForm(ws, "F2", u8"Äİ·¹ÀÌ¼Ç");
+    setDataSchemaSheetForm(ws, "G2", u8"ÀÚµ¿Áõ°¡");
 
     int index = 3;
     for (int i = 0; i < info->getSheets().size(); i++) {
@@ -188,39 +188,39 @@ void writeExcel(excelInfo* info)
 
 
     cellName = "A" + to_string(index++);
-    utf_string = u8"ì œì•½ì¡°ê±´";
+    utf_string = u8"Á¦¾àÁ¶°Ç";
     ws.cell(cellName).value(utf_string);
     ws.cell(cellName).alignment(alignment);
 
     int indexPlusOne = index + 1;
 
-    setDataSchemaSheetForm(ws, "A" + to_string(index), u8"í…Œì´ë¸”");
+    setDataSchemaSheetForm(ws, "A" + to_string(index), u8"Å×ÀÌºí");
 
     cellName = "A" + to_string(index) + ":A" + to_string(indexPlusOne);
     ws.merge_cells(cellName);
     ws.cell("A" + to_string(indexPlusOne)).border(border);
 
-    setDataSchemaSheetForm(ws, "B" + to_string(index), u8"ì œì•½ì¡°ê±´ì´ë¦„");
+    setDataSchemaSheetForm(ws, "B" + to_string(index), u8"Á¦¾àÁ¶°ÇÀÌ¸§");
 
     cellName = "B" + to_string(index) + ":B" + to_string(indexPlusOne);
     ws.merge_cells(cellName);
     ws.cell("B" + to_string(indexPlusOne)).border(border);
 
-    setDataSchemaSheetForm(ws, "C" + to_string(index), u8"ì£¼ìš”í‚¤");
-    setDataSchemaSheetForm(ws, "C" + to_string(indexPlusOne), u8"í•„ë“œ");
-    setDataSchemaSheetForm(ws, "D" + to_string(index), u8"ê³ ìœ í‚¤");
-    setDataSchemaSheetForm(ws, "D" + to_string(indexPlusOne), u8"í•„ë“œ");
-    setDataSchemaSheetForm(ws, "E" + to_string(index), u8"ì¡°ê±´");
+    setDataSchemaSheetForm(ws, "C" + to_string(index), u8"ÁÖ¿äÅ°");
+    setDataSchemaSheetForm(ws, "C" + to_string(indexPlusOne), u8"ÇÊµå");
+    setDataSchemaSheetForm(ws, "D" + to_string(index), u8"°íÀ¯Å°");
+    setDataSchemaSheetForm(ws, "D" + to_string(indexPlusOne), u8"ÇÊµå");
+    setDataSchemaSheetForm(ws, "E" + to_string(index), u8"Á¶°Ç");
 
     cellName = "E" + to_string(index) + ":F" + to_string(index);
     ws.merge_cells(cellName);
     ws.cell("F" + to_string(index)).border(border);
 
-    setDataSchemaSheetForm(ws, "E" + to_string(indexPlusOne), u8"í•„ë“œ");
-    setDataSchemaSheetForm(ws, "F" + to_string(indexPlusOne), u8"ì¡°ê±´ì‹");
-    setDataSchemaSheetForm(ws, "G" + to_string(index), u8"ì™¸ë˜í‚¤");
-    setDataSchemaSheetForm(ws, "G" + to_string(indexPlusOne), u8"í•„ë“œ");
-    setDataSchemaSheetForm(ws, "H" + to_string(index), u8"ì°¸ì¡°");
+    setDataSchemaSheetForm(ws, "E" + to_string(indexPlusOne), u8"ÇÊµå");
+    setDataSchemaSheetForm(ws, "F" + to_string(indexPlusOne), u8"Á¶°Ç½Ä");
+    setDataSchemaSheetForm(ws, "G" + to_string(index), u8"¿Ü·¡Å°");
+    setDataSchemaSheetForm(ws, "G" + to_string(indexPlusOne), u8"ÇÊµå");
+    setDataSchemaSheetForm(ws, "H" + to_string(index), u8"ÂüÁ¶");
 
 
     cellName = "H" + to_string(index) + ":K" + to_string(index);
@@ -229,10 +229,10 @@ void writeExcel(excelInfo* info)
     ws.cell("J" + to_string(index)).border(border);
     ws.cell("K" + to_string(index)).border(border);
 
-    setDataSchemaSheetForm(ws, "H" + to_string(indexPlusOne), u8"í…Œì´ë¸”");
-    setDataSchemaSheetForm(ws, "I" + to_string(indexPlusOne), u8"í•„ë“œ");
-    setDataSchemaSheetForm(ws, "J" + to_string(indexPlusOne), u8"ì‚­ì œê·œì¹™");
-    setDataSchemaSheetForm(ws, ("K" + to_string(indexPlusOne)), u8"ìˆ˜ì •ê·œì¹™");
+    setDataSchemaSheetForm(ws, "H" + to_string(indexPlusOne), u8"Å×ÀÌºí");
+    setDataSchemaSheetForm(ws, "I" + to_string(indexPlusOne), u8"ÇÊµå");
+    setDataSchemaSheetForm(ws, "J" + to_string(indexPlusOne), u8"»èÁ¦±ÔÄ¢");
+    setDataSchemaSheetForm(ws, ("K" + to_string(indexPlusOne)), u8"¼öÁ¤±ÔÄ¢");
 
 
     index = indexPlusOne + 1;
@@ -281,7 +281,7 @@ void writeExcel(excelInfo* info)
     ws.column_properties("J").width = 9;
     ws.column_properties("K").width = 9;
 
-    std::string path = absPath+"\\"+ info->getTitle();
+    std::string path = absPath + "\\" + info->getTitle();
     wb.save(path);
 }
 

@@ -1069,9 +1069,10 @@ public:
 
 
         tableList.resetCurrent();
-
         
-        getData = json.GetName().substr(0, json.GetName().find(".json", 0));
+
+        getData = strrchr(json.GetName().c_str(), '\\') + 1;
+        getData = getData.substr(0, getData.find(".json", 0));
         json_object_set_string(rootObject, "name", getData.c_str());
         json_object_set_number(rootObject, "tableNum", numberOfTables);
 
@@ -2378,7 +2379,7 @@ int DBtoExcel(std::string srcpath, std::string dstpath)
 
 
     // EXCEL
-    writeXLSX(srcpath);
+    writeXLSX(srcpath, dstpath);
 
     std::cout << "------COMPLETE-----" << std::endl;
 
@@ -2390,7 +2391,7 @@ int main (/*int argc, char *argv[]*/)
     //std::string path1 = argv[1];
     //std::string path2 = argv[2];
 
-    DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "mytest.xlsx");
+    DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX");
 
     //ExceltoDB();
 
