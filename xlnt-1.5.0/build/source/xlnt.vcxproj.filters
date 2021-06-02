@@ -1,0 +1,608 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\cell.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\cell_reference.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\comment.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\hyperlink.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\index_types.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\phonetic_run.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\rich_text.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\cell\rich_text_run.cpp">
+      <Filter>cell</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\drawing\spreadsheet_drawing.cpp">
+      <Filter>drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\packaging\ext_list.cpp">
+      <Filter>packaging</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\packaging\manifest.cpp">
+      <Filter>packaging</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\packaging\relationship.cpp">
+      <Filter>packaging</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\packaging\uri.cpp">
+      <Filter>packaging</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\alignment.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\border.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\color.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\conditional_format.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\fill.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\font.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\format.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\number_format.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\protection.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\styles\style.cpp">
+      <Filter>styles</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\utils\date.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\utils\datetime.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\utils\exceptions.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\utils\path.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\utils\time.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\utils\timedelta.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\utils\variant.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\workbook\named_range.cpp">
+      <Filter>workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\workbook\streaming_workbook_reader.cpp">
+      <Filter>workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\workbook\streaming_workbook_writer.cpp">
+      <Filter>workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\workbook\workbook.cpp">
+      <Filter>workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\workbook\worksheet_iterator.cpp">
+      <Filter>workbook</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\cell_iterator.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\cell_vector.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\header_footer.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\page_margins.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\page_setup.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\phonetic_pr.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\range.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\range_iterator.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\range_reference.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\sheet_protection.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\worksheet\worksheet.cpp">
+      <Filter>worksheet</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\constants.cpp">
+      <Filter>detail</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\unicode.cpp">
+      <Filter>detail</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\aes.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\base64.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\compound_document.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\encryption_info.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\hash.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\sha.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\sha1.c">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\sha512.c">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\xlsx_crypto_consumer.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\xlsx_crypto_producer.cpp">
+      <Filter>detail\cryptography</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\header_footer\header_footer_code.cpp">
+      <Filter>detail\header_footer</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\cell_impl.cpp">
+      <Filter>detail\implementations</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\number_format\number_formatter.cpp">
+      <Filter>detail\number_format</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\custom_value_traits.cpp">
+      <Filter>detail\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\open_stream.cpp">
+      <Filter>detail\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\vector_streambuf.cpp">
+      <Filter>detail\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\xlsx_consumer.cpp">
+      <Filter>detail\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\xlsx_producer.cpp">
+      <Filter>detail\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\zstream.cpp">
+      <Filter>detail\serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\third-party\miniz\miniz.c">
+      <Filter>third-party\miniz</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\xlnt.hpp">
+      <Filter>xlnt</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\xlnt_config.hpp">
+      <Filter>xlnt</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\cell.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\cell_reference.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\cell_type.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\comment.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\hyperlink.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\index_types.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\phonetic_run.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\rich_text.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\cell\rich_text_run.hpp">
+      <Filter>cell</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\drawing\spreadsheet_drawing.hpp">
+      <Filter>drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\packaging\ext_list.hpp">
+      <Filter>packaging</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\packaging\manifest.hpp">
+      <Filter>packaging</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\packaging\relationship.hpp">
+      <Filter>packaging</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\packaging\uri.hpp">
+      <Filter>packaging</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\alignment.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\border.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\color.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\conditional_format.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\fill.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\font.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\format.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\number_format.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\protection.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\styles\style.hpp">
+      <Filter>styles</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\calendar.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\date.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\datetime.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\exceptions.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\numeric.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\optional.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\path.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\scoped_enum_hash.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\time.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\timedelta.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\utils\variant.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\calculation_properties.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\document_security.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\external_book.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\metadata_property.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\named_range.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\streaming_workbook_reader.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\streaming_workbook_writer.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\theme.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\workbook.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\workbook_view.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\workbook\worksheet_iterator.hpp">
+      <Filter>workbook</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\cell_iterator.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\cell_vector.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\column_properties.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\header_footer.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\major_order.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\page_margins.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\page_setup.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\pane.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\phonetic_pr.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\print_options.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\range.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\range_iterator.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\range_reference.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\row_properties.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\selection.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\sheet_format_properties.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\sheet_pr.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\sheet_protection.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\sheet_view.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\include\xlnt\worksheet\worksheet.hpp">
+      <Filter>worksheet</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\binary.hpp">
+      <Filter>detail</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\constants.hpp">
+      <Filter>detail</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\default_case.hpp">
+      <Filter>detail</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\unicode.hpp">
+      <Filter>detail</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\aes.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\base64.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\cipher.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\compound_document.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\encryption_info.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\hash.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\sha.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\value_traits.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\xlsx_crypto_consumer.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\cryptography\xlsx_crypto_producer.hpp">
+      <Filter>detail\cryptography</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\external\include_libstudxml.hpp">
+      <Filter>detail\external</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\external\include_windows.hpp">
+      <Filter>detail\external</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\header_footer\header_footer_code.hpp">
+      <Filter>detail\header_footer</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\cell_impl.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\conditional_format_impl.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\format_impl.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\formatting_record.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\hyperlink_impl.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\style_impl.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\stylesheet.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\workbook_impl.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\implementations\worksheet_impl.hpp">
+      <Filter>detail\implementations</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\number_format\number_formatter.hpp">
+      <Filter>detail\number_format</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\custom_value_traits.hpp">
+      <Filter>detail\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\excel_thumbnail.hpp">
+      <Filter>detail\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\open_stream.hpp">
+      <Filter>detail\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\vector_streambuf.hpp">
+      <Filter>detail\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\xlsx_consumer.hpp">
+      <Filter>detail\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\xlsx_producer.hpp">
+      <Filter>detail\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\serialization\zstream.hpp">
+      <Filter>detail\serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\third-party\miniz\miniz.h">
+      <Filter>third-party\miniz</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\parser.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\qname.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\serializer.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\value-traits.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\char-props.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\genx.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\xmlparse.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\xmlrole.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\third-party\libstudxml\libstudxml.dir\$(Configuration)\xmltok.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{D30840C0-4BC3-3F21-A902-EC8A21D7DE14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cell">
+      <UniqueIdentifier>{90C44CDA-A674-38EC-9B7F-AF306BD30FF2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail">
+      <UniqueIdentifier>{50D625F2-79BA-30AD-B63D-52427FFDBC7B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail\cryptography">
+      <UniqueIdentifier>{7B4BF6CA-7909-3072-BCFC-CECBFCE9710C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail\external">
+      <UniqueIdentifier>{109C4B15-6088-3816-BC05-10768AAF538F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail\header_footer">
+      <UniqueIdentifier>{F9FCEE9A-59AF-3B61-934D-83DA8B91035A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail\implementations">
+      <UniqueIdentifier>{A1531200-331D-3AB7-A22E-ED9DEA2199C6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail\number_format">
+      <UniqueIdentifier>{451E8831-5DEB-35D3-9840-E9E6FCDDEF73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="detail\serialization">
+      <UniqueIdentifier>{F00A09AC-FD4E-3780-90C5-146E9C5A7E2A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="drawing">
+      <UniqueIdentifier>{2F7BEDF6-8FA0-3400-AE9F-E6C5D6F7DE46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="packaging">
+      <UniqueIdentifier>{F80E1109-5E1E-3EFE-A77C-DF7C1A13CD8E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="styles">
+      <UniqueIdentifier>{9C9FAA52-3955-3EB2-8C55-ADE527ED806D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third-party">
+      <UniqueIdentifier>{645649BD-A115-3647-A812-55B27583BAE6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="third-party\miniz">
+      <UniqueIdentifier>{E20A0B7D-DCA6-3442-8240-FF5DEC0CD600}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{90BDD782-1848-3C3F-98C8-B545F6F1FDCF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="workbook">
+      <UniqueIdentifier>{D89FB716-24CC-315A-B6BF-7224DA8FD086}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="worksheet">
+      <UniqueIdentifier>{05981FFA-0E24-3BB9-9082-C9876BAFB825}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xlnt">
+      <UniqueIdentifier>{62643A25-C03C-3879-BF96-D450CB282D13}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

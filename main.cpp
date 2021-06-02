@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cmath>
 #include <algorithm>
+#include "parson.h"
 
 #define SIZE_OF_DB_HEADER 100
 #define SIZE_OF_INTERIOR_PAGE_HEADER 12
@@ -947,6 +948,9 @@ private:
     Table *table;
     LinkedList tableList;
 
+
+
+
 public:
     DBConverter(FileContainer &db)  // db->excel  or  db->db
     {
@@ -1300,6 +1304,28 @@ public:
     }
     int MakeDB(FileContainer &file)
     {
+        return 0;
+    }
+    int MakeJSON2(FileContainer &json)
+    {
+        JSON_Value *rootValue;
+        JSON_Object *rootObject;
+
+        rootValue = json_value_init_object();
+        rootObject = json_value_get_object(rootValue);
+
+
+        /*json_object_set_string("");
+        json_object_set_number();
+        json_object_set_string();
+        json_object_set_value();
+        JSON_Array *actors = ;
+
+        json_array_appen_string(actors, "");*/
+
+        json_serialize_to_file_pretty(rootValue, "test2.json");
+        json_value_free(rootValue);
+
         return 0;
     }
 
@@ -2171,7 +2197,8 @@ int DBtoExcel(std::string srcpath)
 
     FileContainer jsonFile(FILE_TYPE_JSON_WRITE, "D-BEX/test.json");
     jsonFile.Load();
-    dbConverter.MakeJSON(jsonFile);
+    //dbConverter.MakeJSON(jsonFile);
+    dbConverter.MakeJSON2(jsonFile);
 
     // EXCEL
 

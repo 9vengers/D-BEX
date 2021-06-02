@@ -1,0 +1,74 @@
+﻿  Building Custom Rule C:/Users/jina0/Downloads/xlnt-1.5.0/xlnt-1.5.0/source/CMakeLists.txt
+  cell.cpp
+  cell_reference.cpp
+  comment.cpp
+  hyperlink.cpp
+  index_types.cpp
+  phonetic_run.cpp
+  rich_text.cpp
+  rich_text_run.cpp
+  spreadsheet_drawing.cpp
+  ext_list.cpp
+  manifest.cpp
+  relationship.cpp
+  uri.cpp
+  alignment.cpp
+  border.cpp
+  color.cpp
+  conditional_format.cpp
+  fill.cpp
+  font.cpp
+  format.cpp
+  number_format.cpp
+  protection.cpp
+  style.cpp
+  date.cpp
+  datetime.cpp
+  exceptions.cpp
+  path.cpp
+  time.cpp
+  timedelta.cpp
+  variant.cpp
+  named_range.cpp
+  streaming_workbook_reader.cpp
+  streaming_workbook_writer.cpp
+  workbook.cpp
+  worksheet_iterator.cpp
+  cell_iterator.cpp
+  cell_vector.cpp
+  header_footer.cpp
+  page_margins.cpp
+  page_setup.cpp
+  phonetic_pr.cpp
+  range.cpp
+  range_iterator.cpp
+  range_reference.cpp
+  sheet_protection.cpp
+  worksheet.cpp
+  constants.cpp
+  unicode.cpp
+  base64.cpp
+  compound_document.cpp
+  encryption_info.cpp
+  hash.cpp
+  sha.cpp
+  xlsx_crypto_consumer.cpp
+  xlsx_crypto_producer.cpp
+  header_footer_code.cpp
+  cell_impl.cpp
+  number_formatter.cpp
+  custom_value_traits.cpp
+  open_stream.cpp
+  vector_streambuf.cpp
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\number_format\number_formatter.cpp(194,21): warning C4566: 유니버설 문자 이름 '\u00E5'(으)로 표현되는 문자는 현재 코드 페이지(949)에서 표현할 수 없습니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\number_format\number_formatter.cpp(408,22): warning C4566: 유니버설 문자 이름 '\u00F4'(으)로 표현되는 문자는 현재 코드 페이지(949)에서 표현할 수 없습니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\source\detail\number_format\number_formatter.cpp(452,22): warning C4566: 유니버설 문자 이름 '\u00E5'(으)로 표현되는 문자는 현재 코드 페이지(949)에서 표현할 수 없습니다.
+  xlsx_consumer.cpp
+  xlsx_producer.cpp
+  zstream.cpp
+  aes.cpp
+  sha1.c
+  sha512.c
+  miniz.c
+     C:/Users/jina0/Downloads/xlnt-1.5.0/build/source/Debug/xlntd.lib 라이브러리 및 C:/Users/jina0/Downloads/xlnt-1.5.0/build/source/Debug/xlntd.exp 개체를 생성하고 있습니다.
+  xlnt.vcxproj -> C:\Users\jina0\Downloads\xlnt-1.5.0\build\source\Debug\xlntd.dll
