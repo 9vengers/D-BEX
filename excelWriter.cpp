@@ -66,10 +66,10 @@ bool ReadFromFile(char* buffer, int len)
     return true;
 }
 
-void readJson(excelInfo* info) {
+void readJson(excelInfo* info, std::string filename) {
     Json::Value root;
     Json::Reader reader;
-    ifstream json("test.json", ifstream::binary);
+    ifstream json(filename, ifstream::binary);
 
     bool parsingSuccessful = reader.parse(json, root);
 
@@ -79,6 +79,8 @@ void readJson(excelInfo* info) {
         return;
     }
 
+    std::cout << "...Converting...." << std::endl;
+
     std::string name = root.get("name", "").asString();
     info->setTitle(name);
 
@@ -87,10 +89,13 @@ void readJson(excelInfo* info) {
         std::string sheetCount = "table" + std::to_string(i + 1);
         info->setSheet(sheetCount, root, i);
     }
+
+    std::cout << " Read JSON complete!.." << std::endl;
 }
 
 void writeExcel(excelInfo* info)
 {
+    std::cout << "...Make Excel..." << std::endl;
     std::string cellName;
     int size = info->getSheets().size();
     xlnt::workbook wb;
@@ -104,7 +109,7 @@ void writeExcel(excelInfo* info)
         }
 
         sheetDetails* tmp = info->getSheets().at(i);
-        std::cout << tmp->sheetTitle << std::endl;
+        //std::cout << tmp->sheetTitle << std::endl;
         ws.title(tmp->sheetTitle);
         /*
         for (int k = 0; k < ALPHASIZE; k++)
@@ -117,8 +122,8 @@ void writeExcel(excelInfo* info)
             for (int k = 0; k < tmp->cells.at(j)->size(); k++) {
                 cellName = alpha[j] + std::to_string(((k + 1)));
                 ws.cell(cellName).value(tmp->cells.at(j)->at(k)->data); //tmp->cells.at(j)->at(k)->data
-                std::cout << cellName << std::endl;
-                std::cout << tmp->cells.at(j)->at(k)->data << std::endl;
+                //std::cout << cellName << std::endl;
+                //std::cout << tmp->cells.at(j)->at(k)->data << std::endl;
             }
         }
     }
@@ -241,9 +246,9 @@ void writeExcel(excelInfo* info)
         ws.cell(cellName).value(tmp->sheetTitle);
         ws.cell(cellName).alignment(alignment);
         ws.cell(cellName).border(border);
-        std::cout << tmp->constraints.size() << std::endl;
+        //std::cout << tmp->constraints.size() << std::endl;
         for (int j = 0; j < tmp->constraints.size(); j++) {
-            std::cout << tmp->constraints.at(j)->name << std::endl;
+            //std::cout << tmp->constraints.at(j)->name << std::endl;
             ws.cell("A" + to_string(index)).fill(xlnt::fill::solid(xlnt::rgb_color(242, 242, 242)));
             ws.cell("A" + to_string(index)).border(border);
 
@@ -280,8 +285,13 @@ void writeExcel(excelInfo* info)
     wb.save(info->getTitle());
 }
 
-void writeXLSX() {
+void writeXLSX(std::string filename) {
     excelInfo* info = new excelInfo();
-    readJson(info);
+    readJson(info, filename);
     writeExcel(info);
+
+    //
+    // where is  delete info?
+    //
+    //delete info;
 }

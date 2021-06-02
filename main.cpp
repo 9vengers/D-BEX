@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -5,6 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include "parson.h"
+#include "excelWriter.hpp"
 
 #define SIZE_OF_DB_HEADER 100
 #define SIZE_OF_INTERIOR_PAGE_HEADER 12
@@ -174,32 +176,6 @@ private:
 
     int FileOpen()
     {
-        // Open the target file
-        /*readFile.open(srcpath, std::ios::binary);
-        if(readFile.is_open())
-        {
-            std::cout << "Created ";
-            switch (filetype)
-            {
-                case FILE_TYPE_DB_READ:
-                std::cout << "DB";
-                break;
-                case FILE_TYPE_EXCEL_READ:
-                std::cout << "Excel";
-                break;
-                case FILE_TYPE_JSON_READ:
-                std::cout << "JSON";
-                break;
-            }
-
-        }
-        else
-        {
-            std::cout << "[error] file is not opened" << std::endl;
-            return 1;
-        }
-        return 0;*/
-
         switch (filetype)
         {
             case FILE_TYPE_DB_READ:
@@ -659,16 +635,14 @@ public:
     std::string GetFieldName()
     {
         char *fieldName;
-        fieldName = strtok(field, " ");
-        field += strlen(fieldName) + 1;
+        fieldName = strtok_s(field, " ", &field);
         return fieldName;
     }
 
     std::string GetDataType()
     {
         char *dataType;
-        dataType = strtok(field, " ");
-        field += strlen(dataType) + 1;
+        dataType = strtok_s(field, " ", &field);
         return dataType;
     }
 
@@ -735,10 +709,8 @@ public:
     {
         if ( strstr(constraint, "CONSTRAINT") != NULL)
         {
-            strtok(constraint, " ");
-            constraint += strlen(constraint) + 1;
-            char *constraintName = strtok(NULL, " ");
-            constraint += strlen(constraint) + 1;
+            strtok_s(constraint, " ", &constraint);
+            char *constraintName = strtok_s(NULL, " ", &constraint);
             return constraintName;
         }
         return "";
@@ -948,9 +920,6 @@ private:
     Table *table;
     LinkedList tableList;
 
-
-
-
 public:
     DBConverter(FileContainer &db)  // db->excel  or  db->db
     {
@@ -982,7 +951,7 @@ public:
         double *dataf = NULL;
         bool *datab = NULL;
 
-        for (int i = 0; i < numberOfTables; i++)
+        for (unsigned int i = 0; i < numberOfTables; i++)
         {
             table->fieldList.resetCurrent();
             for (int j = 0; j < table->numberOfFields; j++)
@@ -1054,7 +1023,7 @@ public:
 
             // Read Pages and input data
             tableList.resetCurrent();
-            for (int i = 0; i < numberOfTables; i++)
+            for (unsigned int i = 0; i < numberOfTables; i++)
             {
                 table = (Table *)tableList.getNodeData();
                 currentRootPage = table->rootPage;
@@ -1071,7 +1040,181 @@ public:
         }
         return 0;
     }
+    int ReadJSON(FileContainer &file)
+    {
+        return 0;
+    }
+    int MakeDB(FileContainer &file)
+    {
+        return 0;
+    }
     int MakeJSON(FileContainer &json)
+    {
+        JSON_Value *rootValue;
+        JSON_Object *rootObject;
+        JSON_Value* tableValue;
+        JSON_Object* tableObject;
+        JSON_Array* arrayPointer;
+
+        rootValue = json_value_init_object();
+        rootObject = json_value_get_object(rootValue);
+
+        std::string getData;
+        long long* datai;
+        double* dataf;
+        char* datac;
+        Field* field;
+        Constraint* constraint;
+
+
+        tableList.resetCurrent();
+
+        
+        getData = json.GetName().substr(0, json.GetName().find(".json", 0));
+        json_object_set_string(rootObject, "name", getData.c_str());
+        json_object_set_number(rootObject, "tableNum", numberOfTables);
+
+        for (int i = 0; i < numberOfTables; i++)
+        {
+            table = (Table *)tableList.getNodeData();
+            tableValue = json_value_init_object();
+            tableObject = json_value_get_object(tableValue);
+            getData = "table" + std::to_string(i + 1);
+            json_object_set_value(rootObject, getData.c_str(), tableValue);
+
+            json_object_set_string(tableObject, "tableName", table->name.c_str());
+            json_object_set_number(tableObject, "columnNum", table->numberOfFields);
+
+            // Records
+            table->fieldList.resetCurrent();
+            for (int j = 0; j < table->numberOfFields; j++)
+            {
+                field = (Field *)table->fieldList.getNodeData();
+                getData = TransformNumber(j + 1);
+                json_object_set_value(tableObject, getData.c_str(), json_value_init_array());
+                arrayPointer = json_object_get_array(tableObject, getData.c_str());
+                json_array_append_string(arrayPointer, field->name.c_str());
+                field->dataList.resetCurrent();
+
+                if (strstr(field->typeString.c_str(), "INTEGER") != NULL)
+                {
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+
+                        datai = (long long*)field->dataList.getNodeData();
+                        if (datai == NULL)
+                            json_array_append_null(arrayPointer);
+                        else json_array_append_number(arrayPointer, *datai);
+                    }
+                }
+                else if (strstr(field->typeString.c_str(), "NVARCHAR") != NULL || strstr(field->typeString.c_str(), "DATETIME") != NULL)
+                {
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        datac = (char*)field->dataList.getNodeData();
+                        if (datac == NULL)
+                            json_array_append_null(arrayPointer);
+                        else json_array_append_string(arrayPointer, datac);
+                    }
+                }
+                else if (strstr(field->typeString.c_str(), "NUMERIC") != NULL)
+                {
+                    for (int k = 0; k < field->numberOfDatas; k++)
+                    {
+                        dataf = (double*)field->dataList.getNodeData();
+                        if (dataf == NULL)
+                            json_array_append_null(arrayPointer);
+                        else json_array_append_number(arrayPointer, *dataf);
+                    }
+                }
+            }
+
+
+            // Field Schemas
+            table->fieldList.resetCurrent();
+            for (int j = 0; j < table->numberOfFields; j++)
+            {
+                field = (Field*)table->fieldList.getNodeData();
+                getData = TransformNumber(j + 1) + "Schema";
+                json_object_set_value(tableObject, getData.c_str(), json_value_init_array());
+                arrayPointer = json_object_get_array(tableObject, getData.c_str());
+                json_array_append_string(arrayPointer, field->name.c_str());
+                json_array_append_string(arrayPointer, field->typeString.c_str());
+                json_array_append_boolean(arrayPointer, field->nullable);
+                json_array_append_string(arrayPointer, field->defaultData.c_str());
+                json_array_append_string(arrayPointer, field->collationString.c_str());
+                json_array_append_boolean(arrayPointer, field->autoIncrement);
+            }
+
+
+            // Constraints
+            table->constraintList.resetCurrent();
+            json_object_set_number(tableObject, "ConstraintsNum", table->numberOfConstraints);
+            for (int j = 0; j < table->numberOfConstraints; j++)
+            {
+                constraint = (Constraint*)table->constraintList.getNodeData();
+                getData = "Constraint" + std::to_string(j + 1);
+                json_object_set_value(tableObject, getData.c_str(), json_value_init_array());
+                arrayPointer = json_object_get_array(tableObject, getData.c_str());
+                json_array_append_string(arrayPointer, constraint->name.c_str());
+                json_array_append_string(arrayPointer, constraint->primaryKey.c_str());
+                json_array_append_string(arrayPointer, constraint->unique.c_str());
+                json_array_append_string(arrayPointer, constraint->check.c_str());
+                json_array_append_string(arrayPointer, constraint->check.c_str());
+                json_array_append_string(arrayPointer, constraint->foreignKey.field.c_str());
+                json_array_append_string(arrayPointer, constraint->foreignKey.referenceTable.c_str());
+                json_array_append_string(arrayPointer, constraint->foreignKey.referenceField.c_str());
+                switch (constraint->foreignKey.onDelete)
+                {
+                case REFERENCE_RULE_CASCADE:
+                    getData = "CASCADE";
+                    break;
+                case REFERENCE_RULE_NOACTION:
+                    getData = "NO ACTION";
+                    break;
+                case REFERENCE_RULE_RESTRICT:
+                    getData = "RESTRICT";
+                    break;
+                case REFERENCE_RULE_SETDEFAULT:
+                    getData = "SET DEFAULT";
+                    break;
+                case REFERENCE_RULE_SETNULL:
+                    getData = "SET NULL";
+                    break;
+                default:
+                    getData = "";
+                }
+                json_array_append_string(arrayPointer, getData.c_str());
+                switch (constraint->foreignKey.onUpdate)
+                {
+                case REFERENCE_RULE_CASCADE:
+                    getData = "CASCADE";
+                    break;
+                case REFERENCE_RULE_NOACTION:
+                    getData = "NO ACTION";
+                    break;
+                case REFERENCE_RULE_RESTRICT:
+                    getData = "RESTRICT";
+                    break;
+                case REFERENCE_RULE_SETDEFAULT:
+                    getData = "SET DEFAULT";
+                    break;
+                case REFERENCE_RULE_SETNULL:
+                    getData = "SET NULL";
+                    break;
+                default:
+                    getData = "";
+                }
+                json_array_append_string(arrayPointer, getData.c_str());
+            }
+        }
+
+        json_serialize_to_file_pretty(rootValue, json.GetName().c_str());
+        json_value_free(rootValue);
+
+        return 0;
+    }
+    /*int MakeJSON2(FileContainer& json)
     {
         std::string getData;
         targetFile = &json;
@@ -1097,9 +1240,9 @@ public:
         targetFile->Write(",\n", 2);
 
         // Table Datas
-        for (int i = 0; i < numberOfTables; i++)
+        for (unsigned int i = 0; i < numberOfTables; i++)
         {
-            table = (Table *)tableList.getNodeData();
+            table = (Table*)tableList.getNodeData();
             getData = "\t\"table";
             targetFile->Write(getData, getData.size());
             getData = std::to_string(i + 1);
@@ -1110,22 +1253,22 @@ public:
             targetFile->Write(getData, getData.size());
             getData = table->name;
             targetFile->Write(getData, getData.size());
-            getData ="\",\n\t\t\"columnNum\" : ";
+            getData = "\",\n\t\t\"columnNum\" : ";
             targetFile->Write(getData, getData.size());
             getData = std::to_string(table->numberOfFields);
             targetFile->Write(getData, getData.size());
 
             table->fieldList.resetCurrent();
-            Field *field;
-            long long *datai;
-            char *datac;
-            double *dataf;
-            bool *datab;
-            Constraint *constraint;
+            Field* field;
+            long long* datai;
+            char* datac;
+            double* dataf;
+            //bool *datab;
+            Constraint* constraint;
 
             for (int j = 0; j < table->numberOfFields; j++)
             {
-                field = (Field *)table->fieldList.getNodeData();
+                field = (Field*)table->fieldList.getNodeData();
                 targetFile->Write(",\n\t\t\"", 5);
                 getData = std::to_string(j + 1);
                 targetFile->Write(getData, getData.size());
@@ -1136,11 +1279,11 @@ public:
 
                 field->dataList.resetCurrent();
                 if (strstr(field->typeString.c_str(), "INTEGER") != NULL || strstr(field->typeString.c_str(), "DATETIME") != NULL)
-                {                
+                {
                     for (int k = 0; k < field->numberOfDatas; k++)
                     {
                         targetFile->Write(", \"", 3);
-                        datai = (long long *)field->dataList.getNodeData();
+                        datai = (long long*)field->dataList.getNodeData();
                         if (datai == NULL) getData = "";
                         else getData = std::to_string(*datai);
                         targetFile->Write(getData, getData.size());
@@ -1148,23 +1291,23 @@ public:
                     }
                 }
                 else if (strstr(field->typeString.c_str(), "NVARCHAR") != NULL)
-                {                
+                {
                     for (int k = 0; k < field->numberOfDatas; k++)
                     {
                         targetFile->Write(", \"", 3);
-                        datac = (char *)field->dataList.getNodeData();  
-                        if (datac == NULL) getData = "";  
+                        datac = (char*)field->dataList.getNodeData();
+                        if (datac == NULL) getData = "";
                         else getData = datac;
                         targetFile->Write(getData, getData.size());
                         targetFile->Write("\"", 1);
                     }
                 }
                 else if (strstr(field->typeString.c_str(), "NUMERIC") != NULL)
-                {                
+                {
                     for (int k = 0; k < field->numberOfDatas; k++)
                     {
                         targetFile->Write(", \"", 3);
-                        dataf = (double *)field->dataList.getNodeData();
+                        dataf = (double*)field->dataList.getNodeData();
                         if (dataf == NULL) getData = "";
                         else getData = std::to_string(*dataf);
                         targetFile->Write(getData, getData.size());
@@ -1174,12 +1317,12 @@ public:
 
                 targetFile->Write("]", 1);
             }
-            
+
             // Schema
             table->fieldList.resetCurrent();
             for (int j = 0; j < table->numberOfFields; j++)
             {
-                field = (Field *)table->fieldList.getNodeData();
+                field = (Field*)table->fieldList.getNodeData();
                 targetFile->Write(",\n\t\t\"", 5);
                 getData = std::to_string(j + 1);
                 targetFile->Write(getData, getData.size());
@@ -1215,7 +1358,7 @@ public:
             table->constraintList.resetCurrent();
             for (int j = 0; j < table->numberOfConstraints; j++)
             {
-                constraint = (Constraint *)table->constraintList.getNodeData();
+                constraint = (Constraint*)table->constraintList.getNodeData();
                 getData = ",\n\t\t\"Constraint";
                 targetFile->Write(getData, getData.size());
                 getData = std::to_string(j + 1);
@@ -1247,45 +1390,45 @@ public:
                 targetFile->Write("\", \"", 4);
                 switch (constraint->foreignKey.onDelete)
                 {
-                    case REFERENCE_RULE_CASCADE:
-                        getData = "CASCADE";
-                        break;
-                    case REFERENCE_RULE_NOACTION:
-                        getData = "NO ACTION";
-                        break;
-                    case REFERENCE_RULE_RESTRICT:
-                        getData = "RESTRICT";
-                        break;
-                    case REFERENCE_RULE_SETDEFAULT:
-                        getData = "SET DEFAULT";
-                        break;
-                    case REFERENCE_RULE_SETNULL:
-                        getData = "SET NULL";
-                        break;
-                    default:
-                        getData = "";
+                case REFERENCE_RULE_CASCADE:
+                    getData = "CASCADE";
+                    break;
+                case REFERENCE_RULE_NOACTION:
+                    getData = "NO ACTION";
+                    break;
+                case REFERENCE_RULE_RESTRICT:
+                    getData = "RESTRICT";
+                    break;
+                case REFERENCE_RULE_SETDEFAULT:
+                    getData = "SET DEFAULT";
+                    break;
+                case REFERENCE_RULE_SETNULL:
+                    getData = "SET NULL";
+                    break;
+                default:
+                    getData = "";
                 }
                 targetFile->Write(getData, getData.size());
                 targetFile->Write("\", \"", 4);
                 switch (constraint->foreignKey.onUpdate)
                 {
-                    case REFERENCE_RULE_CASCADE:
-                        getData = "CASCADE";
-                        break;
-                    case REFERENCE_RULE_NOACTION:
-                        getData = "NO ACTION";
-                        break;
-                    case REFERENCE_RULE_RESTRICT:
-                        getData = "RESTRICT";
-                        break;
-                    case REFERENCE_RULE_SETDEFAULT:
-                        getData = "SET DEFAULT";
-                        break;
-                    case REFERENCE_RULE_SETNULL:
-                        getData = "SET NULL";
-                        break;
-                    default:
-                        getData = "";
+                case REFERENCE_RULE_CASCADE:
+                    getData = "CASCADE";
+                    break;
+                case REFERENCE_RULE_NOACTION:
+                    getData = "NO ACTION";
+                    break;
+                case REFERENCE_RULE_RESTRICT:
+                    getData = "RESTRICT";
+                    break;
+                case REFERENCE_RULE_SETDEFAULT:
+                    getData = "SET DEFAULT";
+                    break;
+                case REFERENCE_RULE_SETNULL:
+                    getData = "SET NULL";
+                    break;
+                default:
+                    getData = "";
                 }
                 targetFile->Write(getData, getData.size());
                 targetFile->Write("\"]", 2);
@@ -1297,37 +1440,8 @@ public:
 
         targetFile->Write("\n}", 2);
         return 0;
-    }
-    int ReadJSON(FileContainer &file)
-    {
-        return 0;
-    }
-    int MakeDB(FileContainer &file)
-    {
-        return 0;
-    }
-    int MakeJSON2(FileContainer &json)
-    {
-        JSON_Value *rootValue;
-        JSON_Object *rootObject;
+    }*/
 
-        rootValue = json_value_init_object();
-        rootObject = json_value_get_object(rootValue);
-
-
-        /*json_object_set_string("");
-        json_object_set_number();
-        json_object_set_string();
-        json_object_set_value();
-        JSON_Array *actors = ;
-
-        json_array_appen_string(actors, "");*/
-
-        json_serialize_to_file_pretty(rootValue, "test2.json");
-        json_value_free(rootValue);
-
-        return 0;
-    }
 
 private:
     int ReadDBheader(unsigned char* buffer);
@@ -1341,6 +1455,7 @@ private:
     void TestSchema();
     void TestRecord();
 
+    std::string TransformNumber(int input);
     int GetVarintSize(unsigned char *buffer)
     {
         int count = 0;
@@ -2118,8 +2233,8 @@ void DBConverter::TestRecord()
 {
     // console output test
 
-    Table *table;
-    Field *field;
+    Table *table = NULL;
+    Field *field = NULL;
     long long *datai = NULL;
     char *datac = NULL;
     double *dataf = NULL;
@@ -2162,7 +2277,7 @@ void DBConverter::TestRecord()
                 {
                     datai = (long long *)field->dataList.getNodeData();
                     if ( datai == NULL ) std::cout << "NULL" << std::endl;
-                    else printf(" %d\n", *datai);
+                    else printf(" %lld\n", *datai);
                 }
             }
             else if (strstr(datatype, "NUMERIC") != NULL)
@@ -2183,6 +2298,63 @@ void DBConverter::TestRecord()
         }
     }
 }
+std::string DBConverter::TransformNumber(int input) {
+
+    std::string output;
+    int buffer;
+    int rest;
+
+    if (input > 702 && input < 16384) {
+        buffer = (input - 702) / 676;
+        rest = (input - 702) % 676;
+        if (rest < 27 && rest != 0) {
+            output += (char)buffer + 65;
+            output += (char)65;
+            output += (char)rest + 64;
+        }
+        else if (rest == 0) {
+            output += (char)buffer + 64;
+            output += (char)90;
+            output += (char)90;
+        }
+        else if (rest > 26 && rest < 676) {
+            output += (char)buffer + 65;
+            buffer = rest / 26;
+            rest = rest % 26;
+            if (rest == 0) {
+                output += (char)buffer + 64;
+                output += (char)90;
+            }
+            else if (rest != 0) {
+                output += (char)buffer + 65;
+                output += (char)rest + 64;
+            }
+        }
+    }
+    else if (input > 26 && input < 703) {
+        buffer = input / 26;
+        rest = input % 26;
+        if (buffer >= 1 && rest != 0) {
+            output += (char)buffer + 64;
+            output += (char)rest + 64;
+        }
+        else if (buffer >= 1 && rest == 0) {
+            output += (char)buffer + 63;
+            output += (char)90;
+        }
+
+
+    }
+    else if (input < 27 && input > 0) {
+        output += (char)input + 64;
+
+    }
+    else {
+        output = "too many columns";
+    }
+    return output;
+}
+
 class ExcelConverter{
 
 };
@@ -2195,22 +2367,29 @@ int DBtoExcel(std::string srcpath)
     DBConverter dbConverter(srcFile);
     dbConverter.ReadDB();
 
-    FileContainer jsonFile(FILE_TYPE_JSON_WRITE, "D-BEX/test.json");
-    jsonFile.Load();
-    //dbConverter.MakeJSON(jsonFile);
-    dbConverter.MakeJSON2(jsonFile);
+
+    srcpath = srcpath.substr(0, srcpath.find(".db", 0)) + ".json";
+
+    FileContainer jsonFile(FILE_TYPE_JSON_WRITE, srcpath);
+    //jsonFile.Load();
+    dbConverter.MakeJSON(jsonFile);
+
 
     // EXCEL
+    writeXLSX(srcpath);
+
+    std::cout << "------COMPLETE-----" << std::endl;
 
     return 0;
 }
 
 int main ()
 {
-    //std::string path;
-    //std::cout << "input file path: ";   // D-BEX/chinook.db
-    //std::cin >> path;
-    DBtoExcel("D-BEX/chinook.db");
+    std::string path;
+    std::cout << "input file path: ";   // D-BEX/chinook.db
+    std::cin >> path;
+    DBtoExcel(path);
+
     //ExceltoDB();
 
     //DBtoDB();

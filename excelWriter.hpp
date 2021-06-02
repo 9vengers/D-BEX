@@ -86,7 +86,7 @@ public:
 
             // Schema
             std::string alphaSchema = alpha[i] + "Schema"; //"ASchema"
-            std::cout << alphaSchema << std::endl;
+            //std::cout << alphaSchema << std::endl;
             const Json::Value columnSchema = root[sheetCount][alphaSchema];
 
             int indexSchema = 0;
@@ -99,13 +99,13 @@ public:
             schemaTmp->autoInc = columnSchema[indexSchema++].asString();
             newSheetDetails->schemas.push_back(schemaTmp);
 
-            std::cout << schemaTmp->type << std::endl;
+            //std::cout << schemaTmp->type << std::endl;
 
             // Constraint
         }
 
         int constraintsNum = root[sheetCount].get("ConstraintsNum", "").asInt();
-        std::cout << constraintsNum << std::endl;
+        //std::cout << constraintsNum << std::endl;
         for (int i = 1; i <= constraintsNum; i++) {
             std::string constraintName = "Constraint" + to_string(i);
             const Json::Value constraintJson = root[sheetCount][constraintName];
@@ -133,6 +133,6 @@ public:
 void setDataSchemaSheetForm(xlnt::worksheet ws, std::string cellName, std::string utf_string);
 void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::string string);
 bool ReadFromFile(char* buffer, int len);
-void readJson(excelInfo* info);
+void readJson(excelInfo* info, std::string filename);
 void writeExcel(excelInfo* info);
-void writeXLSX();
+void writeXLSX(std::string filename);
