@@ -2386,12 +2386,13 @@ int DBtoExcel(std::string srcpath, std::string dstpath)
     return 0;
 }
 
-int main (/*int argc, char *argv[]*/)
+int main (int argc, char *argv[])
 {
-    //std::string path1 = argv[1];
-    //std::string path2 = argv[2];
+    std::string path1 = argv[1];
+    std::string path2 = argv[2];
 
-    DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX");
+    //DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX");
+    DBtoExcel(path1, path2);
 
     //ExceltoDB();
 
