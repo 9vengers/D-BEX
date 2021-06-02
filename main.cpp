@@ -45,6 +45,7 @@
 #define REFERENCE_RULE_SETNULL 404
 #define REFERENCE_RULE_SETDEFAULT 405
 
+
 class LinkedList{
     struct Node{
         void *data;
@@ -2359,7 +2360,7 @@ class ExcelConverter{
 
 };
 
-int DBtoExcel(std::string srcpath)
+int DBtoExcel(std::string srcpath, std::string dstpath)
 {
     // DB
     FileContainer srcFile(FILE_TYPE_DB_READ, srcpath);
@@ -2371,8 +2372,9 @@ int DBtoExcel(std::string srcpath)
     srcpath = srcpath.substr(0, srcpath.find(".db", 0)) + ".json";
 
     FileContainer jsonFile(FILE_TYPE_JSON_WRITE, srcpath);
-    //jsonFile.Load();
     dbConverter.MakeJSON(jsonFile);
+
+
 
 
     // EXCEL
@@ -2383,12 +2385,12 @@ int DBtoExcel(std::string srcpath)
     return 0;
 }
 
-int main ()
+int main (/*int argc, char *argv[]*/)
 {
-    std::string path;
-    std::cout << "input file path: ";   // D-BEX/chinook.db
-    std::cin >> path;
-    DBtoExcel(path);
+    //std::string path1 = argv[1];
+    //std::string path2 = argv[2];
+
+    DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "mytest.xlsx");
 
     //ExceltoDB();
 
