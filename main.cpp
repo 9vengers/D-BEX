@@ -2388,8 +2388,14 @@ int DBtoExcel(std::string srcpath, std::string dstpath)
 
 int main (int argc, char *argv[])
 {
+    if (argc != 3)
+    {
+        std::cout << "\n Invalid argument !!" << std::endl;
+        return -1;
+    }
     std::string path1 = argv[1];
     std::string path2 = argv[2];
+
 
     //DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX");
     DBtoExcel(path1, path2);
