@@ -2434,6 +2434,8 @@ int main (int argc, char *argv[])
     if (argc != 3)
     {
         std::cout << "[error] Invalid argument!!" << std::endl;
+        std::cout << "press any key.. " << std::endl;
+        system("pause > nul");
         return -1;
     }
     std::string path1 = argv[1];
