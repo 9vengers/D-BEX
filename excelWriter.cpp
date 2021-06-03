@@ -48,38 +48,17 @@ void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::s
     ws.cell(cellName).border(border);
 }
 
-bool ReadFromFile(char* buffer, int len)
-{
-    FILE* fp = nullptr;
-
-    fopen_s(&fp, "test.json", "rb");
-
-    if (fp == nullptr)
-    {
-        return false;
-    }
-
-    size_t fileSize = fread(buffer, 1, len, fp);
-
-    fclose(fp);
-
-    return true;
-}
-
-void readJson(excelInfo* info, std::string filename) {
+int readJson(excelInfo* info, std::string filename) {
     Json::Value root;
     Json::Reader reader;
-    ifstream json(filename, ifstream::binary);
+    std::ifstream json(filename, std::ifstream::binary);
 
     bool parsingSuccessful = reader.parse(json, root);
 
-
     if (parsingSuccessful == false) {
-        std::cout << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
-        return;
+        std::cout << "[error] Failed to parse configuration\n" << reader.getFormatedErrorMessages();
+        return -1;
     }
-
-    std::cout << "...Converting...." << std::endl;
 
     std::string name = root.get("name", "").asString();
     info->setTitle(name);
@@ -90,16 +69,19 @@ void readJson(excelInfo* info, std::string filename) {
         info->setSheet(sheetCount, root, i);
     }
 
-    std::cout << " Read JSON complete!.." << std::endl;
+    std::cout << "-------------SUCCESS READ JSON---------------" << std::endl;
+    return 0;
 }
 
 void writeExcel(excelInfo* info, std::string absPath)
 {
-    std::cout << "...Make Excel..." << std::endl;
+    std::cout << "---------------------------------------------" << std::endl;
+    std::cout << "--------------START MAKE EXCEL---------------" << std::endl;
     std::string cellName;
     int size = info->getSheets().size();
     xlnt::workbook wb;
     xlnt::worksheet ws;
+    std::cout << "--------------------...----------------------" << std::endl;
     for (int i = 0; i < info->getSheets().size(); i++) { //각 sheet
         if (i == 0) {
             ws = wb.active_sheet();
@@ -127,7 +109,7 @@ void writeExcel(excelInfo* info, std::string absPath)
             }
         }
     }
-
+    std::cout << "--------------------...----------------------" << std::endl;
     ws = wb.create_sheet();
     ws.title("DataSchema");
     /*
@@ -186,53 +168,54 @@ void writeExcel(excelInfo* info, std::string absPath)
         }
     }
 
+    std::cout << "--------------------...----------------------" << std::endl;
 
-    cellName = "A" + to_string(index++);
+    cellName = "A" + std::to_string(index++);
     utf_string = u8"제약조건";
     ws.cell(cellName).value(utf_string);
     ws.cell(cellName).alignment(alignment);
 
     int indexPlusOne = index + 1;
 
-    setDataSchemaSheetForm(ws, "A" + to_string(index), u8"테이블");
+    setDataSchemaSheetForm(ws, "A" + std::to_string(index), u8"테이블");
 
-    cellName = "A" + to_string(index) + ":A" + to_string(indexPlusOne);
+    cellName = "A" + std::to_string(index) + ":A" + std::to_string(indexPlusOne);
     ws.merge_cells(cellName);
-    ws.cell("A" + to_string(indexPlusOne)).border(border);
+    ws.cell("A" + std::to_string(indexPlusOne)).border(border);
 
-    setDataSchemaSheetForm(ws, "B" + to_string(index), u8"제약조건이름");
+    setDataSchemaSheetForm(ws, "B" + std::to_string(index), u8"제약조건이름");
 
-    cellName = "B" + to_string(index) + ":B" + to_string(indexPlusOne);
+    cellName = "B" + std::to_string(index) + ":B" + std::to_string(indexPlusOne);
     ws.merge_cells(cellName);
-    ws.cell("B" + to_string(indexPlusOne)).border(border);
+    ws.cell("B" + std::to_string(indexPlusOne)).border(border);
 
-    setDataSchemaSheetForm(ws, "C" + to_string(index), u8"주요키");
-    setDataSchemaSheetForm(ws, "C" + to_string(indexPlusOne), u8"필드");
-    setDataSchemaSheetForm(ws, "D" + to_string(index), u8"고유키");
-    setDataSchemaSheetForm(ws, "D" + to_string(indexPlusOne), u8"필드");
-    setDataSchemaSheetForm(ws, "E" + to_string(index), u8"조건");
+    setDataSchemaSheetForm(ws, "C" + std::to_string(index), u8"주요키");
+    setDataSchemaSheetForm(ws, "C" + std::to_string(indexPlusOne), u8"필드");
+    setDataSchemaSheetForm(ws, "D" + std::to_string(index), u8"고유키");
+    setDataSchemaSheetForm(ws, "D" + std::to_string(indexPlusOne), u8"필드");
+    setDataSchemaSheetForm(ws, "E" + std::to_string(index), u8"조건");
 
-    cellName = "E" + to_string(index) + ":F" + to_string(index);
+    cellName = "E" + std::to_string(index) + ":F" + std::to_string(index);
     ws.merge_cells(cellName);
-    ws.cell("F" + to_string(index)).border(border);
+    ws.cell("F" + std::to_string(index)).border(border);
 
-    setDataSchemaSheetForm(ws, "E" + to_string(indexPlusOne), u8"필드");
-    setDataSchemaSheetForm(ws, "F" + to_string(indexPlusOne), u8"조건식");
-    setDataSchemaSheetForm(ws, "G" + to_string(index), u8"외래키");
-    setDataSchemaSheetForm(ws, "G" + to_string(indexPlusOne), u8"필드");
-    setDataSchemaSheetForm(ws, "H" + to_string(index), u8"참조");
+    setDataSchemaSheetForm(ws, "E" + std::to_string(indexPlusOne), u8"필드");
+    setDataSchemaSheetForm(ws, "F" + std::to_string(indexPlusOne), u8"조건식");
+    setDataSchemaSheetForm(ws, "G" + std::to_string(index), u8"외래키");
+    setDataSchemaSheetForm(ws, "G" + std::to_string(indexPlusOne), u8"필드");
+    setDataSchemaSheetForm(ws, "H" + std::to_string(index), u8"참조");
 
 
-    cellName = "H" + to_string(index) + ":K" + to_string(index);
+    cellName = "H" + std::to_string(index) + ":K" + std::to_string(index);
     ws.merge_cells(cellName);
-    ws.cell("I" + to_string(index)).border(border);
-    ws.cell("J" + to_string(index)).border(border);
-    ws.cell("K" + to_string(index)).border(border);
+    ws.cell("I" + std::to_string(index)).border(border);
+    ws.cell("J" + std::to_string(index)).border(border);
+    ws.cell("K" + std::to_string(index)).border(border);
 
-    setDataSchemaSheetForm(ws, "H" + to_string(indexPlusOne), u8"테이블");
-    setDataSchemaSheetForm(ws, "I" + to_string(indexPlusOne), u8"필드");
-    setDataSchemaSheetForm(ws, "J" + to_string(indexPlusOne), u8"삭제규칙");
-    setDataSchemaSheetForm(ws, ("K" + to_string(indexPlusOne)), u8"수정규칙");
+    setDataSchemaSheetForm(ws, "H" + std::to_string(indexPlusOne), u8"테이블");
+    setDataSchemaSheetForm(ws, "I" + std::to_string(indexPlusOne), u8"필드");
+    setDataSchemaSheetForm(ws, "J" + std::to_string(indexPlusOne), u8"삭제규칙");
+    setDataSchemaSheetForm(ws, ("K" + std::to_string(indexPlusOne)), u8"수정규칙");
 
 
     index = indexPlusOne + 1;
@@ -249,19 +232,19 @@ void writeExcel(excelInfo* info, std::string absPath)
         //std::cout << tmp->constraints.size() << std::endl;
         for (int j = 0; j < tmp->constraints.size(); j++) {
             //std::cout << tmp->constraints.at(j)->name << std::endl;
-            ws.cell("A" + to_string(index)).fill(xlnt::fill::solid(xlnt::rgb_color(242, 242, 242)));
-            ws.cell("A" + to_string(index)).border(border);
+            ws.cell("A" + std::to_string(index)).fill(xlnt::fill::solid(xlnt::rgb_color(242, 242, 242)));
+            ws.cell("A" + std::to_string(index)).border(border);
 
-            setDataSchemaSheetContents(ws, "B" + to_string(index), tmp->constraints.at(j)->name);
-            setDataSchemaSheetContents(ws, "C" + to_string(index), tmp->constraints.at(j)->primaryKeyField);
-            setDataSchemaSheetContents(ws, "D" + to_string(index), tmp->constraints.at(j)->uniqueKeyField);
-            setDataSchemaSheetContents(ws, "E" + to_string(index), tmp->constraints.at(j)->conditionField);
-            setDataSchemaSheetContents(ws, "F" + to_string(index), tmp->constraints.at(j)->ConditionalStatement);
-            setDataSchemaSheetContents(ws, "G" + to_string(index), tmp->constraints.at(j)->foreignKeyField);
-            setDataSchemaSheetContents(ws, "H" + to_string(index), tmp->constraints.at(j)->referTable);
-            setDataSchemaSheetContents(ws, "I" + to_string(index), tmp->constraints.at(j)->referField);
-            setDataSchemaSheetContents(ws, "J" + to_string(index), tmp->constraints.at(j)->removeRule);
-            setDataSchemaSheetContents(ws, "K" + to_string(index), tmp->constraints.at(j)->modifyRule);
+            setDataSchemaSheetContents(ws, "B" + std::to_string(index), tmp->constraints.at(j)->name);
+            setDataSchemaSheetContents(ws, "C" + std::to_string(index), tmp->constraints.at(j)->primaryKeyField);
+            setDataSchemaSheetContents(ws, "D" + std::to_string(index), tmp->constraints.at(j)->uniqueKeyField);
+            setDataSchemaSheetContents(ws, "E" + std::to_string(index), tmp->constraints.at(j)->conditionField);
+            setDataSchemaSheetContents(ws, "F" + std::to_string(index), tmp->constraints.at(j)->ConditionalStatement);
+            setDataSchemaSheetContents(ws, "G" + std::to_string(index), tmp->constraints.at(j)->foreignKeyField);
+            setDataSchemaSheetContents(ws, "H" + std::to_string(index), tmp->constraints.at(j)->referTable);
+            setDataSchemaSheetContents(ws, "I" + std::to_string(index), tmp->constraints.at(j)->referField);
+            setDataSchemaSheetContents(ws, "J" + std::to_string(index), tmp->constraints.at(j)->removeRule);
+            setDataSchemaSheetContents(ws, "K" + std::to_string(index), tmp->constraints.at(j)->modifyRule);
 
             index++;
 
@@ -285,13 +268,17 @@ void writeExcel(excelInfo* info, std::string absPath)
     wb.save(path);
 }
 
-void writeXLSX(std::string filename, std::string absPath) {
+int writeXLSX(std::string filename, std::string absPath) {
     excelInfo* info = new excelInfo();
-    readJson(info, filename);
+    
+    if (readJson(info, filename) == -1)
+    {
+        delete info;
+        return -1;
+    }
+
     writeExcel(info, absPath);
 
-    //
-    // where is  delete info?
-    //
-    //delete info;
+    delete info;
+    return 0;
 }

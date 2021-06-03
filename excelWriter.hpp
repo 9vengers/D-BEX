@@ -6,10 +6,9 @@
 #include <fstream>
 #include <xlnt/xlnt.hpp>
 #include <string>
-
 #include "json/json.h"
 
-using namespace::std;
+
 #define ALPHASIZE 26
 extern std::string alpha[ALPHASIZE];
 
@@ -106,7 +105,7 @@ public:
         int constraintsNum = root[sheetCount].get("ConstraintsNum", "").asInt();
         //std::cout << constraintsNum << std::endl;
         for (int i = 1; i <= constraintsNum; i++) {
-            std::string constraintName = "Constraint" + to_string(i);
+            std::string constraintName = "Constraint" + std::to_string(i);
             const Json::Value constraintJson = root[sheetCount][constraintName];
 
             int indexConstraint = 0;
@@ -131,7 +130,7 @@ public:
 
 void setDataSchemaSheetForm(xlnt::worksheet ws, std::string cellName, std::string utf_string);
 void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::string string);
-bool ReadFromFile(char* buffer, int len);
-void readJson(excelInfo* info, std::string filename);
+
+int readJson(excelInfo* info, std::string filename);
 void writeExcel(excelInfo* info, std::string absPath);
-void writeXLSX(std::string filename, std::string absPath);
+int writeXLSX(std::string filename, std::string absPath);

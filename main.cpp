@@ -188,8 +188,7 @@ private:
             }
             else
             {
-                std::cout << "[error] file is not opened" << std::endl;
-                return 1;
+                return -1;
             }
             break;
 
@@ -202,8 +201,7 @@ private:
             }
             else
             {
-                std::cout << "[error] file is not opened" << std::endl;
-                return 1;
+                return -1;
             }
             break;
 
@@ -216,8 +214,7 @@ private:
             }
             else
             {
-                std::cout << "[error] file is not opened" << std::endl;
-                return 1;
+                return -1;
             }
             break;
 
@@ -230,10 +227,8 @@ private:
             }
             else
             {
-                std::cout << "[error] file is not opened" << std::endl;
-                return 1;
+                return -1;
             }
-
             break;
 
             case FILE_TYPE_EXCEL_WRITE:
@@ -245,10 +240,8 @@ private:
             }
             else
             {
-                std::cout << "[error] file is not opened" << std::endl;
-                return 1;
+                return -1;
             }
-
             break;
 
             case FILE_TYPE_JSON_WRITE:
@@ -260,15 +253,13 @@ private:
             }
             else
             {
-                std::cout << "[error] file is not opened" << std::endl;
-                return 1;
+                return -1;
             }
-
             break;
             default:
-            std::cout << "[error] incorrect file type" << std::endl;
+            std::cout << "[error] Incorrect file type argument" << std::endl;
         }
-        return 0;
+        return -1;
     }
 
 public:
@@ -287,28 +278,56 @@ public:
         switch(filetype)
         {
             case FILE_TYPE_DB_READ:
-            case FILE_TYPE_DB_WRITE:
-                if(srcpath.substr(srcpath.find_last_of(".") + 1) == "db")
-                    FileOpen();
+                if (srcpath.substr(srcpath.find_last_of(".") + 1) == "db")
+                {
+                    if (FileOpen() == -1)
+                    {
+                        std::cout << "[error] The input file does not exist." << std::endl;
+                        return -1;
+                    }
+                }
                 else
-                    std::cout << "[error] Invalid file type" << std::endl;
+                {
+                    std::cout << "[error] The input file is not '*.db'" << std::endl;
+                    return -1;
+                }
+            break;
+
+            case FILE_TYPE_DB_WRITE:
+                std::cout << "[error] FILE_TYPE_DB_WRITE" << std::endl;
+                return -1;
             break;
 
             case FILE_TYPE_EXCEL_READ:
             case FILE_TYPE_EXCEL_WRITE:
-                std::cout << "excel" << std::endl;
+                std::cout << "[error] FILE_TYPE_EXCEL" << std::endl;
+                return -1;
             break;
 
             case FILE_TYPE_JSON_READ:
+                    std::cout << "[error] FILE_TYPE_JSON_READ" << std::endl;
+                    return -1;
+            break;
+
             case FILE_TYPE_JSON_WRITE:
                 if(srcpath.substr(srcpath.find_last_of(".") + 1) == "json")
-                    FileOpen();
+                {
+                    if (FileOpen() == -1)
+                    {
+                        std::cout << "[error] The json file does not exist." << std::endl;
+                        return -1;
+                    }
+                }
                 else
-                    std::cout << "[error] Invalid file type" << std::endl;
+                {
+                    std::cout << "[error] The JSON file is not named '*.json'" << std::endl;
+                    return -1;
+                }
             break;
 
             default:
-                std::cout << "[error] Invalid file type" << std::endl;
+                std::cout << "[error] Incorrect file type argument" << std::endl;
+                return -1;
         }
         return 0;
     }
@@ -853,7 +872,6 @@ public:
         return rule;
     }
 
-
     int GetNumberOfSystemField()
     {
         // ',' 개수 + 1
@@ -934,10 +952,10 @@ public:
         numberOfTables = 0;
         table = NULL;
     }
-    DBConverter()   // only excel->db
+    /*DBConverter()   // only excel->db
     {
 
-    }
+    }*/
     ~DBConverter()
     {
         delete sqliteInfo;
@@ -1010,17 +1028,21 @@ public:
         srcFile->Read((char *)buffer, SIZE_OF_DB_HEADER);
         if (ReadDBheader(buffer))
         {
-            std::cout << "----------------[schema]-----------------" << std::endl;
+            std::cout << "------------------[SCHEMA]-------------------" << std::endl;
             printf(" One Page size : %d, Total number of pages : %d\n", sizeOfPage, numberOfPages);
             delete[] buffer;
 
             // Read and create a schema
-            ReadPage(currentRootPage);
+            if (ReadPage(currentRootPage) == -1)
+            {
+                return -1;
+            }
             printf(" Total number of Tables: %d\n", numberOfTables);
+            std::cout << "---------------------------------------------" << std::endl;
 
             // Build the table schema (SQL Parser)
             SqlParsing();
-            TestSchema();
+            //TestSchema();
 
             // Read Pages and input data
             tableList.resetCurrent();
@@ -1028,18 +1050,18 @@ public:
             {
                 table = (Table *)tableList.getNodeData();
                 currentRootPage = table->rootPage;
-                ReadPage(currentRootPage);
+                if (ReadPage(currentRootPage) == -1)
+                {
+                    return -1;
+                }
             }
-
-            //std::cout << "----------------[record]-----------------" << std::endl;
-            //TestRecord();
         }
         else
         {
             delete[] buffer;
-            return 1;
+            return -1;
         }
-        return 0;
+        return 1;
     }
     int ReadJSON(FileContainer &file)
     {
@@ -1051,6 +1073,9 @@ public:
     }
     int MakeJSON(FileContainer &json)
     {
+        //---------------------------------------------
+        // Use parson-master library in this Function.
+        //---------------------------------------------
         JSON_Value *rootValue;
         JSON_Object *rootObject;
         JSON_Value* tableValue;
@@ -1491,8 +1516,8 @@ int DBConverter::ReadDBheader(unsigned char *buffer)
     else
     {
         // wrong file
-        std::cout << "This is not SQLite Format!!!" << std::endl;
-        return 0;
+        std::cout << "[error] This file is not SQLite Format!!!" << std::endl;
+        return -1;
     }
 };
 long long DBConverter::BitPattern(unsigned char *buffer, unsigned char *getSize)
@@ -1613,6 +1638,7 @@ int DBConverter::ReadPage(unsigned int pageNumber)
     buffer = new unsigned char[sizeOfPage];
     srcFile->seekg(pageNumber, sizeOfPage);
     srcFile->Read((char *)buffer, sizeOfPage);
+
     //std::cout << "Page" << pageNumber << ": ";
 
     // Only First Page
@@ -1623,33 +1649,30 @@ int DBConverter::ReadPage(unsigned int pageNumber)
     // Internal Table   : 0x05
     // Leaf     Table   : 0x0D
     // -----------------------------------------------
-    switch(buffer[offset]){
-        case 0x02:
-            //std::cout << "Internal index" << std::endl;
-            InteriorIndex(buffer, pageNumber);
-            break;
-
-        case 0x05:
-            //std::cout << "Internal table" << std::endl;
-            InteriorTable(buffer, pageNumber);
-            break;
-
-        case 0x0A:
-            //std::cout << "Leaf index" << std::endl;
-            LeafIndex(buffer, pageNumber);
-            break;
-
-        case 0x0D:
-            //std::cout << "Leaf table" << std::endl;
-            LeafTable(buffer, pageNumber);
-            break;
-
-        // exception, error
-        default:
-            return 0;
+    if (*(buffer + offset) == 0x02)
+    {
+        InteriorIndex(buffer, pageNumber);
     }
+    else if (*(buffer + offset) == 0x05)
+    {
+        InteriorTable(buffer, pageNumber);
+    }
+    else if (*(buffer + offset) == 0x0A)
+    {
+        LeafIndex(buffer, pageNumber);
+    }
+    else if (*(buffer + offset) == 0x0D)
+    {
+        LeafTable(buffer, pageNumber);
+    }
+    else
+    {
+        std::cout << "[error] Invalid page type(Index or Table)" << std::endl;
+        return -1;
+    }
+
     delete[] buffer;
-    return 0;
+    return 1;
 };
 int DBConverter::InteriorTable(unsigned char *buffer, int pageNumber)
 {
@@ -2235,7 +2258,7 @@ void DBConverter::TestRecord()
 {
     // console output test
 
-    Table *table = NULL;
+    /*Table *table = NULL;
     Field *field = NULL;
     long long *datai = NULL;
     char *datac = NULL;
@@ -2298,7 +2321,7 @@ void DBConverter::TestRecord()
                 }
             }
         }
-    }
+    }*/
 }
 std::string DBConverter::TransformNumber(int input) {
 
@@ -2365,24 +2388,44 @@ int DBtoExcel(std::string srcpath, std::string dstpath)
 {
     // DB
     FileContainer srcFile(FILE_TYPE_DB_READ, srcpath);
-    srcFile.Load();
+    if (srcFile.Load() == -1)
+    {
+        std::cout << "[error] Failed to load database file." << std::endl;
+        return -1;
+    }
     DBConverter dbConverter(srcFile);
-    dbConverter.ReadDB();
-
-
+    if (dbConverter.ReadDB() == -1)
+    {
+        std::cout << "[error] Failed to read database file." << std::endl;
+        return -1;
+    }
+    std::cout << "--------------SUCCESS READ DB----------------" << std::endl;
+    std::cout << "---------------------------------------------" << std::endl;
+    // JSON
+    // filename.db ---> filename.json
     srcpath = srcpath.substr(0, srcpath.find(".db", 0)) + ".json";
 
-    FileContainer jsonFile(FILE_TYPE_JSON_WRITE, srcpath);
-    dbConverter.MakeJSON(jsonFile);
 
+    FileContainer jsonFile(FILE_TYPE_JSON_WRITE, srcpath);
+    if (dbConverter.MakeJSON(jsonFile) == -1)
+    {
+        std::cout << "[error] Failed to make json file." << std::endl;
+        return -1;
+    }
+    std::cout << "-------------SUCCESS MAKE JSON---------------" << std::endl;
 
 
 
     // EXCEL
-    writeXLSX(srcpath, dstpath);
+    if (writeXLSX(srcpath, dstpath) == -1)
+    {
+        std::cout << "[error] Failed to make Excel file." << std::endl;
+        return -1;
+    }
 
-    std::cout << "------COMPLETE-----" << std::endl;
-
+    std::cout << "---------------------------------------------" << std::endl;
+    std::cout << "--------------SUCCESS CONVERTING-------------" << std::endl;
+    std::cout << "---------------------------------------------" << std::endl;
     return 0;
 }
 
@@ -2390,7 +2433,7 @@ int main (int argc, char *argv[])
 {
     if (argc != 3)
     {
-        std::cout << "\n Invalid argument !!" << std::endl;
+        std::cout << "[error] Invalid argument!!" << std::endl;
         return -1;
     }
     std::string path1 = argv[1];
@@ -2398,7 +2441,11 @@ int main (int argc, char *argv[])
 
 
     //DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX");
-    DBtoExcel(path1, path2);
+    if (DBtoExcel(path1, path2) == -1)
+    {
+        std::cout << "[error] Failed to DB to Excel Process" << std::endl;
+        return -1;
+    }
 
     //ExceltoDB();
 
