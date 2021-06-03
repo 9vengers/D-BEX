@@ -12,6 +12,7 @@
 
 ## 개요
 - D-BEX 프로젝트는 개발중에 있습니다.
+- Prototype
 - 현재 프로젝트의 하나의 기능인 [Database -> Excel] ( DB to Excel ) 변환 기능만을 제공하고 있습니다.
 - 향후 ( Excel to DB )를 구현하면, ( DB to DB ) 또한 확장할 수 있습니다.
 
