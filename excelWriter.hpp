@@ -6,42 +6,44 @@
 #include <fstream>
 #include <xlnt/xlnt.hpp>
 #include <string>
+#include <cctype>
+
 #include "json/json.h"
 
-
+using namespace::std;
 #define ALPHASIZE 26
 extern std::string alpha[ALPHASIZE];
 
 struct cellDetails {
     std::string data;
-    std::string style; //cell¼­½Ä
-    std::string func; //ÇÔ¼ö°ªÀÖÀ¸¸é
+    std::string style; //cellì„œì‹
+    std::string func; //í•¨ìˆ˜ê°’ìˆìœ¼ë©´
 };
 
 struct schema {
-    std::string field; //ÇÊµå
-    std::string type; //Å¸ÀÔ
+    std::string field; //í•„ë“œ
+    std::string type; //íƒ€ì…
     std::string isNull; //null
-    std::string defaultValue; //±âº»°ª
-    std::string collation; //Äİ·¹ÀÌ¼Ç
-    std::string autoInc; //ÀÚµ¿Áõ°¡
+    std::string defaultValue; //ê¸°ë³¸ê°’
+    std::string collation; //ì½œë ˆì´ì…˜
+    std::string autoInc; //ìë™ì¦ê°€
 };
 
 struct constraint {
     std::string name;
-    std::string primaryKeyField; //ÁÖ¿äÅ° ÇÊµå
-    std::string uniqueKeyField; //°íÀ¯Å° ÇÊµå
-    std::string conditionField; //Á¶°Ç, ÇÊµå
-    std::string ConditionalStatement; //Á¶°Ç, Á¶°Ç½Ä
-    std::string foreignKeyField; //¿Ü·¡Å° ÇÊµå
-    std::string referTable; //ÂüÁ¶ Å×ÀÌºí
-    std::string referField; //ÂüÁ¶ ÇÊµå
-    std::string removeRule; //ÂüÁ¶ »èÁ¦±ÔÄ¢
-    std::string modifyRule; //ÂüÁ¶ ¼öÁ¤±ÔÄ¢
+    std::string primaryKeyField; //ì£¼ìš”í‚¤ í•„ë“œ
+    std::string uniqueKeyField; //ê³ ìœ í‚¤ í•„ë“œ
+    std::string conditionField; //ì¡°ê±´, í•„ë“œ
+    std::string ConditionalStatement; //ì¡°ê±´, ì¡°ê±´ì‹
+    std::string foreignKeyField; //ì™¸ë˜í‚¤ í•„ë“œ
+    std::string referTable; //ì°¸ì¡° í…Œì´ë¸”
+    std::string referField; //ì°¸ì¡° í•„ë“œ
+    std::string removeRule; //ì°¸ì¡° ì‚­ì œê·œì¹™
+    std::string modifyRule; //ì°¸ì¡° ìˆ˜ì •ê·œì¹™
 };
 
 struct sheetDetails {
-    std::string sheetTitle; //sheet ÀÌ¸§
+    std::string sheetTitle; //sheet ì´ë¦„
     std::vector<std::vector<cellDetails*>*> cells;
     std::vector<schema*> schemas;
     std::vector<constraint*> constraints;
@@ -105,21 +107,21 @@ public:
         int constraintsNum = root[sheetCount].get("ConstraintsNum", "").asInt();
         //std::cout << constraintsNum << std::endl;
         for (int i = 1; i <= constraintsNum; i++) {
-            std::string constraintName = "Constraint" + std::to_string(i);
+            std::string constraintName = "Constraint" + to_string(i);
             const Json::Value constraintJson = root[sheetCount][constraintName];
 
             int indexConstraint = 0;
             constraint* constraintTmp = new constraint;
             constraintTmp->name = constraintJson[indexConstraint++].asString();
-            constraintTmp->primaryKeyField = constraintJson[indexConstraint++].asString();; //ÁÖ¿äÅ° ÇÊµå
-            constraintTmp->uniqueKeyField = constraintJson[indexConstraint++].asString();; //°íÀ¯Å° ÇÊµå
-            constraintTmp->conditionField = constraintJson[indexConstraint++].asString();; //Á¶°Ç, ÇÊµå
-            constraintTmp->ConditionalStatement = constraintJson[indexConstraint++].asString();; //Á¶°Ç, Á¶°Ç½Ä
-            constraintTmp->foreignKeyField = constraintJson[indexConstraint++].asString();; //¿Ü·¡Å° ÇÊµå
-            constraintTmp->referTable = constraintJson[indexConstraint++].asString();; //ÂüÁ¶ Å×ÀÌºí
-            constraintTmp->referField = constraintJson[indexConstraint++].asString();; //ÂüÁ¶ ÇÊµå
-            constraintTmp->removeRule = constraintJson[indexConstraint++].asString();; //ÂüÁ¶ »èÁ¦±ÔÄ¢
-            constraintTmp->modifyRule = constraintJson[indexConstraint++].asString();; //ÂüÁ¶ ¼öÁ¤±ÔÄ¢
+            constraintTmp->primaryKeyField = constraintJson[indexConstraint++].asString();; //ì£¼ìš”í‚¤ í•„ë“œ
+            constraintTmp->uniqueKeyField = constraintJson[indexConstraint++].asString();; //ê³ ìœ í‚¤ í•„ë“œ
+            constraintTmp->conditionField = constraintJson[indexConstraint++].asString();; //ì¡°ê±´, í•„ë“œ
+            constraintTmp->ConditionalStatement = constraintJson[indexConstraint++].asString();; //ì¡°ê±´, ì¡°ê±´ì‹
+            constraintTmp->foreignKeyField = constraintJson[indexConstraint++].asString();; //ì™¸ë˜í‚¤ í•„ë“œ
+            constraintTmp->referTable = constraintJson[indexConstraint++].asString();; //ì°¸ì¡° í…Œì´ë¸”
+            constraintTmp->referField = constraintJson[indexConstraint++].asString();; //ì°¸ì¡° í•„ë“œ
+            constraintTmp->removeRule = constraintJson[indexConstraint++].asString();; //ì°¸ì¡° ì‚­ì œê·œì¹™
+            constraintTmp->modifyRule = constraintJson[indexConstraint++].asString();; //ì°¸ì¡° ìˆ˜ì •ê·œì¹™
 
 
             newSheetDetails->constraints.push_back(constraintTmp);
@@ -130,7 +132,9 @@ public:
 
 void setDataSchemaSheetForm(xlnt::worksheet ws, std::string cellName, std::string utf_string);
 void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::string string);
-
-int readJson(excelInfo* info, std::string filename);
+bool ReadFromFile(char* buffer, int len);
+void readJson(excelInfo* info, std::string filename);
 void writeExcel(excelInfo* info, std::string absPath);
-int writeXLSX(std::string filename, std::string absPath);
+void writeXLSX(std::string filename, std::string absPath);
+bool isNumber(std::string str);
+bool isDouble(std::string str);
