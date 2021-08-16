@@ -48,17 +48,38 @@ void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::s
     ws.cell(cellName).border(border);
 }
 
-int readJson(excelInfo* info, std::string filename) {
+bool ReadFromFile(char* buffer, int len)
+{
+    FILE* fp = nullptr;
+
+    fopen_s(&fp, "test.json", "rb");
+
+    if (fp == nullptr)
+    {
+        return false;
+    }
+
+    size_t fileSize = fread(buffer, 1, len, fp);
+
+    fclose(fp);
+
+    return true;
+}
+
+void readJson(excelInfo* info, std::string filename) {
     Json::Value root;
     Json::Reader reader;
-    std::ifstream json(filename, std::ifstream::binary);
+    ifstream json(filename, ifstream::binary);
 
     bool parsingSuccessful = reader.parse(json, root);
 
+
     if (parsingSuccessful == false) {
-        std::cout << "[error] Failed to parse configuration\n" << reader.getFormatedErrorMessages();
-        return -1;
+        std::cout << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
+        return;
     }
+
+    std::cout << "...Converting...." << std::endl;
 
     std::string name = root.get("name", "").asString();
     info->setTitle(name);
@@ -69,20 +90,17 @@ int readJson(excelInfo* info, std::string filename) {
         info->setSheet(sheetCount, root, i);
     }
 
-    std::cout << "-------------SUCCESS READ JSON---------------" << std::endl;
-    return 0;
+    std::cout << " Read JSON complete!.." << std::endl;
 }
 
 void writeExcel(excelInfo* info, std::string absPath)
 {
-    std::cout << "---------------------------------------------" << std::endl;
-    std::cout << "--------------START MAKE EXCEL---------------" << std::endl;
+    std::cout << "...Make Excel..." << std::endl;
     std::string cellName;
     int size = info->getSheets().size();
     xlnt::workbook wb;
     xlnt::worksheet ws;
-    std::cout << "--------------------...----------------------" << std::endl;
-    for (int i = 0; i < info->getSheets().size(); i++) { //°¢ sheet
+    for (int i = 0; i < info->getSheets().size(); i++) { //ê° sheet
         if (i == 0) {
             ws = wb.active_sheet();
         }
@@ -100,16 +118,47 @@ void writeExcel(excelInfo* info, std::string absPath)
         }
         */
 
-        for (int j = 0; j < tmp->cells.size(); j++) { //°¢ sheetÀÇ cellµé
+        for (int j = 0; j < tmp->cells.size(); j++) { //ê° sheetì˜ cellë“¤
             for (int k = 0; k < tmp->cells.at(j)->size(); k++) {
                 cellName = alpha[j] + std::to_string(((k + 1)));
-                ws.cell(cellName).value(tmp->cells.at(j)->at(k)->data); //tmp->cells.at(j)->at(k)->data
+                
+                std::cout << tmp->cells.at(j)->at(k)->data << std::endl;
+               if (tmp->schemas.at(j)->type == "INTEGER" && k>=1)
+               {
+                 int convertiedInt = std::stoi(tmp->cells.at(j)->at(k)->data);
+                 ws.cell(cellName).value(convertiedInt); //tmp->cells.at(j)->at(k)->data
+               }
+               else if (tmp->schemas.at(j)->type.find("NUMERIC") != std::string::npos && k >= 1)
+               {
+                   double convertiedDouble = std::stod(tmp->cells.at(j)->at(k)->data);
+                    ws.cell(cellName).value(convertiedDouble);
+               }
+               else
+               {
+                   if (isNumber(tmp->cells.at(j)->at(k)->data))
+                   {
+                       if (isDouble(tmp->cells.at(j)->at(k)->data)) {
+                           std::cout << tmp->cells.at(j)->at(k)->data << "ëŠ” ì‹¤ìˆ˜ì´ë‹¤." << std::endl;
+                           double convertiedDouble = std::stod(tmp->cells.at(j)->at(k)->data);
+                           ws.cell(cellName).value(convertiedDouble);
+                       }
+                       else
+                       {
+                           std::cout << tmp->cells.at(j)->at(k)->data << "ëŠ” ì •ìˆ˜ì´ë‹¤." << std::endl;
+                           int convertiedInt = std::stoi(tmp->cells.at(j)->at(k)->data);
+                           ws.cell(cellName).value(convertiedInt); //tmp->cells.at(j)->at(k)->data
+                       }
+                   }
+                   else {
+                       ws.cell(cellName).value(tmp->cells.at(j)->at(k)->data); //tmp->cells.at(j)->at(k)->data
+                   }
+               }
                 //std::cout << cellName << std::endl;
                 //std::cout << tmp->cells.at(j)->at(k)->data << std::endl;
             }
         }
     }
-    std::cout << "--------------------...----------------------" << std::endl;
+
     ws = wb.create_sheet();
     ws.title("DataSchema");
     /*
@@ -132,17 +181,17 @@ void writeExcel(excelInfo* info, std::string absPath)
     border.side(xlnt::border_side::top, border_pro);
     border.side(xlnt::border_side::bottom, border_pro);
 
-    std::string utf_string = u8"½ºÅ°¸¶";
+    std::string utf_string = u8"ìŠ¤í‚¤ë§ˆ";
     ws.cell("A1").value(utf_string);
     ws.cell("A1").alignment(alignment);
 
-    setDataSchemaSheetForm(ws, "A2", u8"Å×ÀÌºí");
-    setDataSchemaSheetForm(ws, "B2", u8"ÇÊµå");
-    setDataSchemaSheetForm(ws, "C2", u8"Å¸ÀÔ");
+    setDataSchemaSheetForm(ws, "A2", u8"í…Œì´ë¸”");
+    setDataSchemaSheetForm(ws, "B2", u8"í•„ë“œ");
+    setDataSchemaSheetForm(ws, "C2", u8"íƒ€ì…");
     setDataSchemaSheetForm(ws, "D2", u8"null");
-    setDataSchemaSheetForm(ws, "E2", u8"±âº»°ª");
-    setDataSchemaSheetForm(ws, "F2", u8"Äİ·¹ÀÌ¼Ç");
-    setDataSchemaSheetForm(ws, "G2", u8"ÀÚµ¿Áõ°¡");
+    setDataSchemaSheetForm(ws, "E2", u8"ê¸°ë³¸ê°’");
+    setDataSchemaSheetForm(ws, "F2", u8"ì½œë ˆì´ì…˜");
+    setDataSchemaSheetForm(ws, "G2", u8"ìë™ì¦ê°€");
 
     int index = 3;
     for (int i = 0; i < info->getSheets().size(); i++) {
@@ -168,54 +217,53 @@ void writeExcel(excelInfo* info, std::string absPath)
         }
     }
 
-    std::cout << "--------------------...----------------------" << std::endl;
 
-    cellName = "A" + std::to_string(index++);
-    utf_string = u8"Á¦¾àÁ¶°Ç";
+    cellName = "A" + to_string(index++);
+    utf_string = u8"ì œì•½ì¡°ê±´";
     ws.cell(cellName).value(utf_string);
     ws.cell(cellName).alignment(alignment);
 
     int indexPlusOne = index + 1;
 
-    setDataSchemaSheetForm(ws, "A" + std::to_string(index), u8"Å×ÀÌºí");
+    setDataSchemaSheetForm(ws, "A" + to_string(index), u8"í…Œì´ë¸”");
 
-    cellName = "A" + std::to_string(index) + ":A" + std::to_string(indexPlusOne);
+    cellName = "A" + to_string(index) + ":A" + to_string(indexPlusOne);
     ws.merge_cells(cellName);
-    ws.cell("A" + std::to_string(indexPlusOne)).border(border);
+    ws.cell("A" + to_string(indexPlusOne)).border(border);
 
-    setDataSchemaSheetForm(ws, "B" + std::to_string(index), u8"Á¦¾àÁ¶°ÇÀÌ¸§");
+    setDataSchemaSheetForm(ws, "B" + to_string(index), u8"ì œì•½ì¡°ê±´ì´ë¦„");
 
-    cellName = "B" + std::to_string(index) + ":B" + std::to_string(indexPlusOne);
+    cellName = "B" + to_string(index) + ":B" + to_string(indexPlusOne);
     ws.merge_cells(cellName);
-    ws.cell("B" + std::to_string(indexPlusOne)).border(border);
+    ws.cell("B" + to_string(indexPlusOne)).border(border);
 
-    setDataSchemaSheetForm(ws, "C" + std::to_string(index), u8"ÁÖ¿äÅ°");
-    setDataSchemaSheetForm(ws, "C" + std::to_string(indexPlusOne), u8"ÇÊµå");
-    setDataSchemaSheetForm(ws, "D" + std::to_string(index), u8"°íÀ¯Å°");
-    setDataSchemaSheetForm(ws, "D" + std::to_string(indexPlusOne), u8"ÇÊµå");
-    setDataSchemaSheetForm(ws, "E" + std::to_string(index), u8"Á¶°Ç");
+    setDataSchemaSheetForm(ws, "C" + to_string(index), u8"ì£¼ìš”í‚¤");
+    setDataSchemaSheetForm(ws, "C" + to_string(indexPlusOne), u8"í•„ë“œ");
+    setDataSchemaSheetForm(ws, "D" + to_string(index), u8"ê³ ìœ í‚¤");
+    setDataSchemaSheetForm(ws, "D" + to_string(indexPlusOne), u8"í•„ë“œ");
+    setDataSchemaSheetForm(ws, "E" + to_string(index), u8"ì¡°ê±´");
 
-    cellName = "E" + std::to_string(index) + ":F" + std::to_string(index);
+    cellName = "E" + to_string(index) + ":F" + to_string(index);
     ws.merge_cells(cellName);
-    ws.cell("F" + std::to_string(index)).border(border);
+    ws.cell("F" + to_string(index)).border(border);
 
-    setDataSchemaSheetForm(ws, "E" + std::to_string(indexPlusOne), u8"ÇÊµå");
-    setDataSchemaSheetForm(ws, "F" + std::to_string(indexPlusOne), u8"Á¶°Ç½Ä");
-    setDataSchemaSheetForm(ws, "G" + std::to_string(index), u8"¿Ü·¡Å°");
-    setDataSchemaSheetForm(ws, "G" + std::to_string(indexPlusOne), u8"ÇÊµå");
-    setDataSchemaSheetForm(ws, "H" + std::to_string(index), u8"ÂüÁ¶");
+    setDataSchemaSheetForm(ws, "E" + to_string(indexPlusOne), u8"í•„ë“œ");
+    setDataSchemaSheetForm(ws, "F" + to_string(indexPlusOne), u8"ì¡°ê±´ì‹");
+    setDataSchemaSheetForm(ws, "G" + to_string(index), u8"ì™¸ë˜í‚¤");
+    setDataSchemaSheetForm(ws, "G" + to_string(indexPlusOne), u8"í•„ë“œ");
+    setDataSchemaSheetForm(ws, "H" + to_string(index), u8"ì°¸ì¡°");
 
 
-    cellName = "H" + std::to_string(index) + ":K" + std::to_string(index);
+    cellName = "H" + to_string(index) + ":K" + to_string(index);
     ws.merge_cells(cellName);
-    ws.cell("I" + std::to_string(index)).border(border);
-    ws.cell("J" + std::to_string(index)).border(border);
-    ws.cell("K" + std::to_string(index)).border(border);
+    ws.cell("I" + to_string(index)).border(border);
+    ws.cell("J" + to_string(index)).border(border);
+    ws.cell("K" + to_string(index)).border(border);
 
-    setDataSchemaSheetForm(ws, "H" + std::to_string(indexPlusOne), u8"Å×ÀÌºí");
-    setDataSchemaSheetForm(ws, "I" + std::to_string(indexPlusOne), u8"ÇÊµå");
-    setDataSchemaSheetForm(ws, "J" + std::to_string(indexPlusOne), u8"»èÁ¦±ÔÄ¢");
-    setDataSchemaSheetForm(ws, ("K" + std::to_string(indexPlusOne)), u8"¼öÁ¤±ÔÄ¢");
+    setDataSchemaSheetForm(ws, "H" + to_string(indexPlusOne), u8"í…Œì´ë¸”");
+    setDataSchemaSheetForm(ws, "I" + to_string(indexPlusOne), u8"í•„ë“œ");
+    setDataSchemaSheetForm(ws, "J" + to_string(indexPlusOne), u8"ì‚­ì œê·œì¹™");
+    setDataSchemaSheetForm(ws, ("K" + to_string(indexPlusOne)), u8"ìˆ˜ì •ê·œì¹™");
 
 
     index = indexPlusOne + 1;
@@ -232,19 +280,19 @@ void writeExcel(excelInfo* info, std::string absPath)
         //std::cout << tmp->constraints.size() << std::endl;
         for (int j = 0; j < tmp->constraints.size(); j++) {
             //std::cout << tmp->constraints.at(j)->name << std::endl;
-            ws.cell("A" + std::to_string(index)).fill(xlnt::fill::solid(xlnt::rgb_color(242, 242, 242)));
-            ws.cell("A" + std::to_string(index)).border(border);
+            ws.cell("A" + to_string(index)).fill(xlnt::fill::solid(xlnt::rgb_color(242, 242, 242)));
+            ws.cell("A" + to_string(index)).border(border);
 
-            setDataSchemaSheetContents(ws, "B" + std::to_string(index), tmp->constraints.at(j)->name);
-            setDataSchemaSheetContents(ws, "C" + std::to_string(index), tmp->constraints.at(j)->primaryKeyField);
-            setDataSchemaSheetContents(ws, "D" + std::to_string(index), tmp->constraints.at(j)->uniqueKeyField);
-            setDataSchemaSheetContents(ws, "E" + std::to_string(index), tmp->constraints.at(j)->conditionField);
-            setDataSchemaSheetContents(ws, "F" + std::to_string(index), tmp->constraints.at(j)->ConditionalStatement);
-            setDataSchemaSheetContents(ws, "G" + std::to_string(index), tmp->constraints.at(j)->foreignKeyField);
-            setDataSchemaSheetContents(ws, "H" + std::to_string(index), tmp->constraints.at(j)->referTable);
-            setDataSchemaSheetContents(ws, "I" + std::to_string(index), tmp->constraints.at(j)->referField);
-            setDataSchemaSheetContents(ws, "J" + std::to_string(index), tmp->constraints.at(j)->removeRule);
-            setDataSchemaSheetContents(ws, "K" + std::to_string(index), tmp->constraints.at(j)->modifyRule);
+            setDataSchemaSheetContents(ws, "B" + to_string(index), tmp->constraints.at(j)->name);
+            setDataSchemaSheetContents(ws, "C" + to_string(index), tmp->constraints.at(j)->primaryKeyField);
+            setDataSchemaSheetContents(ws, "D" + to_string(index), tmp->constraints.at(j)->uniqueKeyField);
+            setDataSchemaSheetContents(ws, "E" + to_string(index), tmp->constraints.at(j)->conditionField);
+            setDataSchemaSheetContents(ws, "F" + to_string(index), tmp->constraints.at(j)->ConditionalStatement);
+            setDataSchemaSheetContents(ws, "G" + to_string(index), tmp->constraints.at(j)->foreignKeyField);
+            setDataSchemaSheetContents(ws, "H" + to_string(index), tmp->constraints.at(j)->referTable);
+            setDataSchemaSheetContents(ws, "I" + to_string(index), tmp->constraints.at(j)->referField);
+            setDataSchemaSheetContents(ws, "J" + to_string(index), tmp->constraints.at(j)->removeRule);
+            setDataSchemaSheetContents(ws, "K" + to_string(index), tmp->constraints.at(j)->modifyRule);
 
             index++;
 
@@ -268,17 +316,59 @@ void writeExcel(excelInfo* info, std::string absPath)
     wb.save(path);
 }
 
-int writeXLSX(std::string filename, std::string absPath) {
-    excelInfo* info = new excelInfo();
-    
-    if (readJson(info, filename) == -1)
+bool isNumber(std::string str)
+{
+    int cnt = 0;
+
+    if (str.empty())
     {
-        delete info;
-        return -1;
+        return false;
     }
 
+    for (int i = 0; i < str.size(); i++)
+    {
+        wchar_t wchar = str.at(i);
+            
+        if (wchar<48||wchar>57)
+        {
+               
+            if (str.at(i) != '.') //.ì´ ì•„ë‹Œê²½ìš°
+            {
+                return false;
+            }
+            else if (cnt == 2) { //ì‹¤ìˆ˜ì˜ ê²½ìš° .ê°€ ìˆì„ ìˆ˜ìˆëŠ”ë° .ê°€ ë‘ê°œìˆì„ìˆ˜ëŠ” ì—†ìœ¼ë‹ˆê¹
+                return false;
+            }
+            else if (str.at(i) == '.')
+            {
+                cnt++;
+            }
+        }
+    }
+    return true;
+}
+
+bool isDouble(std::string str) 
+{
+    std::cout << "isDoubleí•¨ìˆ˜" << std::endl;
+    for (int i = 0; i < str.size(); i++)
+    {
+        if (str.at(i) == '.')
+        {
+                return true;
+        }
+        
+    }
+    return false;
+}
+
+void writeXLSX(std::string filename, std::string absPath) {
+    excelInfo* info = new excelInfo();
+    readJson(info, filename);
     writeExcel(info, absPath);
 
-    delete info;
-    return 0;
+    //
+    // where is  delete info?
+    //
+    //delete info;
 }
