@@ -121,8 +121,7 @@ void writeExcel(excelInfo* info, std::string absPath)
         for (int j = 0; j < tmp->cells.size(); j++) { //각 sheet의 cell들
             for (int k = 0; k < tmp->cells.at(j)->size(); k++) {
                 cellName = alpha[j] + std::to_string(((k + 1)));
-                
-                std::cout << tmp->cells.at(j)->at(k)->data << std::endl;
+               
                if (tmp->schemas.at(j)->type == "INTEGER" && k>=1)
                {
                  int convertiedInt = std::stoi(tmp->cells.at(j)->at(k)->data);
@@ -138,13 +137,11 @@ void writeExcel(excelInfo* info, std::string absPath)
                    if (isNumber(tmp->cells.at(j)->at(k)->data))
                    {
                        if (isDouble(tmp->cells.at(j)->at(k)->data)) {
-                           std::cout << tmp->cells.at(j)->at(k)->data << "는 실수이다." << std::endl;
                            double convertiedDouble = std::stod(tmp->cells.at(j)->at(k)->data);
                            ws.cell(cellName).value(convertiedDouble);
                        }
                        else
                        {
-                           std::cout << tmp->cells.at(j)->at(k)->data << "는 정수이다." << std::endl;
                            int convertiedInt = std::stoi(tmp->cells.at(j)->at(k)->data);
                            ws.cell(cellName).value(convertiedInt); //tmp->cells.at(j)->at(k)->data
                        }
@@ -350,7 +347,6 @@ bool isNumber(std::string str)
 
 bool isDouble(std::string str) 
 {
-    std::cout << "isDouble함수" << std::endl;
     for (int i = 0; i < str.size(); i++)
     {
         if (str.at(i) == '.')
