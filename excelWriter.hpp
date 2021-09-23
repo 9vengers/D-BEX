@@ -133,8 +133,8 @@ public:
 void setDataSchemaSheetForm(xlnt::worksheet ws, std::string cellName, std::string utf_string);
 void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::string string);
 bool ReadFromFile(char* buffer, int len);
-void readJson(excelInfo* info, std::string filename);
+int readJson(excelInfo* info, std::string filename);
 void writeExcel(excelInfo* info, std::string absPath);
-void writeXLSX(std::string filename, std::string absPath);
+int writeXLSX(std::string filename, std::string absPath);
 bool isNumber(std::string str);
 bool isDouble(std::string str);
