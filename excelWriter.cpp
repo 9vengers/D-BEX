@@ -66,20 +66,17 @@ bool ReadFromFile(char* buffer, int len)
     return true;
 }
 
-void readJson(excelInfo* info, std::string filename) {
+int readJson(excelInfo* info, std::string filename) {
     Json::Value root;
     Json::Reader reader;
-    ifstream json(filename, ifstream::binary);
+    std::ifstream json(filename, std::ifstream::binary);
 
     bool parsingSuccessful = reader.parse(json, root);
 
-
     if (parsingSuccessful == false) {
-        std::cout << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
-        return;
+        std::cout << "[error] Failed to parse configuration\n" << reader.getFormatedErrorMessages();
+        return -1;
     }
-
-    std::cout << "...Converting...." << std::endl;
 
     std::string name = root.get("name", "").asString();
     info->setTitle(name);
@@ -90,7 +87,8 @@ void readJson(excelInfo* info, std::string filename) {
         info->setSheet(sheetCount, root, i);
     }
 
-    std::cout << " Read JSON complete!.." << std::endl;
+    std::cout << "-------------SUCCESS READ JSON---------------" << std::endl;
+    return 0;
 }
 
 void writeExcel(excelInfo* info, std::string absPath)
@@ -358,13 +356,17 @@ bool isDouble(std::string str)
     return false;
 }
 
-void writeXLSX(std::string filename, std::string absPath) {
+int writeXLSX(std::string filename, std::string absPath) {
     excelInfo* info = new excelInfo();
-    readJson(info, filename);
+
+    if (readJson(info, filename) == -1)
+    {
+        delete info;
+        return -1;
+    }
+
     writeExcel(info, absPath);
 
-    //
-    // where is  delete info?
-    //
-    //delete info;
+    delete info;
+    return 0;
 }
