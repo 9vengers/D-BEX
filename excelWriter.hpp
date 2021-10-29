@@ -141,7 +141,7 @@ void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::s
 bool ReadFromFile(char* buffer, int len);
 int readJson(excelInfo* info, std::string filename);
 void readFunctionsJson(std::string filename, std::vector<functionInfo*>* functions);
-void writeExcel(excelInfo* info, std::string absPath);
+void writeExcel(std::string filename, excelInfo* info, std::string absPath, bool hasFunctions);
 int writeXLSX(std::string filename, std::string absPath, bool hasFunctions);
 bool isNumber(std::string str);
 bool isDouble(std::string str);
