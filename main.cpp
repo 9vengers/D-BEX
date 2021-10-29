@@ -2417,7 +2417,7 @@ int DBtoExcel(std::string srcpath, std::string dstpath)
 
 
     // EXCEL
-    if (writeXLSX(srcpath, dstpath) == -1)
+    if (writeXLSX(srcpath, dstpath, false) == -1)
     {
         std::cout << "[error] Failed to make Excel file." << std::endl;
         return -1;
