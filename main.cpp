@@ -2384,7 +2384,7 @@ class ExcelConverter{
 
 };
 
-int DBtoExcel(std::string srcpath, std::string dstpath)
+int DBtoExcel(std::string srcpath, std::string dstpath, bool hasFunctions)
 {
     // DB
     FileContainer srcFile(FILE_TYPE_DB_READ, srcpath);
@@ -2417,7 +2417,7 @@ int DBtoExcel(std::string srcpath, std::string dstpath)
 
 
     // EXCEL
-    if (writeXLSX(srcpath, dstpath, false) == -1)
+    if (writeXLSX(srcpath, dstpath, hasFunctions) == -1)
     {
         std::cout << "[error] Failed to make Excel file." << std::endl;
         return -1;
@@ -2443,7 +2443,7 @@ int main (int argc, char *argv[])
 
 
     //DBtoExcel("D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX\\chinook.db", "D:\\Documents\\Visual Studio 2019\\projects\\D-BEX\\qvengers\\D-BEX");
-    if (DBtoExcel(path1, path2) == -1)
+    if (DBtoExcel(path1, path2, false) == -1)
     {
         std::cout << "[error] Failed to DB to Excel Process" << std::endl;
         return -1;
