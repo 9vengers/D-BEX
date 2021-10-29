@@ -49,6 +49,12 @@ struct sheetDetails {
     std::vector<constraint*> constraints;
 };
 
+struct functionInfo {
+    std::vector<std::string> cellFormula;
+    std::vector<std::string> cellName;
+    std::string sheetName;
+};
+
 class excelInfo {
 private:
     std::string title;
@@ -134,7 +140,8 @@ void setDataSchemaSheetForm(xlnt::worksheet ws, std::string cellName, std::strin
 void setDataSchemaSheetContents(xlnt::worksheet ws, std::string cellName, std::string string);
 bool ReadFromFile(char* buffer, int len);
 int readJson(excelInfo* info, std::string filename);
+void readFunctionsJson(std::string filename, std::vector<functionInfo*>* functions);
 void writeExcel(excelInfo* info, std::string absPath);
-int writeXLSX(std::string filename, std::string absPath);
+int writeXLSX(std::string filename, std::string absPath, bool hasFunctions);
 bool isNumber(std::string str);
 bool isDouble(std::string str);
