@@ -413,7 +413,7 @@ bool isDouble(std::string str)
     return false;
 }
 
-int writeXLSX(std::string filename, std::string absPath) {
+int writeXLSX(std::string filename, std::string absPath, bool hasFunctions) {
     excelInfo* info = new excelInfo();
 
     if (readJson(info, filename) == -1)
