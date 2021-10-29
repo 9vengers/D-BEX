@@ -129,7 +129,7 @@ void readFunctionsJson(std::string filename, std::vector<functionInfo*>* functio
     std::cout << " Read Functions JSON complete!.." << std::endl;
 }
 
-void writeExcel(excelInfo* info, std::string absPath)
+void writeExcel(std::string filename, excelInfo* info, std::string absPath, bool hasFunctions)
 {
     std::cout << "...Make Excel..." << std::endl;
     std::string cellName;
