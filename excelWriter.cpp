@@ -91,11 +91,55 @@ int readJson(excelInfo* info, std::string filename) {
     return 0;
 }
 
+void readFunctionsJson(std::string filename, std::vector<functionInfo*>* functions) {
+    Json::Value root;
+    Json::Reader reader;
+    filename = filename.substr(0, filename.length() - 5);
+    filename += "Functions.json";
+    cout << filename << endl;
+    ifstream json(filename, ifstream::binary);
+    
+
+    bool parsingSuccessful = reader.parse(json, root);
+
+    if (parsingSuccessful == false) {
+        std::cout << "Failed to parse configuration\n" << reader.getFormatedErrorMessages();
+        return;
+    }
+
+    std::cout << "...Converting...." << std::endl;
+
+    int sheetNum = root.get("sheetNum", "").asInt();
+
+    for (int i = 0; i < sheetNum; i++) {
+        functionInfo* tmp = new functionInfo();
+
+        std::string sheetCount = "sheet" + std::to_string(i + 1);
+        const Json::Value cellFormula = root[sheetCount]["cellFormula"];
+        const Json::Value cellName = root[sheetCount]["cellName"];
+        const Json::Value sheetName = root[sheetCount]["sheetName"];
+        tmp->sheetName = sheetName.asString();
+        for (int j = 0; j < cellFormula.size(); j++) {
+            tmp->cellFormula.push_back(cellFormula[j].asString());
+            tmp->cellName.push_back(cellName[j].asString());
+            functions->push_back(tmp);
+        }
+    }
+
+    std::cout << " Read Functions JSON complete!.." << std::endl;
+}
+
 void writeExcel(excelInfo* info, std::string absPath)
 {
     std::cout << "...Make Excel..." << std::endl;
     std::string cellName;
     int size = info->getSheets().size();
+    
+    std::vector<functionInfo*>* functions = new std::vector<functionInfo*>();
+    if (hasFunctions) {
+        readFunctionsJson(filename, functions);
+    }
+    
     xlnt::workbook wb;
     xlnt::worksheet ws;
     for (int i = 0; i < info->getSheets().size(); i++) { //각 sheet
@@ -150,6 +194,19 @@ void writeExcel(excelInfo* info, std::string absPath)
                }
                 //std::cout << cellName << std::endl;
                 //std::cout << tmp->cells.at(j)->at(k)->data << std::endl;
+            }
+        }
+        if (hasFunctions && functions->size()!=0) {
+            for (int i = 0; i < functions->size(); i++) {
+                functionInfo* f = functions->at(i);
+                if (f->sheetName == tmp->sheetTitle) {
+                    for (int j = 0; j < f->cellFormula.size(); j++) {
+                        
+                        ws.cell(f->cellName.at(j)).value(f->cellFormula.at(j));
+                    }
+                    functions->erase(functions->begin() + i);
+                    break;
+                }
             }
         }
     }
@@ -365,7 +422,7 @@ int writeXLSX(std::string filename, std::string absPath) {
         return -1;
     }
 
-    writeExcel(info, absPath);
+   writeExcel(filename, info, absPath, hasFunctions);
 
     delete info;
     return 0;
