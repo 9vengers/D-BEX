@@ -201,8 +201,7 @@ void writeExcel(std::string filename, excelInfo* info, std::string absPath, bool
                 functionInfo* f = functions->at(i);
                 if (f->sheetName == tmp->sheetTitle) {
                     for (int j = 0; j < f->cellFormula.size(); j++) {
-                        
-                        ws.cell(f->cellName.at(j)).value(f->cellFormula.at(j));
+                        ws.cell(f->cellName.at(j)).formula(f->cellFormula.at(j));
                     }
                     functions->erase(functions->begin() + i);
                     break;
