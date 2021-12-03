@@ -1,0 +1,47 @@
+﻿  DBConverter.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(167,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(208,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(332,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(363,65): warning C4244: '인수': '__int64'에서 'double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(494,45): warning C4244: '=': 'double'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(495,100): warning C4244: '=': 'double'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(590,33): warning C4244: 'return': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(595,33): warning C4244: 'return': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(676,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(679,31): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(682,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(685,37): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(689,36): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(699,43): warning C4244: '=': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(716,18): warning C4244: '인수': '__int64'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(739,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(742,31): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(745,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(748,37): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(758,43): warning C4244: '=': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(803,44): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(807,39): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(811,48): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(836,47): warning C4244: '초기화 중': '__int64'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(876,118): warning C4244: '인수': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(876,53): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(878,48): warning C4244: '+=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(952,152): warning C4244: '인수': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(952,87): warning C4244: '=': 'double'에서 'unsigned __int64'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(954,48): warning C4244: '+=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(960,105): warning C4244: '인수': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(961,48): warning C4244: '+=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(965,47): warning C4244: '초기화 중': '__int64'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(999,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(1152,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(1425,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\DBConverter.cpp(1588,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  ExcelConverter.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Function.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  excelReader.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelReader.cpp(36,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelReader.cpp(227,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  zolproject.vcxproj -> C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\Release\zolproject.lib

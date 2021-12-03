@@ -1,0 +1,67 @@
+﻿  excelLeader.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelLeader.cpp(92,2): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelLeader.cpp(104,2): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  excelWriter.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.cpp(121,27): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.cpp(135,40): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  others.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(379,1): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(389,1): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(477,1): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(564,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(565,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(566,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(573,1): warning C4267: '+=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(575,1): warning C4267: '+=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(576,1): warning C4267: '+=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(579,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(580,1): warning C4267: '-=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(623,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(624,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(625,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(632,1): warning C4267: '+=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(634,1): warning C4267: '+=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(635,1): warning C4267: '+=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(638,1): warning C4267: '=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(639,1): warning C4267: '-=': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(712,1): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(779,1): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(799,1): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(819,1): warning C4267: '초기화 중': 'size_t'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1105,27): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1135,69): warning C4244: '인수': '__int64'에서 'double'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1512,45): warning C4244: '=': 'double'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1513,100): warning C4244: '=': 'double'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1608,33): warning C4244: 'return': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1613,33): warning C4244: 'return': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1694,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1697,31): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1700,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1703,37): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1707,36): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1717,43): warning C4244: '=': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1734,18): warning C4244: '인수': '__int64'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1757,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1760,31): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1763,33): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1766,37): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1776,43): warning C4244: '=': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1822,44): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1826,42): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1830,48): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1895,118): warning C4244: '인수': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1895,53): warning C4244: '=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1897,48): warning C4244: '+=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1932,113): warning C4244: '인수': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1933,48): warning C4244: '+=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1954,105): warning C4244: '인수': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1956,48): warning C4244: '+=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1972,105): warning C4244: '인수': '__int64'에서 'unsigned short'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(1977,48): warning C4244: '+=': '__int64'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(2003,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\others.cpp(2122,23): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  parson.c
+  zolproject.vcxproj -> C:\Users\82109\Desktop\D-BEX\DBEX_GUI\x64\Release\zolproject.lib

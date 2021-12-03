@@ -1,0 +1,10 @@
+﻿  ExcelConverter.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  excelReader.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelReader.cpp(36,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelReader.cpp(227,20): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  Function.cpp
+C:\Users\82109\Desktop\project - 복사본\zolproject\zolproject\excelWriter.hpp(84,31): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+  코드를 생성하고 있습니다...
+  zolproject.vcxproj -> C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\Debug\zolproject.lib

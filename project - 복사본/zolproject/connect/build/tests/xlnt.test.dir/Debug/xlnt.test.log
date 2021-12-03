@@ -1,0 +1,39 @@
+﻿  Building Custom Rule C:/Users/jina0/Downloads/xlnt-1.5.0/xlnt-1.5.0/tests/CMakeLists.txt
+  runner.cpp
+  cell_test_suite.cpp
+  index_types_test_suite.cpp
+  rich_text_test_suite.cpp
+  drawing_test_suite.cpp
+  numeric_util_test_suite.cpp
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\detail\numeric_util_test_suite.cpp(60,1): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\detail\numeric_util_test_suite.cpp(72,1): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\detail\numeric_util_test_suite.cpp(82,1): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\detail\numeric_util_test_suite.cpp(93,1): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\detail\numeric_util_test_suite.cpp(135,35): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\detail\numeric_util_test_suite.cpp(135,25): warning C4244: '초기화 중': 'double'에서 'const float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  alignment_test_suite.cpp
+  color_test_suite.cpp
+  conditional_format_test_suite.cpp
+  fill_test_suite.cpp
+  number_format_test_suite.cpp
+  protection_test_suite.cpp
+  style_test_suite.cpp
+  datetime_test_suite.cpp
+  helper_test_suite.cpp
+  optional_tests.cpp
+  path_test_suite.cpp
+  timedelta_test_suite.cpp
+  variant_tests.cpp
+  named_range_test_suite.cpp
+  코드를 생성하고 있습니다...
+  컴파일하고 있습니다...
+  serialization_test_suite.cpp
+  workbook_test_suite.cpp
+  page_setup_test_suite.cpp
+  range_test_suite.cpp
+  worksheet_test_suite.cpp
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\worksheet\worksheet_test_suite.cpp(1276,48): warning C4566: 유니버설 문자 이름 '\u6226'(으)로 표현되는 문자는 현재 코드 페이지(949)에서 표현할 수 없습니다.
+C:\Users\jina0\Downloads\xlnt-1.5.0\xlnt-1.5.0\tests\worksheet\worksheet_test_suite.cpp(1276,48): warning C4566: 유니버설 문자 이름 '\u4E89'(으)로 표현되는 문자는 현재 코드 페이지(949)에서 표현할 수 없습니다.
+  test_suite.cpp
+  코드를 생성하고 있습니다...
+  xlnt.test.vcxproj -> C:\Users\jina0\Downloads\xlnt-1.5.0\build\tests\Debug\xlnt.test.exe
