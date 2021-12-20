@@ -51,4 +51,5 @@ private slots:
     void DBEX_32bit::Option2_delete();
     void DBEX_32bit::Option2_table_show();
     std::string DBEX_32bit::tostring(QString input);
+    QString DBEX_32bit::fromstring(std::string input);
 };

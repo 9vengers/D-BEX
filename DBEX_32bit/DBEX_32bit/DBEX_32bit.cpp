@@ -63,6 +63,10 @@ std::string DBEX_32bit::tostring(QString input){
 		return input.toUtf8().constData();
 }
 
+QString DBEX_32bit::fromstring(std::string input) {
+	return QString::fromLatin1(input.c_str());
+}
+
 void DBEX_32bit::NextButtonClick() {
 
 	if (ui.widget_1->isVisible()) {
@@ -88,10 +92,10 @@ void DBEX_32bit::NextButtonClick() {
 
 				// thread->start();
 				// thread->terminate();
-
+				
 				schema_map = table_list(tostring(openfile_qstr), tostring(savepath_qstr));
-				Option_set();
 
+				Option_set();
 				ui.widget_1_2->setVisible(true);
 				ui.widget_1->setVisible(false);
 				ui.before_button->setVisible(true);
@@ -239,7 +243,7 @@ void DBEX_32bit::Option2_delete() {
 }
 
 void DBEX_32bit::Option_set() {
-
+	
 	//option1 set
 	ui.tablename_combobox->clear();
 	ui.tablename_combobox2->clear();
@@ -263,41 +267,44 @@ void DBEX_32bit::Option_set() {
 	ui.nowfield_combobox->clear();
 
 	schema_map.erase("DataSchema");
-	ui.numeric_combobox->addItems({ "NUMERIC","DECIMAL","SMALLINT","INTEGER", "BIGINT", "FLOAT", "DATETIME" });
-	ui.nvarchar_combobox->addItems({ "NVARCHAR","CHAR" });
+	ui.numeric_combobox->addItem("NUMERIC");
+	ui.numeric_combobox->addItem("DECIMAL");
+	ui.numeric_combobox->addItem("SMALLINT");
+	ui.numeric_combobox->addItem("INTEGER");
+	ui.numeric_combobox->addItem("BIGINT");
+	ui.numeric_combobox->addItem("FLOAT");
+	ui.numeric_combobox->addItem("DATETIME");
+	ui.nvarchar_combobox->addItem("NVARCHAR");
+	ui.nvarchar_combobox->addItem("CHAR");
 
 	auto iter = schema_map.begin();
-	ui.nowtable_label->setText(QString::fromStdString(iter->first));
-	ui.nowtable_label2->setText(QString::fromStdString(iter->first));
+	ui.nowtable_label->setText(fromstring(iter->first));
+	ui.nowtable_label2->setText(fromstring(iter->first));
 
 	while (iter != schema_map.end()) { //테이블 순환
 
 		std::vector<RuleStruct> now_vector;
 		rule_map.insert(make_pair(" ", now_vector));
-
-		ui.tablename_combobox->addItem(QString::fromStdString(iter->first));
-		ui.tablename_combobox2->addItem(QString::fromStdString(iter->first));
-		ui.tablename_combobox3->addItem(QString::fromStdString(iter->first));
-		ui.fktable_combobox->addItem(QString::fromStdString(iter->first));
-
+		ui.tablename_combobox->addItem(fromstring(iter->first));
+		ui.tablename_combobox2->addItem(fromstring(iter->first));
+		ui.tablename_combobox3->addItem(fromstring(iter->first));
+		ui.fktable_combobox->addItem(fromstring(iter->first));
 		if (iter == schema_map.begin()) { //필드 순환
 			auto iter2 = iter->second.begin();
-			ui.nowfield_label->setText(QString::fromStdString(iter2->first));
+			QString now = QString::fromLatin1((iter2->first).c_str()); 
+			ui.nowfield_label->setText(now);
 			while (iter2 != iter->second.end()) {
-
-				if(iter2->second.pk) ui.pk_combobox->addItem(QString::fromStdString(iter2->first));
-				ui.uk_combobox->addItem(QString::fromStdString(iter2->first));
-				ui.condition_combobox->addItem(QString::fromStdString(iter2->first));
-				ui.field_combobox->addItem(QString::fromStdString(iter2->first));
-				ui.nowfield_combobox->addItem(QString::fromStdString(iter2->first));
-
+				if(iter2->second.pk) ui.pk_combobox->addItem(fromstring(iter2->first)); //여기서 문제
+				ui.uk_combobox->addItem(fromstring(iter2->first));
+				ui.condition_combobox->addItem(fromstring(iter2->first));
+				ui.field_combobox->addItem(fromstring(iter2->first));
+				ui.nowfield_combobox->addItem(fromstring(iter2->first));
 				++iter2;
 			}
 		}
 
 		++iter;
 	}
-
 	ui.pk_combobox->addItem("");
 	ui.pk_combobox->setCurrentText("");
 
@@ -327,24 +334,24 @@ void DBEX_32bit::Option1_tablecombobox_change() {
 
 
 	auto iter = schema_map[tostring(now_table)].begin();
-	QString now_field = QString::fromStdString(iter->first);
+	QString now_field = fromstring(iter->first);
 	ui.nowfield_label->setText(now_field);
 
 	if (iter->second.datatype == "NVARCHAR" || (iter->second.datatype == "CHAR")) {
 		ui.numeric->setChecked(false);
 		ui.nvarchar->setChecked(true);
 		ui.numeric_combobox->setCurrentIndex(0);
-		ui.nvarchar_combobox->setCurrentText(QString::fromStdString(iter->second.datatype));
+		ui.nvarchar_combobox->setCurrentText(fromstring(iter->second.datatype));
 	}
 	else {
 		ui.numeric->setChecked(true);
 		ui.nvarchar->setChecked(false);
-		ui.numeric_combobox->setCurrentText(QString::fromStdString(iter->second.datatype));
+		ui.numeric_combobox->setCurrentText(fromstring(iter->second.datatype));
 		ui.nvarchar_combobox->setCurrentIndex(0);
 	}
 
 	if (iter->second.datatype_2 != "") {
-		ui.datatype_textbox->setText(QString::fromStdString(iter->second.datatype_2));
+		ui.datatype_textbox->setText(fromstring(iter->second.datatype_2));
 	}
 
 	if (iter->second.null) {
@@ -366,16 +373,16 @@ void DBEX_32bit::Option1_tablecombobox_change() {
 	}
 
 	if (iter->second.default_value != "") {
-		ui.default_textbox->setText(QString::fromStdString(iter->second.default_value));
+		ui.default_textbox->setText(fromstring(iter->second.default_value));
 	}
 
 	if (iter->second.collation != "") {
-		ui.collation_textbox->setText(QString::fromStdString(iter->second.collation));
+		ui.collation_textbox->setText(fromstring(iter->second.collation));
 	}
 
 	while (iter != schema_map[tostring(now_table)].end()) {
 
-		ui.field_combobox->addItem(QString::fromStdString(iter->first));
+		ui.field_combobox->addItem(fromstring(iter->first));
 
 		++iter;
 	}
@@ -394,10 +401,10 @@ void DBEX_32bit::Table_show() {
 
 		ui.table->insertRow(ui.table->rowCount());
 		//열이름
-		ui.table->setItem(ui.table->rowCount() - 1, 0, new QTableWidgetItem(QString::fromStdString(iter->first)));
+		ui.table->setItem(ui.table->rowCount() - 1, 0, new QTableWidgetItem(fromstring(iter->first)));
 		//데이터타입
-		if(iter->second.datatype_2!="") ui.table->setItem(ui.table->rowCount() - 1, 1, new QTableWidgetItem(QString::fromStdString(iter->second.datatype+"("+iter->second.datatype_2+")")));
-		else ui.table->setItem(ui.table->rowCount() - 1, 1, new QTableWidgetItem(QString::fromStdString(iter->second.datatype)));
+		if(iter->second.datatype_2!="") ui.table->setItem(ui.table->rowCount() - 1, 1, new QTableWidgetItem(fromstring(iter->second.datatype+"("+iter->second.datatype_2+")")));
+		else ui.table->setItem(ui.table->rowCount() - 1, 1, new QTableWidgetItem(fromstring(iter->second.datatype)));
 		//null
 		if (iter->second.null) ui.table->setItem(ui.table->rowCount() - 1, 2, new QTableWidgetItem("true"));
 		else ui.table->setItem(ui.table->rowCount() - 1, 2, new QTableWidgetItem("false"));
@@ -420,14 +427,14 @@ void DBEX_32bit::Option2_table_show() {
 	while (iter != rule_map[tostring(table2)].end()) {
 
 		ui.table2->insertRow(ui.table2->rowCount());
-		ui.table2->setItem(ui.table2->rowCount() - 1, 0, new QTableWidgetItem(QString::fromStdString(iter->rule_name)));
-		ui.table2->setItem(ui.table2->rowCount() - 1, 1, new QTableWidgetItem(QString::fromStdString(iter->pk)));
-		ui.table2->setItem(ui.table2->rowCount() - 1, 2, new QTableWidgetItem(QString::fromStdString(iter->uk)));
-		ui.table2->setItem(ui.table2->rowCount() - 1, 3, new QTableWidgetItem(QString::fromStdString(iter->condition.first)));
-		ui.table2->setItem(ui.table2->rowCount() - 1, 4, new QTableWidgetItem(QString::fromStdString(iter->condition.second)));
-		ui.table2->setItem(ui.table2->rowCount() - 1, 5, new QTableWidgetItem(QString::fromStdString(iter->fk.fk)));
-		ui.table2->setItem(ui.table2->rowCount() - 1, 6, new QTableWidgetItem(QString::fromStdString(iter->fk.fk_table)));
-		ui.table2->setItem(ui.table2->rowCount() - 1, 7, new QTableWidgetItem(QString::fromStdString(iter->fk.fk_field)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 0, new QTableWidgetItem(fromstring(iter->rule_name)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 1, new QTableWidgetItem(fromstring(iter->pk)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 2, new QTableWidgetItem(fromstring(iter->uk)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 3, new QTableWidgetItem(fromstring(iter->condition.first)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 4, new QTableWidgetItem(fromstring(iter->condition.second)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 5, new QTableWidgetItem(fromstring(iter->fk.fk)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 6, new QTableWidgetItem(fromstring(iter->fk.fk_table)));
+		ui.table2->setItem(ui.table2->rowCount() - 1, 7, new QTableWidgetItem(fromstring(iter->fk.fk_field)));
 
 		++iter;
 	}
@@ -443,7 +450,7 @@ void DBEX_32bit::FK_tablechange() {
 	auto iter = schema_map[now_table].begin();
 	while (iter != schema_map[now_table].end()) {
 
-		ui.fkfield_combobox->addItem(QString::fromStdString(iter->first));
+		ui.fkfield_combobox->addItem(fromstring(iter->first));
 
 		++iter;
 	}
@@ -466,17 +473,17 @@ void DBEX_32bit::Option1_fieldcombobox_change() {
 		ui.numeric->setChecked(false);
 		ui.nvarchar->setChecked(true);
 		ui.numeric_combobox->setCurrentIndex(0);
-		ui.nvarchar_combobox->setCurrentText(QString::fromStdString(now_field));
+		ui.nvarchar_combobox->setCurrentText(fromstring(now_field));
 	}
 	else {
 		ui.numeric->setChecked(true);
 		ui.nvarchar->setChecked(false);
-		ui.numeric_combobox->setCurrentText(QString::fromStdString(now_field));
+		ui.numeric_combobox->setCurrentText(fromstring(now_field));
 		ui.nvarchar_combobox->setCurrentIndex(0);
 	}
 
 	if (schema_map[now_table][now_field].datatype_2 != "") {
-		ui.datatype_textbox->setText(QString::fromStdString(schema_map[now_table][now_field].datatype_2));
+		ui.datatype_textbox->setText(fromstring(schema_map[now_table][now_field].datatype_2));
 	}
 
 	if (schema_map[now_table][now_field].null) {
@@ -498,11 +505,11 @@ void DBEX_32bit::Option1_fieldcombobox_change() {
 	}
 
 	if (schema_map[now_table][now_field].default_value != "") {
-		ui.default_textbox->setText(QString::fromStdString(schema_map[now_table][now_field].default_value));
+		ui.default_textbox->setText(fromstring(schema_map[now_table][now_field].default_value));
 	}
 
 	if (schema_map[now_table][now_field].collation != "") {
-		ui.collation_textbox->setText(QString::fromStdString(schema_map[now_table][now_field].collation));
+		ui.collation_textbox->setText(fromstring(schema_map[now_table][now_field].collation));
 	}
 
 }
@@ -605,7 +612,7 @@ void DBEX_32bit::FileOpen() {
 		else savepath_ += savepath[x];
 	}
 
-	QDesktopServices::openUrl(QUrl(QString::fromStdString(savepath), QUrl::TolerantMode));
+	QDesktopServices::openUrl(QUrl(fromstring(savepath), QUrl::TolerantMode));
 }
 void DBEX_32bit::Firstback() {
 	ui.widget_1->setVisible(true);
@@ -632,11 +639,11 @@ void DBEX_32bit::Option2_combobox_change() {
 	auto iter = schema_map[tostring(now_table)].begin();
 
 	while (iter != schema_map[tostring(now_table)].end()) {
-		ui.pk_combobox->addItem(QString::fromStdString(iter->first));
-		ui.uk_combobox->addItem(QString::fromStdString(iter->first));
-		ui.condition_combobox->addItem(QString::fromStdString(iter->first));
-		ui.field_combobox->addItem(QString::fromStdString(iter->first));
-		ui.nowfield_combobox->addItem(QString::fromStdString(iter->first));
+		ui.pk_combobox->addItem(fromstring(iter->first));
+		ui.uk_combobox->addItem(fromstring(iter->first));
+		ui.condition_combobox->addItem(fromstring(iter->first));
+		ui.field_combobox->addItem(fromstring(iter->first));
+		ui.nowfield_combobox->addItem(fromstring(iter->first));
 
 		++iter;
 	}

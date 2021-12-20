@@ -1,4 +1,25 @@
-﻿  DBEX_32bit.cpp
+﻿  moc DBEX_32bit.h
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(35): Warning: Function declaration DBEX_32bit::NextButtonClick contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(36): Warning: Function declaration DBEX_32bit::BeforeButtonClick contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(37): Warning: Function declaration DBEX_32bit::OpendialogInputButtonClicked contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(38): Warning: Function declaration DBEX_32bit::OpendialogOutputButtonClicked contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(39): Warning: Function declaration DBEX_32bit::FunctionStart contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(40): Warning: Function declaration DBEX_32bit::Option_save contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(41): Warning: Function declaration DBEX_32bit::Table_show contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(42): Warning: Function declaration DBEX_32bit::Option_set contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(43): Warning: Function declaration DBEX_32bit::Option1_tablecombobox_change contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(44): Warning: Function declaration DBEX_32bit::FK_tablechange contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(45): Warning: Function declaration DBEX_32bit::Option1_fieldcombobox_change contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(46): Warning: Function declaration DBEX_32bit::LabelChange contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(47): Warning: Function declaration DBEX_32bit::FileOpen contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(48): Warning: Function declaration DBEX_32bit::Firstback contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(49): Warning: Function declaration DBEX_32bit::Option2_combobox_change contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(50): Warning: Function declaration DBEX_32bit::Option2_save contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(51): Warning: Function declaration DBEX_32bit::Option2_delete contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(52): Warning: Function declaration DBEX_32bit::Option2_table_show contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(53): Warning: Function declaration DBEX_32bit::tostring contains extra qualification. Ignoring as signal or slot.
+   C:\Users\82109\Desktop\DBEX_32bit\DBEX_32bit\DBEX_32bit.h(54): Warning: Function declaration DBEX_32bit::fromstring contains extra qualification. Ignoring as signal or slot.
+  DBEX_32bit.cpp
   main.cpp
   moc_DBEX_32bit.cpp
 zolproject.lib(excelReader.obj) : warning LNK4075: '/EDITANDCONTINUE'이(가) '/SAFESEH' 사양으로 인해 무시됩니다.
